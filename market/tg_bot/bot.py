@@ -1,12 +1,23 @@
 import logging
 
-from telegram import Update
+from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import (
     ApplicationBuilder,
     ContextTypes,
     CommandHandler,
+    ConversationHandler,
+    MessageHandler,
+    filters,
 )
 from django.conf import settings
+
+from tg_bot.handlers.conversation_handlers import (
+    start,
+    cancel,
+    login,
+
+)
+from tg_bot.conversation_states import States
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -17,20 +28,26 @@ logging.basicConfig(
 
 logger = logging.getLogger(__name__)
 
-
 TOKEN = settings.TG_BOT_TOKEN
 
 
-async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await context.bot.send_message(chat_id=update.effective_chat.id,
-                                   text="I'm a bot, please talk to me!")
-
-
 def run():
-    application = ApplicationBuilder().token(TOKEN).build()
+    application = ApplicationBuilder() \
+        .concurrent_updates(False) \
+        .token(TOKEN) \
+        .build()
 
-    start_handler = CommandHandler('start', start)
-    application.add_handler(start_handler)
+    conv_handler = ConversationHandler(
+        entry_points=[CommandHandler("start", start)],
+        states={
+            States.LOGIN: [
+                MessageHandler(filters.Regex("^(Admin|User)$"), login),
+            ]
+        },
+        fallbacks=[CommandHandler("cancel", cancel)],
+    )
+
+    application.add_handler(conv_handler)
 
     application.run_polling()
 
