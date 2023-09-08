@@ -1,23 +1,19 @@
 import logging
 
-from telegram import Update, ReplyKeyboardMarkup, ReplyKeyboardRemove
 from telegram.ext import (
     ApplicationBuilder,
-    ContextTypes,
     CommandHandler,
     ConversationHandler,
     MessageHandler,
+    CallbackQueryHandler,
     filters,
 )
 from django.conf import settings
 
-from tg_bot.handlers.conversation_handlers import (
-    start,
-    cancel,
-    login,
-
-)
+from tg_bot.commands import set_bot_commands
+from tg_bot.handlers import conversation_handlers as c_handlers
 from tg_bot.conversation_states import States
+from tg_bot.keyboards import inline_keyboards as il_keyboards
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -37,14 +33,39 @@ def run():
         .token(TOKEN) \
         .build()
 
+    set_bot_commands(bot=application.bot)
+
     conv_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", start)],
+        entry_points=[CommandHandler("start", c_handlers.start)],
         states={
             States.LOGIN: [
-                MessageHandler(filters.Regex("^(Admin|User)$"), login),
+                CallbackQueryHandler(
+                    c_handlers.ask_username,
+                    pattern=f"^{il_keyboards.ADMIN}$"
+                ),
+            ],
+            States.PASSWORD: [
+                MessageHandler(
+                    filters.TEXT,
+                    c_handlers.ask_password,
+                ),
+            ],
+            States.CHECK_PASSWORD: [
+                MessageHandler(
+                    filters.TEXT,
+                    c_handlers.check_password,
+                ),
+                CallbackQueryHandler(
+                    c_handlers.ask_username,
+                    pattern=f"^{il_keyboards.YES}$"
+                ),
+                CallbackQueryHandler(
+                    c_handlers.cancel,
+                    pattern=f"^{il_keyboards.NO}$"
+                )
             ]
         },
-        fallbacks=[CommandHandler("cancel", cancel)],
+        fallbacks=[CommandHandler("cancel", c_handlers.cancel)],
     )
 
     application.add_handler(conv_handler)
