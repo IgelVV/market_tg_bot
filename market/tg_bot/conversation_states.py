@@ -1,13 +1,14 @@
-from enum import Enum
+from enum import Enum, auto
 
 
 class States(Enum):
-    CHOOSE_ROLE = 1
-    LOGIN = 2
-    PASSWORD = 3
-    SHOP_LIST = 4
-    API_KEY = 5
-    SHOP_MENU = 6
-    SHOP_INFO = 7
-    ACTIVATE = 8
-    PRICE_UPDATING = 9
+    CHOOSE_ROLE = auto()
+    LOGIN = auto()
+    PASSWORD = auto()
+    CHECK_PASSWORD = auto()
+    SHOP_LIST = auto()
+    API_KEY = auto()
+    SHOP_MENU = auto()
+    SHOP_INFO = auto()
+    ACTIVATE = auto()
+    PRICE_UPDATING = auto()
