@@ -10,8 +10,12 @@ from telegram.ext import (
 )
 from django.conf import settings
 
+import tg_bot.handlers.login_conversation
 from tg_bot.commands import set_bot_commands
-from tg_bot.handlers import conversation_handlers as c_handlers
+from tg_bot.handlers import (
+    main_conversation,
+    login_conversation,
+)
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards as il_keyboards
 
@@ -35,40 +39,56 @@ def run():
 
     set_bot_commands(bot=application.bot)
 
-    conv_handler = ConversationHandler(
-        entry_points=[CommandHandler("start", c_handlers.start)],
+    # Nested conversation
+    login_conv = ConversationHandler(
+        entry_points=[
+            CallbackQueryHandler(
+                login_conversation.ask_username,
+                pattern=f"^{il_keyboards.ADMIN}$"
+            ),
+            # todo handle all possible variants
+        ],
         states={
-            States.LOGIN: [
-                CallbackQueryHandler(
-                    c_handlers.ask_username,
-                    pattern=f"^{il_keyboards.ADMIN}$"
-                ),
-            ],
             States.PASSWORD: [
                 MessageHandler(
                     filters.TEXT,
-                    c_handlers.ask_password,
+                    login_conversation.ask_password,
                 ),
             ],
             States.CHECK_PASSWORD: [
                 MessageHandler(
                     filters.TEXT,
-                    c_handlers.check_password,
+                    tg_bot.handlers.login_conversation.check_password,
                 ),
                 CallbackQueryHandler(
-                    c_handlers.ask_username,
+                    tg_bot.handlers.login_conversation.ask_username,
                     pattern=f"^{il_keyboards.YES}$"
                 ),
                 CallbackQueryHandler(
-                    c_handlers.cancel,
+                    main_conversation.cancel,
                     pattern=f"^{il_keyboards.NO}$"
                 )
             ]
         },
-        fallbacks=[CommandHandler("cancel", c_handlers.cancel)],
+        fallbacks=[CommandHandler("cancel", main_conversation.cancel)],
+        map_to_parent={
+            ConversationHandler.END: ConversationHandler.END,
+
+        },
     )
 
-    application.add_handler(conv_handler)
+    main_conv = ConversationHandler(
+        entry_points=[CommandHandler("start", main_conversation.start)],
+        states={
+            States.LOGIN: [
+                login_conv,
+            ],
+        },
+        # todo add logout
+        fallbacks=[CommandHandler("cancel", main_conversation.cancel)],
+    )
+
+    application.add_handler(main_conv)
 
     application.run_polling()
 
