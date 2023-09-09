@@ -71,11 +71,11 @@ async def check_shop_api_key(
     await update.message.reply_text(
         f"API key received: {shop_api_key} \nPlease wait.",
     )
-    key_is_correct = await user_service.check_shop_api_key(
+    authenticated = await user_service.authenticate_seller(
         shop_api_key=shop_api_key,
         tg_user_id=update.message.from_user.id
     )
-    if key_is_correct:
+    if authenticated:
         await update.message.reply_text(
             f"Your key is correct. Please wait admin confirmation.",
         )
