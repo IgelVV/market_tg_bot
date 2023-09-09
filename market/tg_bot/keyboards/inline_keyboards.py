@@ -2,7 +2,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 # Callback data
 ADMIN = "admin"
-USER = "user"
+SELLER = "seller"
 YES = "yes"
 NO = "no"
 
@@ -11,7 +11,7 @@ def get_role_keyboard():
     keyboard = [
         [
             InlineKeyboardButton("Admin", callback_data=ADMIN),
-            InlineKeyboardButton("User", callback_data=USER),
+            InlineKeyboardButton("Seller", callback_data=SELLER),
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
