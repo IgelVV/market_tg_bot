@@ -5,6 +5,7 @@ ADMIN = "admin"
 SELLER = "seller"
 YES = "yes"
 NO = "no"
+CANCEL = "cancel"
 
 
 def get_role_keyboard():
@@ -25,3 +26,13 @@ def get_yes_no():
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
+
+
+def get_cancel():
+    keyboard = [
+        [
+            InlineKeyboardButton("Cancel", callback_data=CANCEL),
+        ]
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
