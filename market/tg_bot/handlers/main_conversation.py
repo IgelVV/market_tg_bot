@@ -8,22 +8,21 @@ from telegram.ext import (
 
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
-from tg_bot.services import user_services
+from tg_bot.services.user_services import UserService
 
 logger = logging.getLogger(__name__)
-
-# todo split handlers by type (callback, message) or by conversations
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Starts the conversation and asks the user about their role."""
 
     logger.info(f"{update.message.from_user.id} starts")
+    user_service = UserService(context)
 
-    if user_services.is_authenticated(context):
+    if user_service.is_authenticated():
         await update.message.reply_text(
             f"Hello {update.message.from_user.full_name} your role is "
-            f"{user_services.get_role(context)}"
+            f"{user_service.get_role()}"
         )
         return ConversationHandler.END
     else:
@@ -42,7 +41,6 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     if update.message:
         user = update.message.from_user
         logger.info("User %s canceled the conversation.", user.first_name)
-        # todo clean username or other data from storage
         await update.message.reply_text(
             cancel_message,
             reply_markup=ReplyKeyboardRemove(),

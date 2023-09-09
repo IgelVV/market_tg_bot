@@ -3,6 +3,7 @@ from telegram.ext import ContextTypes, ConversationHandler
 
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
+from tg_bot.services.user_services import UserService
 
 
 async def ask_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -15,9 +16,9 @@ async def ask_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Cancels and ends the conversation."""
-    # todo save username
-
+    """"""
+    username = update.message.text
+    context.user_data["username"] = username
     user = update.message.from_user
     await update.message.reply_text(
         "Type password:",
@@ -26,25 +27,62 @@ async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Cancels and ends the conversation."""
-    text = update.message.text
+    """"""
+    user_service = UserService(context=context)
+    password = update.message.text
     await update.message.delete()
-    # todo clean username, and login
     await update.message.reply_text(
-        f"password received: {text} \nPlease wait.",
+        f"password received: {password} \nPlease wait.",
     )
-    # todo authentication
-    authenticated = True
+    authenticated = await user_service.authenticate_admin(
+        username=context.user_data.get("username"),
+        password=password,
+        tg_user_id=update.message.from_user.id,
+    )
     if authenticated:
-        context.user_data['authenticated'] = True
-        context.user_data['role'] = "admin"
         await update.message.reply_text(
-            f"You are logged in.",
+            f"You have logged in.",
         )
         return ConversationHandler.END
     else:
         await update.message.reply_text(
-            "Wrong username or password. \nDo you want to try again?",
+            "Wrong username or password. "
+            "\nDo you want to try again?",
             reply_markup=inline_keyboards.get_yes_no()
+        )
+        return None
+
+
+async def ask_shop_api_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer(text=query.data)
+    await query.edit_message_text(
+        text="Type API key of your shop:"
+    )
+    return States.API_KEY
+
+
+async def check_shop_api_key(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """"""
+    user_service = UserService(context=context)
+    shop_api_key = update.message.text
+    await update.message.delete()
+    await update.message.reply_text(
+        f"API key received: {shop_api_key} \nPlease wait.",
+    )
+    key_is_correct = await user_service.check_shop_api_key(
+        shop_api_key=shop_api_key,
+        tg_user_id=update.message.from_user.id
+    )
+    if key_is_correct:
+        await update.message.reply_text(
+            f"Your key is correct. Please wait admin confirmation.",
+        )
+        return ConversationHandler.END
+    else:
+        await update.message.reply_text(
+            "Wrong API key, please enter it again:",
+            reply_markup=inline_keyboards.get_cancel(),
         )
         return None
