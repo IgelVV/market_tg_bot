@@ -10,7 +10,6 @@ from telegram.ext import (
 )
 from django.conf import settings
 
-import tg_bot.handlers.login_conversation
 from tg_bot.commands import set_bot_commands
 from tg_bot.handlers import (
     main_conversation,
@@ -44,9 +43,12 @@ def run():
         entry_points=[
             CallbackQueryHandler(
                 login_conversation.ask_username,
-                pattern=f"^{il_keyboards.ADMIN}$"
+                pattern=f"^{il_keyboards.ADMIN}$",
             ),
-            # todo handle all possible variants
+            CallbackQueryHandler(
+                login_conversation.ask_shop_api_key,
+                pattern=f"^{il_keyboards.SELLER}$",
+            ),
         ],
         states={
             States.PASSWORD: [
@@ -58,19 +60,31 @@ def run():
             States.CHECK_PASSWORD: [
                 MessageHandler(
                     filters.TEXT,
-                    tg_bot.handlers.login_conversation.check_password,
+                    login_conversation.check_password,
                 ),
                 CallbackQueryHandler(
-                    tg_bot.handlers.login_conversation.ask_username,
+                    login_conversation.ask_username,
                     pattern=f"^{il_keyboards.YES}$"
                 ),
                 CallbackQueryHandler(
                     main_conversation.cancel,
                     pattern=f"^{il_keyboards.NO}$"
-                )
+                ),
+            ],
+            States.API_KEY: [
+                MessageHandler(
+                    filters.TEXT,
+                    login_conversation.check_shop_api_key,
+                ),
             ]
         },
-        fallbacks=[CommandHandler("cancel", main_conversation.cancel)],
+        fallbacks=[
+            CommandHandler("cancel", main_conversation.cancel),
+            CallbackQueryHandler(
+                main_conversation.cancel,
+                pattern=f"^{il_keyboards.CANCEL}$",
+            )
+        ],
         map_to_parent={
             ConversationHandler.END: ConversationHandler.END,
 
