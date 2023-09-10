@@ -10,7 +10,7 @@ from django.conf import settings
 
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
-from tg_bot.services.user_services import UserService
+from tg_bot.services.user_services import UserService, ShopService
 from tg_bot.dataclasses import Navigation
 
 logger = logging.getLogger(__name__)
@@ -73,7 +73,31 @@ async def display_shop_menu(
     await query.answer(text=str(query.data))
     await query.edit_message_text(
         text=f"Shop `{query.data}`",
-        reply_markup=await inline_keyboards.build_shop_list(),
+        reply_markup=inline_keyboards.build_shop_menu(),
+    )
+    return States.SHOP_MENU
+
+
+async def display_shop_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer(text=str(query.data))
+    shop_service = ShopService()
+    user_service = UserService(context)
+    shop_id = user_service.get_related_shop_id()
+    shop_info = await shop_service.get_shop_info(shop_api_key=shop_id)
+    text = f"Full shop information \n" \
+           f"Id: {shop_info.id}\n" \
+           f"Name: {shop_info.name}\n" \
+           f"Slug: {shop_info.slug}\n" \
+           f"API key: {shop_info.api_key}\n" \
+           f"Vendor Name: {shop_info.vendor_name}\n" \
+           f"Is Active: {shop_info.is_active}\n" \
+           f"Stop updated price: {shop_info.stop_updated_price}\n" \
+           f"Individual updating time: {shop_info.individual_updating_time}\n"
+
+    await query.edit_message_text(
+        text=text,
+        reply_markup=inline_keyboards.build_back(),
     )
     return States.SHOP_MENU
 

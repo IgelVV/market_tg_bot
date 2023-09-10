@@ -119,7 +119,22 @@ def run():
                 ),
             ],
             States.SHOP_MENU: [
-
+                CallbackQueryHandler(
+                    main_conversation.display_shop_info,
+                    pattern=f"^{il_keyboards.SHOP_INFO}$",
+                ),
+                CallbackQueryHandler(
+                    main_conversation.display_shop_menu,
+                    pattern=f"^{il_keyboards.ACTIVATE}$",
+                ),
+                CallbackQueryHandler(
+                    main_conversation.display_shop_menu,
+                    pattern=f"^{il_keyboards.PRICE_UPDATING}$",
+                ),
+                CallbackQueryHandler(
+                    main_conversation.display_shop_menu,
+                    pattern=f"^{il_keyboards.BACK}$",
+                ),
             ],
         },
         # todo add logout
