@@ -1,5 +1,7 @@
 import logging
 
+from math import ceil
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from django.conf import settings
@@ -25,6 +27,8 @@ SHOP_LIST = "shop_list"
 ACTIVATE = "activate"
 SHOP_INFO = "shop_info"
 PRICE_UPDATING = "price_updating"
+
+DO_NOTHING = "do_nothing"
 
 
 def build_role_keyboard():
@@ -67,36 +71,46 @@ def build_admin_menu():
 
 async def build_shop_list(limit: int = LIST_LIMIT, offset: int = 0):
     keyboard = []
-    shops: list[ShopInfo] = await ShopService().get_shops_to_display(
+    shop_service = ShopService()
+    shops: list[ShopInfo] = await shop_service.get_shops_to_display(
         limit=limit,
         offset=offset,
     )
     for shop in shops:
         keyboard.append(
-            [InlineKeyboardButton(shop.name, callback_data=shop)]
+            [InlineKeyboardButton(f"{shop.name}", callback_data=shop,)]
         )
     keyboard.append(
         build_navigation_buttons(
-            limit=limit, offset=offset, list_len=len(shops))
+            limit=limit,
+            offset=offset,
+            displayed_count=len(shops),
+            total_count=await shop_service.count_shops(),
+        )
     )
 
     return InlineKeyboardMarkup(keyboard)
 
 
-def build_navigation_buttons(limit: int, offset: int, list_len: int):
+def build_navigation_buttons(
+        limit: int, offset: int, displayed_count: int, total_count: int):
     if offset > 0:
         nav_back = Navigation(limit=limit, offset=max(0, (offset - limit)))
     else:
         nav_back = Navigation(limit=limit, offset=0)
-    if list_len < limit:
+    if displayed_count < limit:
         nav_forward = Navigation(limit=limit, offset=offset)
     else:
         nav_forward = Navigation(limit=limit, offset=(offset + limit))
 
     buttons = [
-            InlineKeyboardButton("<<", callback_data=nav_back),
-            InlineKeyboardButton(">>", callback_data=nav_forward),
-        ]
+        InlineKeyboardButton("<<", callback_data=nav_back),
+        InlineKeyboardButton(
+            f"{offset//limit + 1} / {ceil(total_count/limit)}",
+            callback_data=DO_NOTHING
+        ),
+        InlineKeyboardButton(">>", callback_data=nav_forward),
+    ]
     return buttons
 
 

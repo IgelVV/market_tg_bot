@@ -6,11 +6,16 @@ from telegram.ext import (
     ConversationHandler,
 )
 
+from django.conf import settings
+
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services.user_services import UserService
+from tg_bot.dataclasses import Navigation
 
 logger = logging.getLogger(__name__)
+
+LIST_LIMIT: int = settings.TG_BOT_LIST_LIMIT
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -28,7 +33,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         role = user_service.get_role()
         message = f"Hello {update.message.from_user.full_name} your role is " \
-            f"{role}"
+                  f"{role}"
         if role == user_service.ADMIN_ROLE:
             await update.message.reply_text(
                 message,
@@ -48,10 +53,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def display_shop_list(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
-    await query.answer(text=query.data)
+    limit = LIST_LIMIT
+    offset = 0
+    if isinstance(query.data, Navigation):
+        limit = query.data.limit
+        offset = query.data.offset
+    await query.answer(text=str(query.data))
     await query.edit_message_text(
         text="Available shops:",
-        reply_markup=await inline_keyboards.build_shop_list(),
+        reply_markup=await inline_keyboards.build_shop_list(limit, offset),
+        parse_mode="html",
     )
     return States.SHOP_LIST
 

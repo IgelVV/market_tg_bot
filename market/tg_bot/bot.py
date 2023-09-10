@@ -125,7 +125,7 @@ def run():
         # todo add logout
         fallbacks=[CommandHandler("cancel", main_conversation.cancel)],
     )
-
+    # todo add error handler
     application.add_handler(main_conv)
 
     application.run_polling()

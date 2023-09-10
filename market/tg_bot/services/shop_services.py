@@ -21,6 +21,7 @@ LIST_LIMIT = settings.TG_BOT_LIST_LIMIT
 class ShopService:
     # todo use django service layer to access models
     async def count_shops(self):
+        # todo cache
         return await Shop.objects.acount()
 
     async def get_shops_to_display(
