@@ -35,17 +35,21 @@ class ShopService:
 
         shops = Shop.objects.all() \
             .order_by("id") \
-            .values("id", "name")
+            .values("id", "name", "api_key",)
         shops = shops[offset:(offset + limit)]
 
         result = []
         async for shop in shops:
-            shop_info = ShopInfo(id=shop["id"], name=shop["name"])
+            shop_info = ShopInfo(
+                id=shop["id"],
+                name=shop["name"],
+                api_key=shop["api_key"]
+            )
             result.append(shop_info)
         return result
 
-    async def get_shop_info(self, shop_id: int):
-        shop = await Shop.objects.aget(id=shop_id)
+    async def get_shop_info(self, shop_api_key: int):
+        shop = await Shop.objects.aget(api_key=shop_api_key)
         shop_info = ShopInfo(
             id=shop.pk,
             name=shop.name,

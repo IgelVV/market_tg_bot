@@ -20,7 +20,7 @@ class UserService:
 
     AUTH_KEY = "authenticated"
     ROLE_KEY = "role"
-    SHOP_KEY = "shop"
+    SHOP_API_KEY = "shop_api_key"
     ADMIN_USERNAME_KEY = "admin_username"
 
     def __init__(self, context: ContextTypes.DEFAULT_TYPE):
@@ -40,11 +40,11 @@ class UserService:
         self.context.user_data[self.ROLE_KEY] = self.SELLER_ROLE
 
     def get_related_shop_id(self):
-        return self.context.user_data.get(self.SHOP_KEY)
+        return self.context.user_data.get(self.SHOP_API_KEY)
 
     def set_related_shop_id(self):
         # todo checks (role, ...)
-        self.context.user_data[self.SHOP_KEY] = self.SHOP_KEY
+        self.context.user_data[self.SHOP_API_KEY] = self.SHOP_API_KEY
 
     async def authenticate_admin(
             self,
@@ -74,7 +74,7 @@ class UserService:
         if key_is_correct:
             self.context.user_data[self.AUTH_KEY] = True
             self.context.user_data[self.ROLE_KEY] = self.SELLER_ROLE
-            self.context.user_data[self.SHOP_KEY] = shop_api_key
+            self.context.user_data[self.SHOP_API_KEY] = shop_api_key
             return True
         else:
             return False
