@@ -1,5 +1,6 @@
 anyio==4.0.0
 asgiref==3.7.2
+cachetools==5.3.1
 certifi==2023.7.22
 Django==4.2.5
 h11==0.14.0

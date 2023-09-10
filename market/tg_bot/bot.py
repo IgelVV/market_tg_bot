@@ -31,9 +31,12 @@ TOKEN = settings.TG_BOT_TOKEN
 
 
 def run():
+    # arbitrary_callback_data(True) makes it possible to pass
+    # any type as callback data
     application = ApplicationBuilder() \
         .concurrent_updates(False) \
         .token(TOKEN) \
+        .arbitrary_callback_data(True) \
         .build()
 
     set_bot_commands(bot=application.bot)
