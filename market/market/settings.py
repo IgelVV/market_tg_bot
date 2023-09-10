@@ -133,3 +133,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Telegram bot Settings
 
 TG_BOT_TOKEN = getenv('TG_BOT_TOKEN')
+TG_BOT_LIST_LIMIT = 10

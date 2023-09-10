@@ -1,4 +1,15 @@
+import logging
+
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
+
+from django.conf import settings
+
+from tg_bot.dataclasses import ShopInfo, Navigation
+from tg_bot.services.shop_services import ShopService
+
+logger = logging.getLogger(__name__)
+
+LIST_LIMIT = settings.TG_BOT_LIST_LIMIT
 
 # Callback data
 ADMIN = "admin"
@@ -54,28 +65,39 @@ def build_admin_menu():
     return InlineKeyboardMarkup(keyboard)
 
 
-def build_shop_list(limit=None, offset=None):
-    # keyboard = []
-    # shops = shop_services.get_shops_to_display()
-    # for shop in shops:
-    #     keyboard.append(
-    #         [InlineKeyboardButton(shop.name, callback_data=f"shop_{shop.slug}")]
-    #     )
-    # keyboard.append(
-    #     [
-    #         InlineKeyboardButton("<<", callback_data=f"previous_page_limit_{limit}_offset_{offset}")
-    #         InlineKeyboardButton(">>", callback_data=f"next_page_limit_{limit}_offset_{offset}")
-    #     ]
-    # )
-    # todo create SHOP_PREFIX = 'shop_' PREVIOUS_PAGE_PREFIX = 'previous_page_'
-    #  NEXT_PAGE_PREFIX = 'NEXT_page_'
+async def build_shop_list(limit: int = LIST_LIMIT, offset: int = 0):
+    keyboard = []
+    shops: list[ShopInfo] = await ShopService().get_shops_to_display(
+        limit=limit,
+        offset=offset,
+    )
+    for shop in shops:
+        keyboard.append(
+            [InlineKeyboardButton(shop.name, callback_data=shop)]
+        )
+    keyboard.append(
+        build_navigation_buttons(
+            limit=limit, offset=offset, list_len=len(shops))
+    )
 
-    keyboard = [
-        [InlineKeyboardButton("shop1", callback_data='shop_shop1')],
-        [InlineKeyboardButton("shop2", callback_data='shop_shop2')],
-        [InlineKeyboardButton("shop3", callback_data='shop_shop3')],
-    ]
     return InlineKeyboardMarkup(keyboard)
+
+
+def build_navigation_buttons(limit: int, offset: int, list_len: int):
+    if offset > 0:
+        nav_back = Navigation(limit=limit, offset=max(0, (offset - limit)))
+    else:
+        nav_back = Navigation(limit=limit, offset=0)
+    if list_len < limit:
+        nav_forward = Navigation(limit=limit, offset=offset)
+    else:
+        nav_forward = Navigation(limit=limit, offset=(offset + limit))
+
+    buttons = [
+            InlineKeyboardButton("<<", callback_data=nav_back),
+            InlineKeyboardButton(">>", callback_data=nav_forward),
+        ]
+    return buttons
 
 
 def build_shop_menu():

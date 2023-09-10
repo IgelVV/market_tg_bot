@@ -6,12 +6,16 @@ from asgiref.sync import sync_to_async
 from telegram.ext import (
     ContextTypes,
 )
+from django.conf import settings
 
 from shop.models import Shop
 
 from tg_bot.dataclasses import ShopInfo
 
+
 logger = logging.getLogger(__name__)
+
+LIST_LIMIT = settings.TG_BOT_LIST_LIMIT
 
 
 class ShopService:
@@ -20,12 +24,19 @@ class ShopService:
         return await Shop.objects.acount()
 
     async def get_shops_to_display(
-            self, limit: Optional[int] = None, offset: Optional[int] = None):
+            self,
+            limit: int = LIST_LIMIT,
+            offset: int = 0,
+    ):
+        if (limit < 0) or (offset < 0):
+            raise AttributeError(
+                f"Limit or offset less than 0: {limit=}; {offset=}")
+
         shops = Shop.objects.all() \
             .order_by("id") \
             .values("id", "name")
-        if (limit is not None) and (offset is not None):
-            shops = shops[offset:(offset + limit)]
+        shops = shops[offset:(offset + limit)]
+
         result = []
         async for shop in shops:
             shop_info = ShopInfo(id=shop["id"], name=shop["name"])
