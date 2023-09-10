@@ -20,6 +20,8 @@ SELLER = "seller"
 YES = "yes"
 NO = "no"
 
+BACK = "back"
+
 CANCEL = "cancel"
 
 SHOP_LIST = "shop_list"
@@ -116,8 +118,15 @@ def build_navigation_buttons(
 
 def build_shop_menu():
     keyboard = [
-        [InlineKeyboardButton("Activate", callback_data=ACTIVATE)],
         [InlineKeyboardButton("Shop info", callback_data=SHOP_INFO)],
+        [InlineKeyboardButton("Activate", callback_data=ACTIVATE)],
         [InlineKeyboardButton("Price updating", callback_data=PRICE_UPDATING)],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def build_back():
+    keyboard = [
+        [InlineKeyboardButton("<-", callback_data=BACK)],
     ]
     return InlineKeyboardMarkup(keyboard)
