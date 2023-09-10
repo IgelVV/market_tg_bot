@@ -97,6 +97,15 @@ def run():
             States.LOGIN: [
                 login_conv,
             ],
+            States.ADMIN_MENU: [
+                CallbackQueryHandler(
+                    main_conversation.display_shop_list,
+                    pattern=f"^{il_keyboards.SHOP_LIST}$"
+                ),
+            ],
+            States.SHOP_MENU: [
+
+            ],
         },
         # todo add logout
         fallbacks=[CommandHandler("cancel", main_conversation.cancel)],

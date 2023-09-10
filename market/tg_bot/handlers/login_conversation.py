@@ -28,6 +28,7 @@ async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """"""
+    # todo check admin rights
     user_service = UserService(context=context)
     password = update.message.text
     await update.message.delete()
@@ -43,7 +44,7 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(
             f"You have logged in.",
         )
-        return ConversationHandler.END
+        return ConversationHandler.END  # todo
     else:
         await update.message.reply_text(
             "Wrong username or password. "
@@ -79,7 +80,7 @@ async def check_shop_api_key(
         await update.message.reply_text(
             f"Your key is correct. Please wait admin confirmation.",
         )
-        return ConversationHandler.END
+        return ConversationHandler.END  # todo
     else:
         await update.message.reply_text(
             "Wrong API key, please enter it again:",
