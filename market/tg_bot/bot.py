@@ -17,6 +17,7 @@ from tg_bot.handlers import (
 )
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards as il_keyboards
+from tg_bot.dataclasses import ShopInfo, Navigation
 
 logging.basicConfig(
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -105,6 +106,16 @@ def run():
                 CallbackQueryHandler(
                     main_conversation.display_shop_list,
                     pattern=f"^{il_keyboards.SHOP_LIST}$"
+                ),
+            ],
+            States.SHOP_LIST: [
+                CallbackQueryHandler(
+                    main_conversation.display_shop_menu,
+                    pattern=ShopInfo,
+                ),
+                CallbackQueryHandler(
+                    main_conversation.display_shop_list,
+                    pattern=Navigation,
                 ),
             ],
             States.SHOP_MENU: [

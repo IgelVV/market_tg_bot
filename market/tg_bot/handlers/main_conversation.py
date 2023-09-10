@@ -15,7 +15,6 @@ logger = logging.getLogger(__name__)
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Starts the conversation and asks the user about their role."""
-    # todo refactor
     logger.info(f"{update.message.from_user.id} starts")
     user_service = UserService(context)
 
@@ -52,7 +51,18 @@ async def display_shop_list(
     await query.answer(text=query.data)
     await query.edit_message_text(
         text="Available shops:",
-        reply_markup=inline_keyboards.build_shop_list(),
+        reply_markup=await inline_keyboards.build_shop_list(),
+    )
+    return States.SHOP_LIST
+
+
+async def display_shop_menu(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer(text=str(query.data))
+    await query.edit_message_text(
+        text=f"Shop `{query.data}`",
+        reply_markup=await inline_keyboards.build_shop_list(),
     )
     return States.SHOP_MENU
 
