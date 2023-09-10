@@ -27,14 +27,24 @@ class UserService:
         self.context = context
 
     def is_authenticated(self) -> bool:
-        return self.context.user_data.get("authenticated", False)
+        return self.context.user_data.get(self.AUTH_KEY, False)
 
     def get_role(self):
         # find role in db
-        return self.context.user_data.get('role')
+        return self.context.user_data.get(self.ROLE_KEY)
 
-    def set_role(self):
-        ...
+    def set_admin_role(self):
+        self.context.user_data[self.ROLE_KEY] = self.ADMIN_ROLE
+
+    def set_seller_role(self):
+        self.context.user_data[self.ROLE_KEY] = self.SELLER_ROLE
+
+    def get_related_shop_id(self):
+        return self.context.user_data.get(self.SHOP_KEY)
+
+    def set_related_shop_id(self):
+        # todo checks (role, ...)
+        self.context.user_data[self.SHOP_KEY] = self.SHOP_KEY
 
     async def authenticate_admin(
             self,
