@@ -41,10 +41,12 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
         tg_user_id=update.message.from_user.id,
     )
     if authenticated:
+        message = f"You are logged in as admin."
         await update.message.reply_text(
-            f"You have logged in.",
+            message,
+            reply_markup=inline_keyboards.get_admin_menu()
         )
-        return ConversationHandler.END  # todo
+        return States.ADMIN_MENU
     else:
         await update.message.reply_text(
             "Wrong username or password. "
@@ -77,10 +79,12 @@ async def check_shop_api_key(
         tg_user_id=update.message.from_user.id
     )
     if authenticated:
+        message = f"You are logged in as Seller."
         await update.message.reply_text(
-            f"Your key is correct. Please wait admin confirmation.",
+            message,
+            reply_markup=inline_keyboards.get_shop_menu()
         )
-        return ConversationHandler.END  # todo
+        return States.SHOP_MENU
     else:
         await update.message.reply_text(
             "Wrong API key, please enter it again:",

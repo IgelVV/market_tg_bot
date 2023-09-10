@@ -87,7 +87,8 @@ def run():
         ],
         map_to_parent={
             ConversationHandler.END: ConversationHandler.END,
-
+            States.ADMIN_MENU: States.ADMIN_MENU,
+            States.SHOP_MENU: States.SHOP_MENU,
         },
     )
 
