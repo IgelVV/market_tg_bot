@@ -49,6 +49,12 @@ class ShopService:
         shop_info = ShopInfo(
             id=shop.pk,
             name=shop.name,
+            slug=shop.slug,
+            api_key=shop.api_key,
+            vendor_name=shop.vendor_name,
+            is_active=shop.is_active,
+            stop_updated_price=shop.stop_updated_price,
+            individual_updating_time=shop.individual_updating_time,
         )
         return shop_info
 
