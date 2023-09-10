@@ -16,7 +16,7 @@ SHOP_INFO = "shop_info"
 PRICE_UPDATING = "price_updating"
 
 
-def get_role_keyboard():
+def build_role_keyboard():
     keyboard = [
         [
             InlineKeyboardButton("Admin", callback_data=ADMIN),
@@ -26,7 +26,7 @@ def get_role_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_yes_no():
+def build_yes_no():
     keyboard = [
         [
             InlineKeyboardButton("Yes", callback_data=YES),
@@ -36,7 +36,7 @@ def get_yes_no():
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_cancel():
+def build_cancel():
     keyboard = [
         [
             InlineKeyboardButton("Cancel", callback_data=CANCEL),
@@ -45,7 +45,7 @@ def get_cancel():
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_admin_menu():
+def build_admin_menu():
     keyboard = [
         [
             InlineKeyboardButton("Shop list", callback_data=SHOP_LIST),
@@ -54,7 +54,7 @@ def get_admin_menu():
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_shop_list(limit=None, offset=None):
+def build_shop_list(limit=None, offset=None):
     # keyboard = []
     # shops = shop_services.get_shops_to_display()
     # for shop in shops:
@@ -78,7 +78,7 @@ def get_shop_list(limit=None, offset=None):
     return InlineKeyboardMarkup(keyboard)
 
 
-def get_shop_menu():
+def build_shop_menu():
     keyboard = [
         [InlineKeyboardButton("Activate", callback_data=ACTIVATE)],
         [InlineKeyboardButton("Shop info", callback_data=SHOP_INFO)],

@@ -20,7 +20,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user_service = UserService(context)
 
     if not user_service.is_authenticated():
-        keyboard = inline_keyboards.get_role_keyboard()
+        keyboard = inline_keyboards.build_role_keyboard()
         await update.message.reply_text(
             "Choose your role",
             reply_markup=keyboard,
@@ -33,13 +33,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if role == user_service.ADMIN_ROLE:
             await update.message.reply_text(
                 message,
-                reply_markup=inline_keyboards.get_admin_menu()
+                reply_markup=inline_keyboards.build_admin_menu()
             )
             return States.ADMIN_MENU
         elif role == user_service.SELLER_ROLE:
             await update.message.reply_text(
                 message,
-                reply_markup=inline_keyboards.get_shop_menu()
+                reply_markup=inline_keyboards.build_shop_menu()
             )
             return States.SHOP_MENU
         else:
@@ -52,7 +52,7 @@ async def display_shop_list(
     await query.answer(text=query.data)
     await query.edit_message_text(
         text="Available shops:",
-        reply_markup=inline_keyboards.get_shop_list(),
+        reply_markup=inline_keyboards.build_shop_list(),
     )
     return States.SHOP_MENU
 

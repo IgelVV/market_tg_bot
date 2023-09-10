@@ -44,14 +44,14 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
         message = f"You are logged in as admin."
         await update.message.reply_text(
             message,
-            reply_markup=inline_keyboards.get_admin_menu()
+            reply_markup=inline_keyboards.build_admin_menu()
         )
         return States.ADMIN_MENU
     else:
         await update.message.reply_text(
             "Wrong username or password. "
             "\nDo you want to try again?",
-            reply_markup=inline_keyboards.get_yes_no()
+            reply_markup=inline_keyboards.build_yes_no()
         )
         return None
 
@@ -82,12 +82,12 @@ async def check_shop_api_key(
         message = f"You are logged in as Seller."
         await update.message.reply_text(
             message,
-            reply_markup=inline_keyboards.get_shop_menu()
+            reply_markup=inline_keyboards.build_shop_menu()
         )
         return States.SHOP_MENU
     else:
         await update.message.reply_text(
             "Wrong API key, please enter it again:",
-            reply_markup=inline_keyboards.get_cancel(),
+            reply_markup=inline_keyboards.build_cancel(),
         )
         return None
