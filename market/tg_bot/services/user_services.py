@@ -7,7 +7,7 @@ from telegram.ext import (
 )
 from django.contrib.auth import get_user_model
 
-from shop.models import Shop
+from tg_bot.services.shop_services import ShopService
 
 UserModel = get_user_model()
 
@@ -55,28 +55,12 @@ class UserService:
             logger.info(f"User with {username=} DoesNotExists")
             return False
 
-    # todo move to shop_services
-    async def check_shop_api_key(self, shop_api_key: str):
-        # todo use django service layer to access models
-        exists = await Shop.objects.filter(api_key=shop_api_key).aexists()
-        if exists:
-            return True
-        else:
-            return False
-
-    async def _get_shop_by_api_key(self, shop_api_key: str):
-        try:
-            shop = await Shop.objects.aget(api_key=shop_api_key)
-            return shop
-        except Shop.DoesNotExist:
-            logger.info(f"Shop with {shop_api_key} DoesNotExists")
-
     async def authenticate_seller(
             self,
             shop_api_key,
             tg_user_id,
     ):
-        key_is_correct = await self.check_shop_api_key(shop_api_key)
+        key_is_correct = await ShopService().check_shop_api_key(shop_api_key)
         if key_is_correct:
             self.context.user_data[self.AUTH_KEY] = True
             self.context.user_data[self.ROLE_KEY] = self.SELLER_ROLE
