@@ -15,6 +15,11 @@ logger = logging.getLogger(__name__)
 
 
 class UserService:
+    """
+    Actions and data related to telegram users.
+
+    Uses context.user_data as a storage.
+    """
     ADMIN_ROLE = "admin"
     SELLER_ROLE = "seller"
 
@@ -27,19 +32,23 @@ class UserService:
         self.context = context
 
     def is_authenticated(self) -> bool:
+        """"""
         return self.context.user_data.get(self.AUTH_KEY, False)
 
     def get_role(self):
-        # find role in db
+        # todo find role in db
         return self.context.user_data.get(self.ROLE_KEY)
 
     def set_admin_role(self):
+        """Set tg_user role as `admin`."""
         self.context.user_data[self.ROLE_KEY] = self.ADMIN_ROLE
 
     def set_seller_role(self):
+        """Set tg_user role as `seller`."""
         self.context.user_data[self.ROLE_KEY] = self.SELLER_ROLE
 
     def get_related_shop_api_key(self):
+        """"""
         return self.context.user_data.get(self.SHOP_API_KEY)
 
     def set_related_shop_api_key(self):
@@ -52,6 +61,13 @@ class UserService:
             password: str,
             tg_user_id: int,
     ):
+        """
+        Mark tg_user (admin) as authenticated, if credentials are correct.
+
+        If password is matches to User object with passed username,
+        it marks user as admin, authenticated, bind username, and returns True,
+         otherwise returns False.
+        """
         # tg_user_id for saving to db
         try:
             user = await UserModel.objects.aget(username=username)
@@ -70,6 +86,13 @@ class UserService:
             shop_api_key,
             tg_user_id,
     ):
+        """
+        Mark tg_user (seller) as authenticated, if api_key is correct.
+
+        :param shop_api_key:
+        :param tg_user_id:
+        :return:
+        """
         key_is_correct = await ShopService().check_shop_api_key(shop_api_key)
         if key_is_correct:
             self.context.user_data[self.AUTH_KEY] = True
@@ -82,4 +105,5 @@ class UserService:
         # todo confirmation by admin
 
     def logout(self):
+        """Mark user as not authenticated."""
         self.context.user_data[self.AUTH_KEY] = False

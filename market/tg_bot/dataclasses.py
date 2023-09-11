@@ -4,6 +4,7 @@ from typing import Optional
 
 @dataclass
 class ShopInfo:
+    """Represents Shop model for using in bot handlers."""
     id: int
     name: str
     slug: Optional[str] = None
@@ -16,5 +17,6 @@ class ShopInfo:
 
 @dataclass
 class Navigation:
+    """Contains information for page navigation."""
     limit: int
     offset: int

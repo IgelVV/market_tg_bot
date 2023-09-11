@@ -1,3 +1,4 @@
+"""Inline keyboard builders and related data."""
 import logging
 
 from math import ceil
@@ -11,9 +12,10 @@ from tg_bot.services.shop_services import ShopService
 
 logger = logging.getLogger(__name__)
 
+# Maximum items per list, used in pagination
 LIST_LIMIT = settings.TG_BOT_LIST_LIMIT
 
-# Callback data
+# Callback data:
 ADMIN = "admin"
 SELLER = "seller"
 
@@ -75,6 +77,14 @@ def build_admin_menu():
 
 
 async def build_shop_list(limit: int = LIST_LIMIT, offset: int = 0):
+    """
+    Build keyboard, that contains shop list.
+
+    It uses pagination.
+    :param limit: maximum items per page.
+    :param offset: index of start item.
+    :return: keyboard with navigation buttons.
+    """
     keyboard = []
     shop_service = ShopService()
     shops: list[ShopInfo] = await shop_service.get_shops_to_display(
@@ -139,6 +149,16 @@ def build_price_updating(is_updating_on: bool):
 
 def _build_navigation_buttons(
         limit: int, offset: int, displayed_count: int, total_count: int):
+    """
+    Creates navigation buttons to adding to keyboards as a line.
+
+    Displays: `back`, `page counter`, `next`.
+    :param limit: maximum items per page.
+    :param offset: index of start item.
+    :param displayed_count: how many items in the current page.
+    :param total_count: total amount of items.
+    :return: buttons for keyboard.
+    """
     if offset > 0:
         nav_back = Navigation(limit=limit, offset=max(0, (offset - limit)))
     else:
@@ -160,5 +180,6 @@ def _build_navigation_buttons(
 
 
 def _build_back_button():
+    """Creates `back` button to adding to keyboards as a line."""
     button = [InlineKeyboardButton("\U0001F868", callback_data=BACK)]
     return button

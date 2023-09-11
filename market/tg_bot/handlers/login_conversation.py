@@ -1,3 +1,8 @@
+"""
+Handlers that are used in nested ConversationHandler.
+
+It responsible for authentication and registration.
+"""
 from telegram import Update
 from telegram.ext import ContextTypes
 
@@ -7,6 +12,12 @@ from tg_bot.services.user_services import UserService
 
 
 async def ask_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Request admin username.
+
+    Command handlers can be unavailable, because it requests text answer,
+    and next handler will handle commands too.
+    """
     query = update.callback_query
     await query.answer(text=query.data)
     await query.edit_message_text(
@@ -16,7 +27,12 @@ async def ask_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """"""
+    """
+    Request admin password and save the username.
+
+    Command handlers can be unavailable, because it requests text answer,
+    and next handler will handle commands too.
+    """
     username = update.message.text
     context.user_data["username"] = username
     user = update.message.from_user
@@ -27,7 +43,15 @@ async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """"""
+    """
+    Authenticate admin.
+
+    Deletes user message that contains password.
+    If authentication is failed, request if user want to enter username again.
+    It is possible to send password again, ignoring inline keyboard.
+
+    Display `admin menu` if authenticated.
+    """
     # todo check admin rights
     user_service = UserService(context=context)
     password = update.message.text
@@ -57,6 +81,12 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def ask_shop_api_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Request shop api_key from the seller.
+
+    Command handlers can be unavailable, because it requests text answer,
+    and next handler will handle commands too.
+    """
     query = update.callback_query
     await query.answer(text=query.data)
     await query.edit_message_text(
@@ -67,7 +97,14 @@ async def ask_shop_api_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def check_shop_api_key(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """"""
+    """
+    Authenticate seller by api_key.
+
+    Deletes user message that contains api_key.
+    If authentication is failed, requests api_key again.
+
+    Displays `shop menu` if authenticated.
+    """
     user_service = UserService(context=context)
     shop_api_key = update.message.text
     await update.message.delete()

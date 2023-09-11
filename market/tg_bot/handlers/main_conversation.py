@@ -1,3 +1,4 @@
+"""Handlers that are used in main ConversationHandler."""
 import logging
 
 from telegram import Update, ReplyKeyboardRemove
@@ -19,7 +20,12 @@ LIST_LIMIT: int = settings.TG_BOT_LIST_LIMIT
 
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Starts the conversation and asks the user about their role."""
+    """
+    Starts the conversation and asks the user about their role.
+
+    If user is authenticated it displays corresponding menu,
+    otherwise directs to `login conversation`.
+    """
     logger.info(f"{update.message.from_user.id} starts")
     user_service = UserService(context)
 
@@ -52,6 +58,13 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def display_shop_list(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Display available shops.
+
+    It uses pagination.
+    It is allowed only for admins.
+    """
+    # todo check role
     query = update.callback_query
     limit = LIST_LIMIT
     offset = 0
@@ -69,6 +82,11 @@ async def display_shop_list(
 
 async def display_shop_menu(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Display actions related to specific shop.
+
+    Allowed for both admin and seller.
+    """
     query = update.callback_query
     await query.answer(text=str(query.data))
     await query.edit_message_text(
@@ -80,6 +98,7 @@ async def display_shop_menu(
 
 async def display_shop_info(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Display information from Shop model and `back` button."""
     query = update.callback_query
     await query.answer(text=str(query.data))
     shop_service = ShopService()
@@ -115,6 +134,7 @@ async def display_shop_info(
 
 
 async def activate_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Display `is_active` status of shop, and button to change it."""
     query = update.callback_query
     await query.answer(text=str(query.data))
     shop_service = ShopService()
@@ -131,6 +151,11 @@ async def activate_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def switch_activation(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Change `is_active` status to opposite.
+
+    Then displays new status.
+    """
     query = update.callback_query
     await query.answer(text=str(query.data))
     shop_service = ShopService()
@@ -141,6 +166,7 @@ async def switch_activation(
 
 
 async def price_updating(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Display `stop_updated_price` status of shop, and button to change it."""
     query = update.callback_query
     await query.answer(text=str(query.data))
     shop_service = ShopService()
@@ -159,6 +185,11 @@ async def price_updating(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def switch_price_updating(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Change `stop_updated_price` status to opposite.
+
+    Then displays new status.
+    """
     query = update.callback_query
     await query.answer(text=str(query.data))
     shop_service = ShopService()
@@ -169,7 +200,11 @@ async def switch_price_updating(
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
-    """Cancels and ends the conversation."""
+    """
+    Cancels and ends the conversation.
+
+    It handles both messages or callback queries.
+    """
     cancel_message = "Bye! I hope we can talk again some day."
     user = update.message.from_user
     logger.info("User %s canceled the conversation.", user.first_name)
@@ -190,6 +225,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
 
 async def sign_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Logout user."""
     user = update.message.from_user
     logger.info("User %s signed out.", user.full_name)
     UserService(context).logout()
