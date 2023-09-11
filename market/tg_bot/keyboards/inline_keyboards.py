@@ -32,6 +32,8 @@ PRICE_UPDATING = "price_updating"
 
 DO_NOTHING = "do_nothing"
 
+SWITCH_ACTIVATION = "switch_activation"
+
 
 def build_role_keyboard():
     keyboard = [
@@ -80,21 +82,48 @@ async def build_shop_list(limit: int = LIST_LIMIT, offset: int = 0):
     )
     for shop in shops:
         keyboard.append(
-            [InlineKeyboardButton(f"{shop.name}", callback_data=shop,)]
+            [InlineKeyboardButton(f"{shop.name}", callback_data=shop, )]
         )
     keyboard.append(
-        build_navigation_buttons(
+        _build_navigation_buttons(
             limit=limit,
             offset=offset,
             displayed_count=len(shops),
             total_count=await shop_service.count_shops(),
         )
     )
-
     return InlineKeyboardMarkup(keyboard)
 
 
-def build_navigation_buttons(
+def build_shop_menu():
+    keyboard = [
+        [InlineKeyboardButton("Shop info", callback_data=SHOP_INFO)],
+        [InlineKeyboardButton("Activate", callback_data=ACTIVATE)],
+        [InlineKeyboardButton("Price updating", callback_data=PRICE_UPDATING)],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def build_back():
+    back_button = _build_back_button()
+    keyboard = [back_button]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def build_activate_shop(is_active: bool):
+    if is_active:
+        text = "Deactivate"
+    else:
+        text = "Activate"
+
+    keyboard = [
+        [InlineKeyboardButton(text, callback_data=SWITCH_ACTIVATION), ],
+        _build_back_button()
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def _build_navigation_buttons(
         limit: int, offset: int, displayed_count: int, total_count: int):
     if offset > 0:
         nav_back = Navigation(limit=limit, offset=max(0, (offset - limit)))
@@ -108,7 +137,7 @@ def build_navigation_buttons(
     buttons = [
         InlineKeyboardButton("<<", callback_data=nav_back),
         InlineKeyboardButton(
-            f"{offset//limit + 1} / {ceil(total_count/limit)}",
+            f"{offset // limit + 1} / {ceil(total_count / limit)}",
             callback_data=DO_NOTHING
         ),
         InlineKeyboardButton(">>", callback_data=nav_forward),
@@ -116,17 +145,6 @@ def build_navigation_buttons(
     return buttons
 
 
-def build_shop_menu():
-    keyboard = [
-        [InlineKeyboardButton("Shop info", callback_data=SHOP_INFO)],
-        [InlineKeyboardButton("Activate", callback_data=ACTIVATE)],
-        [InlineKeyboardButton("Price updating", callback_data=PRICE_UPDATING)],
-    ]
-    return InlineKeyboardMarkup(keyboard)
-
-
-def build_back():
-    keyboard = [
-        [InlineKeyboardButton("<-", callback_data=BACK)],
-    ]
-    return InlineKeyboardMarkup(keyboard)
+def _build_back_button():
+    button = [InlineKeyboardButton("\U0001F868", callback_data=BACK)]
+    return button

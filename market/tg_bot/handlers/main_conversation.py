@@ -78,28 +78,66 @@ async def display_shop_menu(
     return States.SHOP_MENU
 
 
-async def display_shop_info(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def display_shop_info(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer(text=str(query.data))
     shop_service = ShopService()
     user_service = UserService(context)
-    shop_id = user_service.get_related_shop_id()
-    shop_info = await shop_service.get_shop_info(shop_api_key=shop_id)
-    text = f"Full shop information \n" \
-           f"Id: {shop_info.id}\n" \
-           f"Name: {shop_info.name}\n" \
-           f"Slug: {shop_info.slug}\n" \
-           f"API key: {shop_info.api_key}\n" \
-           f"Vendor Name: {shop_info.vendor_name}\n" \
-           f"Is Active: {shop_info.is_active}\n" \
-           f"Stop updated price: {shop_info.stop_updated_price}\n" \
-           f"Individual updating time: {shop_info.individual_updating_time}\n"
+    shop_api_key = user_service.get_related_shop_api_key()
+    shop_info = await shop_service.get_shop_info(shop_api_key=shop_api_key)
+    text = "<b>Full shop information</b>\n" \
+        "Id: {id}\n" \
+        "Name: {name}\n" \
+        "Slug: {slug}\n" \
+        "API key: {api_key}\n" \
+        "Vendor Name: {vendor_name}\n" \
+        "Is Active: {is_active}\n" \
+        "Stop updated price: {stop_updated_price}\n" \
+        "Individual updating time: {individual_updating_time}\n" \
+        .format(
+            id=shop_info.id,
+            name=shop_info.name,
+            slug=shop_info.slug,
+            api_key=shop_info.api_key,
+            vendor_name=shop_info.vendor_name,
+            is_active=shop_info.is_active,
+            stop_updated_price=shop_info.stop_updated_price,
+            individual_updating_time=shop_info.individual_updating_time,
+        )
 
     await query.edit_message_text(
         text=text,
         reply_markup=inline_keyboards.build_back(),
+        parse_mode="html"
     )
     return States.SHOP_MENU
+
+
+async def activate_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer(text=str(query.data))
+    shop_service = ShopService()
+    user_service = UserService(context)
+    shop_api_key = user_service.get_related_shop_api_key()
+    shop_info = await shop_service.get_shop_info(shop_api_key)
+    await query.edit_message_text(
+        text=f"Shop name: {shop_info.name}\n"
+             f"Is active: {shop_info.is_active}",
+        reply_markup=inline_keyboards.build_activate_shop(shop_info.is_active)
+    )
+    return States.ACTIVATE
+
+
+async def switch_activation(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer(text=str(query.data))
+    shop_service = ShopService()
+    user_service = UserService(context)
+    shop_api_key = user_service.get_related_shop_api_key()
+    await shop_service.switch_activation(shop_api_key)
+    return await activate_shop(update, context)
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
