@@ -1,5 +1,5 @@
 from telegram import Update
-from telegram.ext import ContextTypes, ConversationHandler
+from telegram.ext import ContextTypes
 
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
