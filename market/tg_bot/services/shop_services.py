@@ -69,9 +69,14 @@ class ShopService:
         else:
             return False
 
-    # async def _get_shop_by_api_key(self, shop_api_key: str):
-    #     try:
-    #         shop = await Shop.objects.aget(api_key=shop_api_key)
-    #         return shop
-    #     except Shop.DoesNotExist:
-    #         logger.info(f"Shop with {shop_api_key} DoesNotExists")
+    async def _get_shop_by_api_key(self, shop_api_key: str):
+        try:
+            shop = await Shop.objects.aget(api_key=shop_api_key)
+            return shop
+        except Shop.DoesNotExist:
+            logger.info(f"Shop with {shop_api_key} DoesNotExists")
+
+    async def switch_activation(self, shop_api_key: str):
+        shop = await self._get_shop_by_api_key(shop_api_key)
+        shop.is_active = not shop.is_active
+        await shop.asave()
