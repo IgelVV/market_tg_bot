@@ -171,10 +171,9 @@ async def switch_price_updating(
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Cancels and ends the conversation."""
     cancel_message = "Bye! I hope we can talk again some day."
-
+    user = update.message.from_user
+    logger.info("User %s canceled the conversation.", user.first_name)
     if update.message:
-        user = update.message.from_user
-        logger.info("User %s canceled the conversation.", user.first_name)
         await update.message.reply_text(
             cancel_message,
             reply_markup=ReplyKeyboardRemove(),
@@ -188,3 +187,10 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     else:
         ...
     return ConversationHandler.END
+
+
+async def sign_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.message.from_user
+    logger.info("User %s signed out.", user.full_name)
+    UserService(context).logout()
+    return await start(update, context)

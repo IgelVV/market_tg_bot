@@ -157,8 +157,11 @@ def run():
                 ),
             ],
         },
-        # todo add logout
-        fallbacks=[CommandHandler("cancel", main_conversation.cancel)],
+        fallbacks=[
+            CommandHandler("menu", main_conversation.start),
+            CommandHandler("signOut", main_conversation.sign_out),
+            CommandHandler("cancel", main_conversation.cancel),
+        ],
     )
     # todo add error handler
     application.add_handler(main_conv)

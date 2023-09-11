@@ -3,8 +3,10 @@ from telegram import Bot
 
 
 COMMANDS = [
+    ("start", "Start"),
     ("menu", "Available actions"),
     ("cancel", "Cancel the current operation"),
+    ("signOut", "logout TEST command"),
 ]
 
 

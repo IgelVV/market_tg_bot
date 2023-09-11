@@ -80,3 +80,6 @@ class UserService:
             return False
 
         # todo confirmation by admin
+
+    def logout(self):
+        self.context.user_data[self.AUTH_KEY] = False
