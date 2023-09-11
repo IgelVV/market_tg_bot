@@ -33,6 +33,7 @@ PRICE_UPDATING = "price_updating"
 DO_NOTHING = "do_nothing"
 
 SWITCH_ACTIVATION = "switch_activation"
+SWITCH_PRICE_UPDATING = "switch_price_updating"
 
 
 def build_role_keyboard():
@@ -118,6 +119,19 @@ def build_activate_shop(is_active: bool):
 
     keyboard = [
         [InlineKeyboardButton(text, callback_data=SWITCH_ACTIVATION), ],
+        _build_back_button()
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def build_price_updating(is_updating_on: bool):
+    if is_updating_on:
+        text = "OFF"
+    else:
+        text = "ON"
+
+    keyboard = [
+        [InlineKeyboardButton(text, callback_data=SWITCH_PRICE_UPDATING), ],
         _build_back_button()
     ]
     return InlineKeyboardMarkup(keyboard)

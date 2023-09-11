@@ -12,7 +12,6 @@ from shop.models import Shop
 
 from tg_bot.dataclasses import ShopInfo
 
-
 logger = logging.getLogger(__name__)
 
 LIST_LIMIT = settings.TG_BOT_LIST_LIMIT
@@ -35,7 +34,7 @@ class ShopService:
 
         shops = Shop.objects.all() \
             .order_by("id") \
-            .values("id", "name", "api_key",)
+            .values("id", "name", "api_key", )
         shops = shops[offset:(offset + limit)]
 
         result = []
@@ -79,4 +78,9 @@ class ShopService:
     async def switch_activation(self, shop_api_key: str):
         shop = await self._get_shop_by_api_key(shop_api_key)
         shop.is_active = not shop.is_active
+        await shop.asave()
+
+    async def switch_price_updating(self, shop_api_key: str):
+        shop = await self._get_shop_by_api_key(shop_api_key)
+        shop.stop_updated_price = not shop.stop_updated_price
         await shop.asave()

@@ -128,7 +128,7 @@ def run():
                     pattern=f"^{il_keyboards.ACTIVATE}$",
                 ),
                 CallbackQueryHandler(
-                    main_conversation.display_shop_menu,
+                    main_conversation.price_updating,
                     pattern=f"^{il_keyboards.PRICE_UPDATING}$",
                 ),
                 CallbackQueryHandler(
@@ -140,6 +140,16 @@ def run():
                 CallbackQueryHandler(
                     main_conversation.switch_activation,
                     pattern=f"^{il_keyboards.SWITCH_ACTIVATION}$",
+                ),
+                CallbackQueryHandler(
+                    main_conversation.display_shop_menu,
+                    pattern=f"^{il_keyboards.BACK}$",
+                ),
+            ],
+            States.PRICE_UPDATING: [
+                CallbackQueryHandler(
+                    main_conversation.switch_price_updating,
+                    pattern=f"^{il_keyboards.SWITCH_PRICE_UPDATING}$",
                 ),
                 CallbackQueryHandler(
                     main_conversation.display_shop_menu,

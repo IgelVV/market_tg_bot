@@ -140,6 +140,34 @@ async def switch_activation(
     return await activate_shop(update, context)
 
 
+async def price_updating(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer(text=str(query.data))
+    shop_service = ShopService()
+    user_service = UserService(context)
+    shop_api_key = user_service.get_related_shop_api_key()
+    shop_info = await shop_service.get_shop_info(shop_api_key)
+    is_updating_on = not shop_info.stop_updated_price
+    await query.edit_message_text(
+        text=f"Shop name: {shop_info.name}\n"
+             f"Price updating: "
+             f"{'ON' if  is_updating_on else 'OF'}",
+        reply_markup=inline_keyboards.build_price_updating(is_updating_on)
+    )
+    return States.PRICE_UPDATING
+
+
+async def switch_price_updating(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer(text=str(query.data))
+    shop_service = ShopService()
+    user_service = UserService(context)
+    shop_api_key = user_service.get_related_shop_api_key()
+    await shop_service.switch_price_updating(shop_api_key)
+    return await price_updating(update, context)
+
+
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Cancels and ends the conversation."""
     cancel_message = "Bye! I hope we can talk again some day."
