@@ -13,6 +13,7 @@ from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services.user_services import UserService, ShopService
 from tg_bot.dataclasses import Navigation
+from tg_bot import messages
 
 logger = logging.getLogger(__name__)
 
@@ -32,7 +33,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not user_service.is_authenticated():
         keyboard = inline_keyboards.build_role_keyboard()
         await update.message.reply_text(
-            "Choose your role",
+            messages.start_choose_role,
             reply_markup=keyboard,
         )
         return States.LOGIN
@@ -105,25 +106,16 @@ async def display_shop_info(
     user_service = UserService(context)
     shop_api_key = user_service.get_related_shop_api_key()
     shop_info = await shop_service.get_shop_info(shop_api_key=shop_api_key)
-    text = "<b>Full shop information</b>\n" \
-        "Id: {id}\n" \
-        "Name: {name}\n" \
-        "Slug: {slug}\n" \
-        "API key: {api_key}\n" \
-        "Vendor Name: {vendor_name}\n" \
-        "Is Active: {is_active}\n" \
-        "Stop updated price: {stop_updated_price}\n" \
-        "Individual updating time: {individual_updating_time}\n" \
-        .format(
-            id=shop_info.id,
-            name=shop_info.name,
-            slug=shop_info.slug,
-            api_key=shop_info.api_key,
-            vendor_name=shop_info.vendor_name,
-            is_active=shop_info.is_active,
-            stop_updated_price=shop_info.stop_updated_price,
-            individual_updating_time=shop_info.individual_updating_time,
-        )
+    text = messages.display_shop_info.format(
+        id=shop_info.id,
+        name=shop_info.name,
+        slug=shop_info.slug,
+        api_key=shop_info.api_key,
+        vendor_name=shop_info.vendor_name,
+        is_active=shop_info.is_active,
+        stop_updated_price=shop_info.stop_updated_price,
+        individual_updating_time=shop_info.individual_updating_time,
+    )
 
     await query.edit_message_text(
         text=text,
@@ -177,7 +169,7 @@ async def price_updating(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.edit_message_text(
         text=f"Shop name: {shop_info.name}\n"
              f"Price updating: "
-             f"{'ON' if  is_updating_on else 'OF'}",
+             f"{'ON' if is_updating_on else 'OF'}",
         reply_markup=inline_keyboards.build_price_updating(is_updating_on)
     )
     return States.PRICE_UPDATING
