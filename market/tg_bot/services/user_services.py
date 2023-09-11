@@ -39,10 +39,10 @@ class UserService:
     def set_seller_role(self):
         self.context.user_data[self.ROLE_KEY] = self.SELLER_ROLE
 
-    def get_related_shop_id(self):
+    def get_related_shop_api_key(self):
         return self.context.user_data.get(self.SHOP_API_KEY)
 
-    def set_related_shop_id(self):
+    def set_related_shop_api_key(self):
         # todo checks (role, ...)
         self.context.user_data[self.SHOP_API_KEY] = self.SHOP_API_KEY
 
