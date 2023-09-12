@@ -14,6 +14,9 @@ UserModel = get_user_model()
 logger = logging.getLogger(__name__)
 
 
+# todo separate to TelegramUserService - with model
+#  and ContextUserDataService - with context
+
 class UserService:
     """
     Actions and data related to telegram users.
@@ -51,9 +54,9 @@ class UserService:
         """"""
         return self.context.user_data.get(self.SHOP_API_KEY)
 
-    def set_related_shop_api_key(self):
+    def set_related_shop_api_key(self, api_key):
         # todo checks (role, ...)
-        self.context.user_data[self.SHOP_API_KEY] = self.SHOP_API_KEY
+        self.context.user_data[self.SHOP_API_KEY] = api_key
 
     async def authenticate_admin(
             self,
