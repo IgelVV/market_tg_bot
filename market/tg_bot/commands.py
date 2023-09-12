@@ -2,12 +2,20 @@
 import asyncio
 from telegram import Bot
 
+from tg_bot import texts
+
+
+START = "start"
+MENU = "menu"
+CANCEL = "cancel"
+SIGN_OUT = "sign_out"
+
 
 COMMANDS = [
-    ("start", "Start"),
-    ("menu", "Available actions"),
-    ("cancel", "Cancel the current operation"),
-    ("signOut", "logout TEST command"),
+    (START, texts.start_command_description),
+    (MENU, texts.menu_command_description),
+    (CANCEL, texts.cancel_command_description),
+    (SIGN_OUT, texts.sign_out_command_description),
 ]
 
 

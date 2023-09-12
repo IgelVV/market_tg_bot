@@ -13,7 +13,7 @@ from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services.user_services import UserService, ShopService
 from tg_bot.dataclasses import Navigation
-from tg_bot import messages
+from tg_bot import texts
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +33,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not user_service.is_authenticated():
         keyboard = inline_keyboards.build_role_keyboard()
         await update.message.reply_text(
-            messages.start_choose_role,
+            texts.start_choose_role,
             reply_markup=keyboard,
         )
         return States.LOGIN
@@ -106,7 +106,7 @@ async def display_shop_info(
     user_service = UserService(context)
     shop_api_key = user_service.get_related_shop_api_key()
     shop_info = await shop_service.get_shop_info(shop_api_key=shop_api_key)
-    text = messages.display_shop_info.format(
+    text = texts.display_shop_info.format(
         id=shop_info.id,
         name=shop_info.name,
         slug=shop_info.slug,

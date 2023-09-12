@@ -11,7 +11,7 @@ from telegram.ext import (
 )
 from django.conf import settings
 
-from tg_bot.commands import set_bot_commands
+from tg_bot import commands
 from tg_bot.handlers import (
     main_conversation,
     login_conversation,
@@ -41,8 +41,6 @@ def run():
         .token(TOKEN) \
         .arbitrary_callback_data(True) \
         .build()
-
-    set_bot_commands(bot=application.bot)
 
     # Nested conversation
     login_conv = ConversationHandler(
@@ -85,7 +83,7 @@ def run():
             ]
         },
         fallbacks=[
-            CommandHandler("cancel", main_conversation.cancel),
+            CommandHandler(commands.CANCEL, main_conversation.cancel),
             CallbackQueryHandler(
                 main_conversation.cancel,
                 pattern=f"^{il_keyboards.CANCEL}$",
@@ -99,7 +97,7 @@ def run():
     )
 
     main_conv = ConversationHandler(
-        entry_points=[CommandHandler("start", main_conversation.start)],
+        entry_points=[CommandHandler(commands.START, main_conversation.start)],
         states={
             States.LOGIN: [
                 login_conv,
@@ -160,12 +158,14 @@ def run():
             ],
         },
         fallbacks=[
-            CommandHandler("menu", main_conversation.start),
-            CommandHandler("signOut", main_conversation.sign_out),
-            CommandHandler("cancel", main_conversation.cancel),
+            CommandHandler(commands.MENU, main_conversation.start),
+            CommandHandler(commands.SIGN_OUT, main_conversation.sign_out),
+            CommandHandler(commands.CANCEL, main_conversation.cancel),
         ],
     )
     # todo add error handler
+    commands.set_bot_commands(bot=application.bot)
+
     application.add_handler(main_conv)
 
     application.run_polling()
