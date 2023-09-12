@@ -132,6 +132,12 @@ def run():
                     pattern=f"^{il_keyboards.PRICE_UPDATING}$",
                 ),
                 CallbackQueryHandler(
+                    main_conversation.display_shop_list,
+                    pattern=f"^{il_keyboards.BACK}$",
+                ),
+            ],
+            States.SHOP_INFO: [
+                CallbackQueryHandler(
                     main_conversation.display_shop_menu,
                     pattern=f"^{il_keyboards.BACK}$",
                 ),
@@ -161,6 +167,7 @@ def run():
             CommandHandler(commands.MENU, main_conversation.start),
             CommandHandler(commands.SIGN_OUT, main_conversation.sign_out),
             CommandHandler(commands.CANCEL, main_conversation.cancel),
+            # todo add InvalidCallbackData handler
         ],
     )
     # todo add error handler

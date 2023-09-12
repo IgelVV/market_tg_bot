@@ -12,7 +12,7 @@ from django.conf import settings
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services.user_services import UserService, ShopService
-from tg_bot.dataclasses import Navigation
+from tg_bot.dataclasses import Navigation, ShopInfo
 from tg_bot import texts
 
 logger = logging.getLogger(__name__)
@@ -65,7 +65,9 @@ async def display_shop_list(
     It uses pagination.
     It is allowed only for admins.
     """
-    # todo check role
+    user_service = UserService(context)
+    if user_service.get_role() == user_service.SELLER_ROLE:
+        return await display_shop_menu(update, context)
     query = update.callback_query
     limit = LIST_LIMIT
     offset = 0
@@ -89,10 +91,17 @@ async def display_shop_menu(
     Allowed for both admin and seller.
     """
     query = update.callback_query
+    user_service = UserService(context)
+    if user_service.get_role() == user_service.ADMIN_ROLE:
+        if isinstance(query.data, ShopInfo):
+            user_service.set_related_shop_api_key(query.data.api_key)
+        keyboard = inline_keyboards.build_shop_menu(with_back=True)
+    else:
+        keyboard = inline_keyboards.build_shop_menu()
     await query.answer(text=str(query.data))
     await query.edit_message_text(
         text=f"Shop `{query.data}`",
-        reply_markup=inline_keyboards.build_shop_menu(),
+        reply_markup=keyboard,
     )
     return States.SHOP_MENU
 
@@ -122,7 +131,7 @@ async def display_shop_info(
         reply_markup=inline_keyboards.build_back(),
         parse_mode="html"
     )
-    return States.SHOP_MENU
+    return States.SHOP_INFO
 
 
 async def activate_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
