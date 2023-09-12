@@ -198,9 +198,9 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     It handles both messages or callback queries.
     """
     cancel_message = "Bye! I hope we can talk again some day."
-    user = update.message.from_user
-    logger.info("User %s canceled the conversation.", user.first_name)
     if update.message:
+        user = update.message.from_user
+        logger.info("User %s canceled the conversation.", user.first_name)
         await update.message.reply_text(
             cancel_message,
             reply_markup=ReplyKeyboardRemove(),
