@@ -106,12 +106,14 @@ async def build_shop_list(limit: int = LIST_LIMIT, offset: int = 0):
     return InlineKeyboardMarkup(keyboard)
 
 
-def build_shop_menu():
+def build_shop_menu(with_back: bool = False):
     keyboard = [
         [InlineKeyboardButton("Shop info", callback_data=SHOP_INFO)],
         [InlineKeyboardButton("Activate", callback_data=ACTIVATE)],
         [InlineKeyboardButton("Price updating", callback_data=PRICE_UPDATING)],
     ]
+    if with_back:
+        keyboard.append(_build_back_button())
     return InlineKeyboardMarkup(keyboard)
 
 
