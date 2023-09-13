@@ -9,6 +9,7 @@ from telegram.ext import ContextTypes
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services.user_services import UserService
+from tg_bot import texts
 
 
 async def ask_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -20,9 +21,7 @@ async def ask_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     query = update.callback_query
     await query.answer(text=query.data)
-    await query.edit_message_text(
-        text="Type your Username:"
-    )
+    await query.edit_message_text(text=texts.ask_username)
     return States.PASSWORD
 
 
@@ -36,9 +35,7 @@ async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     username = update.message.text
     context.user_data["username"] = username
     user = update.message.from_user
-    await update.message.reply_text(
-        "Type password:",
-    )
+    await update.message.reply_text(texts.ask_password)
     return States.CHECK_PASSWORD
 
 
@@ -57,7 +54,7 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     password = update.message.text
     await update.message.delete()
     await update.message.reply_text(
-        f"password received: {password} \nPlease wait.",
+        texts.password_received.format(password=password),
     )
     authenticated = await user_service.authenticate_admin(
         username=context.user_data.get("username"),
@@ -65,7 +62,7 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
         tg_user_id=update.message.from_user.id,
     )
     if authenticated:
-        message = f"You are logged in as admin."
+        message = texts.logged_in_as_admin
         await update.message.reply_text(
             message,
             reply_markup=inline_keyboards.build_admin_menu()
@@ -73,8 +70,7 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return States.ADMIN_MENU
     else:
         await update.message.reply_text(
-            "Wrong username or password. "
-            "\nDo you want to try again?",
+            text=texts.wrong_credentials,
             reply_markup=inline_keyboards.build_yes_no()
         )
         return None
@@ -89,9 +85,7 @@ async def ask_shop_api_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     query = update.callback_query
     await query.answer(text=query.data)
-    await query.edit_message_text(
-        text="Type API key of your shop:"
-    )
+    await query.edit_message_text(text=texts.ask_shop_api_key)
     return States.API_KEY
 
 
@@ -109,14 +103,14 @@ async def check_shop_api_key(
     shop_api_key = update.message.text
     await update.message.delete()
     await update.message.reply_text(
-        f"API key received: {shop_api_key} \nPlease wait.",
+        texts.ask_shop_api_key.format(shop_api_key=shop_api_key)
     )
     authenticated = await user_service.authenticate_seller(
         shop_api_key=shop_api_key,
         tg_user_id=update.message.from_user.id
     )
     if authenticated:
-        message = f"You are logged in as Seller."
+        message = texts.logged_in_as_seller
         await update.message.reply_text(
             message,
             reply_markup=inline_keyboards.build_shop_menu()
@@ -124,7 +118,7 @@ async def check_shop_api_key(
         return States.SHOP_MENU
     else:
         await update.message.reply_text(
-            "Wrong API key, please enter it again:",
+            texts.wrong_api_key,
             reply_markup=inline_keyboards.build_cancel(),
         )
         return None

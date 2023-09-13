@@ -39,8 +39,10 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return States.LOGIN
     else:
         role = user_service.get_role()
-        message = f"Hello {update.message.from_user.full_name} your role is " \
-                  f"{role}"
+        message = texts.after_login.format(
+            full_name=update.message.from_user.full_name,
+            role=role,
+        )
         if role == user_service.ADMIN_ROLE:
             await update.message.reply_text(
                 message,
@@ -76,7 +78,7 @@ async def display_shop_list(
         offset = query.data.offset
     await query.answer(text=str(query.data))
     await query.edit_message_text(
-        text="Available shops:",
+        text=texts.display_shop_list,
         reply_markup=await inline_keyboards.build_shop_list(limit, offset),
         parse_mode="html",
     )
@@ -100,7 +102,8 @@ async def display_shop_menu(
         keyboard = inline_keyboards.build_shop_menu()
     await query.answer(text=str(query.data))
     await query.edit_message_text(
-        text=f"Shop `{query.data}`",
+        # todo format
+        text=texts.display_shop_menu,
         reply_markup=keyboard,
     )
     return States.SHOP_MENU
@@ -143,8 +146,10 @@ async def activate_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     shop_api_key = user_service.get_related_shop_api_key()
     shop_info = await shop_service.get_shop_info(shop_api_key)
     await query.edit_message_text(
-        text=f"Shop name: {shop_info.name}\n"
-             f"Is active: {shop_info.is_active}",
+        text=texts.activate_shop.format(
+            name=shop_info.name,
+            is_active=shop_info.is_active
+        ),
         reply_markup=inline_keyboards.build_activate_shop(shop_info.is_active)
     )
     return States.ACTIVATE
@@ -176,9 +181,10 @@ async def price_updating(update: Update, context: ContextTypes.DEFAULT_TYPE):
     shop_info = await shop_service.get_shop_info(shop_api_key)
     is_updating_on = not shop_info.stop_updated_price
     await query.edit_message_text(
-        text=f"Shop name: {shop_info.name}\n"
-             f"Price updating: "
-             f"{'ON' if is_updating_on else 'OF'}",
+        text=texts.price_updating.format(
+            name=shop_info.name,
+            switch='ON' if is_updating_on else 'OFF',
+        ),
         reply_markup=inline_keyboards.build_price_updating(is_updating_on)
     )
     return States.PRICE_UPDATING
