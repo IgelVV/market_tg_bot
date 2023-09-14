@@ -3,13 +3,17 @@ Handlers that are used in nested ConversationHandler.
 
 It responsible for authentication and registration.
 """
+import logging
+
 from telegram import Update
 from telegram.ext import ContextTypes
 
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
-from tg_bot.services.user_services import UserService
+from tg_bot.services import ChatService
 from tg_bot import texts
+
+logger = logging.getLogger(__name__)
 
 
 async def ask_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -33,8 +37,8 @@ async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     and next handler will handle commands too.
     """
     username = update.message.text
-    context.user_data["username"] = username
-    user = update.message.from_user
+    context.chat_data[ChatService.ADMIN_USERNAME_KEY] = username
+    logger.info(f"Username {username} is saved.")
     await update.message.reply_text(texts.ask_password)
     return States.CHECK_PASSWORD
 
@@ -50,18 +54,25 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Display `admin menu` if authenticated.
     """
     # todo check admin rights
-    user_service = UserService(context=context)
+    chat_id = update.message.chat_id
+    chat_service = ChatService(chat_id, context=context)
     password = update.message.text
     await update.message.delete()
     await update.message.reply_text(
         texts.password_received.format(password=password),
     )
-    authenticated = await user_service.authenticate_admin(
-        username=context.user_data.get("username"),
+    username = context.chat_data.get(chat_service.ADMIN_USERNAME_KEY)
+    authenticated = await chat_service.authenticate_admin(
+        username=username,
         password=password,
-        tg_user_id=update.message.from_user.id,
     )
     if authenticated:
+        logger.info(f"User is authenticated")
+        await chat_service.login_admin(
+            first_name=update.message.from_user.first_name,
+            last_name=update.message.from_user.last_name,
+            username=update.message.from_user.username,
+        )
         message = texts.logged_in_as_admin
         await update.message.reply_text(
             message,
@@ -69,6 +80,7 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return States.ADMIN_MENU
     else:
+        logger.info(f"User is not authenticated {username}: {password}")
         await update.message.reply_text(
             text=texts.wrong_credentials,
             reply_markup=inline_keyboards.build_yes_no()
@@ -99,7 +111,8 @@ async def check_shop_api_key(
 
     Displays `shop menu` if authenticated.
     """
-    user_service = UserService(context=context)
+    chat_id = update.message.chat_id
+    user_service = ChatService(chat_id, context=context)
     shop_api_key = update.message.text
     await update.message.delete()
     await update.message.reply_text(
