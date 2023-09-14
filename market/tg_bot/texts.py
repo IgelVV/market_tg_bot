@@ -25,6 +25,10 @@ activate_shop = "Shop name: {name}\nIs active: {is_active}"
 price_updating = "Shop name: {name}\n" \
                  "Price updating: {switch}"
 
+display_ban = "You are banned."
+
+display_not_active = "Your account is not active."
+
 
 ask_username = "Type your Username:"
 
