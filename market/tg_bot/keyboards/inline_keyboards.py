@@ -8,7 +8,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from django.conf import settings
 
 from tg_bot.dataclasses import ShopInfo, Navigation
-from tg_bot.services.shop_services import ShopService
+from shop.services import ShopService
 
 logger = logging.getLogger(__name__)
 

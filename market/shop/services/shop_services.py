@@ -81,11 +81,7 @@ class ShopService:
         :param shop_api_key: api_key.
         :return: bool
         """
-        exists = await Shop.objects.filter(api_key=shop_api_key).aexists()
-        if exists:
-            return True
-        else:
-            return False
+        return await Shop.objects.filter(api_key=shop_api_key).aexists()
 
     async def _get_shop_by_api_key(self, shop_api_key: str):
         """
