@@ -10,6 +10,7 @@ from django.contrib.auth import get_user_model
 
 from shop.services import ShopService
 from tg_bot.services.telegram_user_service import TelegramUserService
+from tg_bot.services.user_services import UserService
 from tg_bot.models import TelegramUser
 
 UserModel = get_user_model()
@@ -30,6 +31,7 @@ class ChatService:
     ROLE_KEY = "role"
     SHOP_API_KEY = "shop_api_key"
     ADMIN_USERNAME_KEY = "admin_username"
+    SHOP_ID_KEY = "shop id"
 
     def __init__(self, chat_id: int, context: ContextTypes.DEFAULT_TYPE):
         self.context = context
@@ -93,42 +95,9 @@ class ChatService:
             username: str,
             password: str,
     ):
-        # """
-        # Mark tg_user (admin) as authenticated, if credentials are correct.
-        #
-        # If password is matches to User object with passed username,
-        # it marks user as admin, authenticated, bind username, and returns True,
-        #  otherwise returns False.
-        # """
-        # tg_user_id for saving to db
-        # try:
-        #     user = await UserModel.objects.aget(username=username)
-        #     if user.check_password(password):
-        #         self.context.user_data[self.AUTH_KEY] = True
-        #         self.context.user_data[self.ROLE_KEY] = self.ADMIN_ROLE
-        #         self.context.user_data[self.ADMIN_USERNAME_KEY] = username
-        #         return True
-        #
-        # except UserModel.DoesNotExist:
-        #     logger.info(f"User with {username=} DoesNotExists")
-        #     return False
-        return await self.check_tg_admin(username, password)
-
-
-    async def check_tg_admin(
-            self,
-            username: str,
-            password: str,
-    ):
-        # todo move to other service (UserService or AccountService)
-        try:
-            user = await UserModel.objects.aget(
-                username=username, is_active=True)
-            # todo check group
-            return user.check_password(password)
-        except UserModel.DoesNotExist:
-            logger.info(f"User with {username=} DoesNotExists")
-            return False
+        user = await UserService()\
+            .authenticate_telegram_admin(username, password)
+        return user is not None
 
     async def login_admin(
             self,
@@ -137,7 +106,7 @@ class ChatService:
             username: Optional[str],
     ):
         """Create or update TelegramUser record."""
-        logger.info(f"Logging in admin: {self.chat_id=}, {first_name=},"
+        logger.info(f"Admin has logged in: {self.chat_id=}, {first_name=},"
                     f" {last_name=}, {username=},")
         first_name = first_name if first_name is not None else ""
         last_name = last_name if last_name is not None else ""
@@ -154,7 +123,7 @@ class ChatService:
             )
         )
         self.context.chat_data[self.ROLE_KEY] = self.ADMIN_ROLE
-
+        self.context.chat_data[self.SHOP_ID_KEY] = None
 
     async def authenticate_seller(
             self,
