@@ -22,7 +22,7 @@ class ChatService:
     """
     Actions and data related to telegram users.
 
-    Uses context.user_data as a storage.
+    Uses context.chat_data as a storage.
     """
     ADMIN_ROLE = TelegramUser.Roles.ADMIN
     SELLER_ROLE = TelegramUser.Roles.SELLER
@@ -37,11 +37,44 @@ class ChatService:
         self.context = context
         self.chat_id = chat_id
 
-    # async def is_user_logged_in(self) -> bool:
-    #     """"""
-    #     tg_user_service = TelegramUserService()
-    #     tg_user = await tg_user_service.get_by_chat_id(self.chat_id)
-    #     return (tg_user is not None) and (not tg_user.is_logged_out)
+    async def get_role(self):
+        cached_role = self.context.chat_data.get(self.ROLE_KEY)
+        if cached_role:
+            return cached_role
+        else:
+            tg_user_service = TelegramUserService()
+            tg_user = await tg_user_service.get_by_chat_id(self.chat_id)
+            if tg_user is None:
+                return None
+            role = tg_user.role
+            if role == TelegramUser.Roles.ADMIN:
+                self.set_admin_role()
+            elif role == TelegramUser.Roles.SELLER:
+                self.set_seller_role()
+            else:
+                raise ValueError("Unknown TelegramUser role.")
+            return self.context.chat_data.get(self.ROLE_KEY)
+
+    def set_admin_role(self):
+        """Set tg_user role as `admin`."""
+        self.context.chat_data[self.ROLE_KEY] = self.ADMIN_ROLE
+
+    def set_seller_role(self):
+        """Set tg_user role as `seller`."""
+        self.context.chat_data[self.ROLE_KEY] = self.SELLER_ROLE
+
+    def get_related_shop_api_key(self):
+        """"""
+        return self.context.chat_data.get(self.SHOP_API_KEY)
+
+    def set_related_shop_api_key(self, api_key):
+        self.context.chat_data[self.SHOP_API_KEY] = api_key
+
+    def get_shop_id(self):
+        self.context.chat_data.get(self.SHOP_ID_KEY)
+
+    def set_shop_id(self, shop_id):
+        self.context.chat_data[self.SHOP_ID_KEY] = shop_id
 
     async def check_to_login(self) -> tuple:
         """
@@ -62,33 +95,6 @@ class ChatService:
             is_active = tg_user.is_active
 
         return is_logged_out, is_banned, is_active
-
-    async def get_role(self):
-        cached_role = self.context.chat_data.get(self.ROLE_KEY)
-        if cached_role:
-            return cached_role
-        else:
-            tg_user_service = TelegramUserService()
-            tg_user = await tg_user_service.get_by_chat_id(self.chat_id)
-            role = tg_user.role
-            self.context.chat_data[self.ROLE_KEY] = role
-            return role
-
-    def set_admin_role(self):
-        """Set tg_user role as `admin`."""
-        self.context.user_data[self.ROLE_KEY] = self.ADMIN_ROLE
-
-    def set_seller_role(self):
-        """Set tg_user role as `seller`."""
-        self.context.user_data[self.ROLE_KEY] = self.SELLER_ROLE
-
-    def get_related_shop_api_key(self):
-        """"""
-        return self.context.user_data.get(self.SHOP_API_KEY)
-
-    def set_related_shop_api_key(self, api_key):
-        # todo checks (role, ...)
-        self.context.user_data[self.SHOP_API_KEY] = api_key
 
     async def authenticate_admin(
             self,
@@ -122,8 +128,8 @@ class ChatService:
                 is_logged_out=False,
             )
         )
-        self.context.chat_data[self.ROLE_KEY] = self.ADMIN_ROLE
-        self.context.chat_data[self.SHOP_ID_KEY] = None
+        self.set_admin_role()
+        self.set_shop_id(None)
 
     async def authenticate_seller(
             self,
@@ -139,9 +145,9 @@ class ChatService:
         """
         key_is_correct = await ShopService().check_shop_api_key(shop_api_key)
         if key_is_correct:
-            self.context.user_data[self.AUTH_KEY] = True
-            self.context.user_data[self.ROLE_KEY] = self.SELLER_ROLE
-            self.context.user_data[self.SHOP_API_KEY] = shop_api_key
+            self.context.chat_data[self.AUTH_KEY] = True
+            self.set_seller_role()
+            self.set_related_shop_api_key(shop_api_key)
             return True
         else:
             return False
@@ -150,4 +156,4 @@ class ChatService:
 
     def logout(self):
         """Mark user as not authenticated."""
-        self.context.user_data[self.AUTH_KEY] = False
+        self.context.chat_data[self.AUTH_KEY] = False
