@@ -76,6 +76,12 @@ class ChatService:
     def set_shop_id(self, shop_id):
         self.context.chat_data[self.SHOP_ID_KEY] = shop_id
 
+    def get_admin_username(self):
+        self.context.chat_data.get(self.ADMIN_USERNAME_KEY)
+
+    def set_admin_username(self, username):
+        self.context.chat_data[self.ADMIN_USERNAME_KEY] = username
+
     async def check_to_login(self) -> tuple:
         """
 

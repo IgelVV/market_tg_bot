@@ -36,8 +36,10 @@ async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     Command handlers can be unavailable, because it requests text answer,
     and next handler will handle commands too.
     """
+    chat_id = update.message.chat_id
     username = update.message.text
-    context.chat_data[ChatService.ADMIN_USERNAME_KEY] = username
+    chat_service = ChatService(chat_id, context)
+    chat_service.set_admin_username(username)
     logger.info(f"Username {username} is saved.")
     await update.message.reply_text(texts.ask_password)
     return States.CHECK_PASSWORD
@@ -61,7 +63,7 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         texts.password_received.format(password=password),
     )
-    username = context.chat_data.get(chat_service.ADMIN_USERNAME_KEY)
+    username = chat_service.get_admin_username()
     authenticated = await chat_service.authenticate_admin(
         username=username,
         password=password,
