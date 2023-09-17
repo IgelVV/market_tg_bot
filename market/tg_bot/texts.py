@@ -5,6 +5,8 @@ start_choose_role = "Choose your role"
 
 after_login = "Hello {full_name} your role is {role}"
 
+display_user_menu = "Main menu ({full_name}: {role}):"
+
 display_shop_list = "Available shops:"
 
 display_shop_menu = "Shop: `{shop_name}`"

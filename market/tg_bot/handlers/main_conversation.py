@@ -51,25 +51,32 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return States.LOGIN
     else:
-        role = await chat_service.get_role()
-        message = texts.after_login.format(
-            full_name=update.message.from_user.full_name,
-            role=role,
+        return await display_user_menu(update, context)
+
+
+async def display_user_menu(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
+    chat_id = update.message.chat_id
+    chat_service = ChatService(chat_id, context)
+    role = await chat_service.get_role()
+    text = texts.display_user_menu.format(
+        full_name=update.message.from_user.full_name,
+        role=role,
+    )
+    if role == chat_service.ADMIN_ROLE:
+        await update.message.reply_text(
+            text,
+            reply_markup=inline_keyboards.build_admin_menu(),
         )
-        if role == chat_service.ADMIN_ROLE:
-            await update.message.reply_text(
-                message,
-                reply_markup=inline_keyboards.build_admin_menu()
-            )
-            return States.ADMIN_MENU
-        elif role == chat_service.SELLER_ROLE:
-            await update.message.reply_text(
-                message,
-                reply_markup=inline_keyboards.build_shop_menu()
-            )
-            return States.SHOP_MENU
-        else:
-            raise ValueError(f"Wrong {role=}")
+        return States.ADMIN_MENU
+    elif role == chat_service.SELLER_ROLE:
+        await update.message.reply_text(
+            text,
+            reply_markup=inline_keyboards.build_seller_menu(),
+        )
+        return States.SELLER_MENU
+    else:
+        raise ValueError(f"Wrong {role=}")
 
 
 async def display_shop_list(
@@ -102,6 +109,16 @@ async def display_shop_list(
     return States.SHOP_LIST
 
 
+async def display_add_shop(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
+    raise NotImplementedError
+
+
+async def display_unlink_shop(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
+    raise NotImplementedError
+
+
 async def display_shop_menu(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -113,12 +130,9 @@ async def display_shop_menu(
     chat_id = query.from_user.id
 
     user_service = ChatService(chat_id, context)
-    if user_service.get_role() == user_service.ADMIN_ROLE:
-        if isinstance(query.data, ShopInfo):
-            user_service.set_shop_id(query.data.id)
-        keyboard = inline_keyboards.build_shop_menu(with_back=True)
-    else:
-        keyboard = inline_keyboards.build_shop_menu()
+    if isinstance(query.data, ShopInfo):
+        user_service.set_shop_id(query.data.id)
+    keyboard = inline_keyboards.build_shop_menu(with_back=True)
     await query.answer(text=str(query.data))
     await query.edit_message_text(
         # todo format()
