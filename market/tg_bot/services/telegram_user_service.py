@@ -31,6 +31,11 @@ class TelegramUserService:
         except TelegramUser.DoesNotExist:
             return None
 
-    async def create_or_update(self, ignore_is_banned=False, ignore_is_active=False):
-        # check is_banned and is_active
-        ...
+    # async def create_or_update(self, ignore_is_banned=False, ignore_is_active=False):
+    #     # check is_banned and is_active
+    #     ...
+
+    async def mark_as_logged_out(self, chat_id: int):
+        tg_user = await self.get_by_chat_id(chat_id)
+        tg_user.is_logged_out = True
+        await tg_user.asave()
