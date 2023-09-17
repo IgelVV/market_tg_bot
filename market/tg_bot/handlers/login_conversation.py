@@ -130,9 +130,9 @@ async def check_shop_api_key(
     if logged_in:
         await update.message.reply_text(
             text=texts.logged_in_as_seller,
-            reply_markup=inline_keyboards.build_shop_menu()
+            reply_markup=inline_keyboards.build_seller_menu()
         )
-        return States.SHOP_MENU
+        return States.SELLER_MENU
     else:
         await update.message.reply_text(
             texts.wrong_api_key,
