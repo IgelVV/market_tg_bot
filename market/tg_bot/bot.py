@@ -108,6 +108,12 @@ def run():
                     pattern=f"^{il_keyboards.SHOP_LIST}$"
                 ),
             ],
+            States.SELLER_MENU: [
+                CallbackQueryHandler(
+                    main_conversation.display_shop_list,
+                    pattern=f"^{il_keyboards.SHOP_LIST}$"
+                ),
+            ],
             States.SHOP_LIST: [
                 CallbackQueryHandler(
                     main_conversation.display_shop_menu,
