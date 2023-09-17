@@ -95,7 +95,8 @@ def build_seller_menu():
 async def build_shop_list(
         qs: QuerySet[Shop],
         limit: int = LIST_LIMIT,
-        offset: int = 0
+        offset: int = 0,
+        with_back: bool = True,
 ):
     # """
     # Build keyboard, that contains shop list.
@@ -124,6 +125,8 @@ async def build_shop_list(
             total_count=await qs.acount(),
         )
     )
+    if with_back:
+        keyboard.append(_build_back_button())
     return InlineKeyboardMarkup(keyboard)
 
 

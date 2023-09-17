@@ -30,7 +30,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     chat_id = update.message.chat_id
     chat_service = ChatService(chat_id, context)
-    logger.info(f"{chat_id} starts. {chat_service.ADMIN_ROLE.label} {type(chat_service.ADMIN_ROLE.label)}")
+    logger.info(
+        f"{chat_id} starts. {chat_service.ADMIN_ROLE.label} {type(chat_service.ADMIN_ROLE.label)}")
 
     is_logged_out, is_banned, is_activate = await chat_service.check_to_login()
 
@@ -56,22 +57,34 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def display_user_menu(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
-    chat_id = update.message.chat_id
+    # Works with callbacks as well as with messages.
+    if update.message:
+        chat_id = update.message.chat_id
+        full_name = update.message.from_user.full_name
+        reply_func = update.message.reply_text
+    elif query := update.callback_query:
+        chat_id = query.from_user.id
+        full_name = query.from_user.full_name
+        reply_func = query.edit_message_text
+        await query.answer(text=str(query.data))
+    else:
+        raise ValueError(
+            "Unexpected update. It is expected Callback or Message.")
     chat_service = ChatService(chat_id, context)
     role = await chat_service.get_role()
     text = texts.display_user_menu.format(
-        full_name=update.message.from_user.full_name,
+        full_name=full_name,
         role=role,
     )
     if role == chat_service.ADMIN_ROLE:
-        await update.message.reply_text(
-            text,
+        await reply_func(
+            text=text,
             reply_markup=inline_keyboards.build_admin_menu(),
         )
         return States.ADMIN_MENU
     elif role == chat_service.SELLER_ROLE:
-        await update.message.reply_text(
-            text,
+        await reply_func(
+            text=text,
             reply_markup=inline_keyboards.build_seller_menu(),
         )
         return States.SELLER_MENU
@@ -81,7 +94,6 @@ async def display_user_menu(
 
 async def display_shop_list(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # for Seller add buttons `add shop` `unlink shop`
     """
     Display available shops.
 
@@ -97,13 +109,16 @@ async def display_shop_list(
     if isinstance(query.data, Navigation):
         limit = query.data.limit
         offset = query.data.offset
-    shop_qs = await chat_service.get_shops()
     await query.answer(text=str(query.data))
+    shop_qs = await chat_service.get_shops()
+    keyboard = await inline_keyboards.build_shop_list(
+        qs=shop_qs,
+        limit=limit,
+        offset=offset,
+    )
     await query.edit_message_text(
         text=texts.display_shop_list,
-        reply_markup=await inline_keyboards.build_shop_list(
-            qs=shop_qs,
-            limit=limit, offset=offset),
+        reply_markup=keyboard,
         parse_mode="html",
     )
     return States.SHOP_LIST
@@ -251,6 +266,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     It handles both messages or callback queries.
     """
     cancel_message = "Bye! I hope we can talk again some day."
+    # Works with callbacks as well as with messages.
     if update.message:
         user = update.message.from_user
         logger.info("User %s canceled the conversation.", user.first_name)
@@ -265,7 +281,8 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
             text=cancel_message
         )
     else:
-        ...
+        raise ValueError(
+            "Unexpected update. It is expected Callback or Message.")
     return ConversationHandler.END
 
 
@@ -290,7 +307,8 @@ async def display_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return ConversationHandler.END
 
 
-async def display_not_active(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def display_not_active(update: Update,
+                             context: ContextTypes.DEFAULT_TYPE):
     """Display message for not active user."""
     bot = context.bot
     if update.message:
