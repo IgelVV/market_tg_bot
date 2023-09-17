@@ -154,7 +154,8 @@ class ChatService:
         # authentication
         shop_service = ShopService()
         shop = await shop_service.get_shop_by_api_key(shop_api_key)
-        if (shop is None) or (not shop.is_active):
+        # if (shop is None) or (not shop.is_active):
+        if shop is None:
             return False
         else:
             # login
