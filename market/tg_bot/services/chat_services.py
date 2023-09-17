@@ -38,8 +38,9 @@ class ChatService:
     AUTH_KEY = "authenticated"
     ROLE_KEY = "role"
     SHOP_API_KEY = "shop_api_key"
-    ADMIN_USERNAME_KEY = "admin_username"
     SHOP_ID_KEY = "shop id"
+    SHOP_ID_TO_UNLINK_KEY = "shop_id_to_unlink"
+    ADMIN_USERNAME_KEY = "admin_username"
 
     def __init__(self, chat_id: int, context: ContextTypes.DEFAULT_TYPE):
         self.context = context
@@ -83,6 +84,12 @@ class ChatService:
 
     def set_shop_id(self, shop_id):
         self.context.chat_data[self.SHOP_ID_KEY] = shop_id
+
+    def get_shop_id_to_unlink(self):
+        return self.context.chat_data.get(self.SHOP_ID_TO_UNLINK_KEY)
+
+    def set_shop_id_to_unlink(self, shop_id):
+        self.context.chat_data[self.SHOP_ID_TO_UNLINK_KEY] = shop_id
 
     def get_admin_username(self):
         return self.context.chat_data.get(self.ADMIN_USERNAME_KEY)
