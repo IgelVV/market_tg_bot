@@ -92,6 +92,71 @@ async def display_user_menu(
         raise ValueError(f"Wrong {role=}")
 
 
+async def display_add_shop(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    chat_id = query.from_user.id
+    chat_service = ChatService(chat_id, context)
+    await query.answer(text=str(query.data))
+    await query.edit_message_text(
+        text=texts.display_add_shop,
+        reply_markup=inline_keyboards.build_back(),
+    )
+    return States.ADD_SHOP
+
+
+async def display_unlink_shop(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    chat_id = query.from_user.id
+    chat_service = ChatService(chat_id, context)
+
+    limit = LIST_LIMIT
+    offset = 0
+    if isinstance(query.data, Navigation):
+        limit = query.data.limit
+        offset = query.data.offset
+    await query.answer(text=str(query.data))
+    shop_qs = await chat_service.get_shops()
+    keyboard = await inline_keyboards.build_shop_list(
+        qs=shop_qs,
+        limit=limit,
+        offset=offset,
+    )
+    await query.edit_message_text(
+        text=texts.display_unlink_shop,
+        reply_markup=keyboard,
+    )
+    return States.UNLINK_SHOP
+
+
+async def confirm_unlink_shop(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    chat_id = query.from_user.id
+    chat_service = ChatService(chat_id, context)
+    if isinstance(query.data, ShopInfo):
+        chat_service.set_shop_id_to_unlink(query.data.id)
+    await query.answer(text=str(query.data))
+    keyboard = inline_keyboards.build_yes_no(no_data=inline_keyboards.BACK)
+    await query.edit_message_text(
+        text=texts.unlink_shop,
+        reply_markup=keyboard,
+    )
+    return States.UNLINK_SHOP
+
+
+async def unlink_shop(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    chat_id = query.from_user.id
+    chat_service = ChatService(chat_id, context)
+    shop_id_to_unlink = chat_service.get_shop_id_to_unlink()
+    # todo unlink
+    await query.answer(text=str(query.data))
+    return await display_user_menu(update, context)
+
+
 async def display_shop_list(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -124,16 +189,6 @@ async def display_shop_list(
     return States.SHOP_LIST
 
 
-async def display_add_shop(
-        update: Update, context: ContextTypes.DEFAULT_TYPE):
-    raise NotImplementedError
-
-
-async def display_unlink_shop(
-        update: Update, context: ContextTypes.DEFAULT_TYPE):
-    raise NotImplementedError
-
-
 async def display_shop_menu(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
@@ -144,9 +199,9 @@ async def display_shop_menu(
     query = update.callback_query
     chat_id = query.from_user.id
 
-    user_service = ChatService(chat_id, context)
+    chat_service = ChatService(chat_id, context)
     if isinstance(query.data, ShopInfo):
-        user_service.set_shop_id(query.data.id)
+        chat_service.set_shop_id(query.data.id)
     keyboard = inline_keyboards.build_shop_menu(with_back=True)
     await query.answer(text=str(query.data))
     await query.edit_message_text(
@@ -164,8 +219,8 @@ async def display_shop_info(
     chat_id = query.from_user.id
     await query.answer(text=str(query.data))
     shop_service = ShopService()
-    user_service = ChatService(chat_id, context)
-    shop_id = user_service.get_shop_id()
+    chat_service = ChatService(chat_id, context)
+    shop_id = chat_service.get_shop_id()
     shop_info = await shop_service.get_shop_info(shop_id=shop_id)
     text = texts.display_shop_info.format(
         id=shop_info.id,
@@ -192,8 +247,8 @@ async def activate_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = query.from_user.id
     await query.answer(text=str(query.data))
     shop_service = ShopService()
-    user_service = ChatService(chat_id, context)
-    shop_id = user_service.get_shop_id()
+    chat_service = ChatService(chat_id, context)
+    shop_id = chat_service.get_shop_id()
     shop_info = await shop_service.get_shop_info(shop_id)
     await query.edit_message_text(
         text=texts.activate_shop.format(
@@ -216,8 +271,8 @@ async def switch_activation(
     chat_id = query.message.chat_id
     await query.answer(text=str(query.data))
     shop_service = ShopService()
-    user_service = ChatService(chat_id, context)
-    shop_id = user_service.get_shop_id()
+    chat_service = ChatService(chat_id, context)
+    shop_id = chat_service.get_shop_id()
     await shop_service.switch_activation(shop_id)
     return await activate_shop(update, context)
 
@@ -228,8 +283,8 @@ async def price_updating(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = query.message.chat_id
     await query.answer(text=str(query.data))
     shop_service = ShopService()
-    user_service = ChatService(chat_id, context)
-    shop_id = user_service.get_shop_id()
+    chat_service = ChatService(chat_id, context)
+    shop_id = chat_service.get_shop_id()
     shop_info = await shop_service.get_shop_info(shop_id)
     is_updating_on = not shop_info.stop_updated_price
     await query.edit_message_text(
@@ -253,8 +308,8 @@ async def switch_price_updating(
     chat_id = query.message.chat_id
     await query.answer(text=str(query.data))
     shop_service = ShopService()
-    user_service = ChatService(chat_id, context)
-    shop_id = user_service.get_shop_id()
+    chat_service = ChatService(chat_id, context)
+    shop_id = chat_service.get_shop_id()
     await shop_service.switch_price_updating(shop_id)
     return await price_updating(update, context)
 

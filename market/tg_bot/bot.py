@@ -110,16 +110,40 @@ def run():
             ],
             States.SELLER_MENU: [
                 CallbackQueryHandler(
-                    main_conversation.display_shop_list,
-                    pattern=f"^{il_keyboards.SHOP_LIST}$"
-                ),
-                CallbackQueryHandler(
                     main_conversation.display_add_shop,
                     pattern=f"^{il_keyboards.ADD_SHOP}$"
                 ),
                 CallbackQueryHandler(
                     main_conversation.display_unlink_shop,
                     pattern=f"^{il_keyboards.UNLINK_SHOP}$"
+                ),
+                CallbackQueryHandler(
+                    main_conversation.display_shop_list,
+                    pattern=f"^{il_keyboards.SHOP_LIST}$"
+                ),
+            ],
+            States.ADD_SHOP: [
+                CallbackQueryHandler(
+                    main_conversation.display_user_menu,
+                    pattern=f"^{il_keyboards.BACK}$",
+                ),
+            ],
+            States.UNLINK_SHOP: [
+                CallbackQueryHandler(
+                    main_conversation.confirm_unlink_shop,
+                    pattern=ShopInfo,
+                ),
+                CallbackQueryHandler(
+                    main_conversation.display_unlink_shop,
+                    pattern=Navigation,
+                ),
+                CallbackQueryHandler(
+                    main_conversation.unlink_shop,
+                    pattern=f"^{il_keyboards.YES}$",
+                ),
+                CallbackQueryHandler(
+                    main_conversation.display_user_menu,
+                    pattern=f"^{il_keyboards.BACK}$",
                 ),
             ],
             States.SHOP_LIST: [
