@@ -16,6 +16,7 @@ from tg_bot import texts
 logger = logging.getLogger(__name__)
 
 
+# if user has chosen Admin role
 async def ask_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Request admin username.
@@ -40,22 +41,21 @@ async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     username = update.message.text
     chat_service = ChatService(chat_id, context)
     chat_service.set_admin_username(username)
-    logger.info(f"Username {username} is saved.")
+    logger.info(f"Username `{username}` is saved.")
     await update.message.reply_text(texts.ask_password)
     return States.CHECK_PASSWORD
 
 
 async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """
-    Authenticate admin.
-
-    Deletes user message that contains password.
-    If authentication is failed, request if user want to enter username again.
-    It is possible to send password again, ignoring inline keyboard.
-
-    Display `admin menu` if authenticated.
-    """
-    # todo check admin rights
+    # """
+    # Authenticate admin.
+    #
+    # Deletes user message that contains password.
+    # If authentication is failed, request if user want to enter username again.
+    # It is possible to send password again, ignoring inline keyboard.
+    #
+    # Display `admin menu` if authenticated.
+    # """
     chat_id = update.message.chat_id
     chat_service = ChatService(chat_id, context=context)
     password = update.message.text
@@ -73,7 +73,7 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await chat_service.login_admin(
             first_name=update.message.from_user.first_name,
             last_name=update.message.from_user.last_name,
-            username=update.message.from_user.username,
+            tg_username=update.message.from_user.username,
         )
         message = texts.logged_in_as_admin
         await update.message.reply_text(
@@ -90,6 +90,7 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return None
 
 
+# if user has chosen Seller role
 async def ask_shop_api_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Request shop api_key from the seller.
@@ -118,16 +119,17 @@ async def check_shop_api_key(
     shop_api_key = update.message.text
     await update.message.delete()
     await update.message.reply_text(
-        texts.ask_shop_api_key.format(shop_api_key=shop_api_key)
+        texts.api_key_received.format(shop_api_key=shop_api_key)
     )
-    authenticated = await user_service.authenticate_seller(
+    logged_in = await user_service.authenticate_and_login_seller(
         shop_api_key=shop_api_key,
-        tg_user_id=update.message.from_user.id
+        first_name=update.message.from_user.first_name,
+        last_name=update.message.from_user.last_name,
+        tg_username=update.message.from_user.username,
     )
-    if authenticated:
-        message = texts.logged_in_as_seller
+    if logged_in:
         await update.message.reply_text(
-            message,
+            text=texts.logged_in_as_seller,
             reply_markup=inline_keyboards.build_shop_menu()
         )
         return States.SHOP_MENU

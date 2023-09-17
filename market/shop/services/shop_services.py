@@ -83,7 +83,7 @@ class ShopService:
         """
         return await Shop.objects.filter(api_key=shop_api_key).aexists()
 
-    async def _get_shop_by_api_key(self, shop_api_key: str):
+    async def get_shop_by_api_key(self, shop_api_key: str) -> Optional[Shop]:
         """
         Get shop by api_key.
 
@@ -99,7 +99,7 @@ class ShopService:
 
     async def switch_activation(self, shop_api_key: str):
         """Changes `is_active` field in Shop object to opposite value."""
-        shop = await self._get_shop_by_api_key(shop_api_key)
+        shop = await self.get_shop_by_api_key(shop_api_key)
         shop.is_active = not shop.is_active
         await shop.asave()
 
@@ -107,6 +107,6 @@ class ShopService:
         """
         Changes `stop_updated_price` field in Shop object to opposite value.
         """
-        shop = await self._get_shop_by_api_key(shop_api_key)
+        shop = await self.get_shop_by_api_key(shop_api_key)
         shop.stop_updated_price = not shop.stop_updated_price
         await shop.asave()

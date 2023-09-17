@@ -113,7 +113,7 @@ class ChatService:
             username: str,
             password: str,
     ):
-        user = await UserService()\
+        user = await UserService() \
             .authenticate_telegram_admin(username, password)
         return user is not None
 
@@ -121,21 +121,21 @@ class ChatService:
             self,
             first_name: Optional[str],
             last_name: Optional[str],
-            username: Optional[str],
+            tg_username: Optional[str],
     ):
         """Create or update TelegramUser record."""
         logger.info(f"Admin has logged in: {self.chat_id=}, {first_name=},"
-                    f" {last_name=}, {username=},")
+                    f" {last_name=}, {tg_username=},")
         first_name = first_name if first_name is not None else ""
         last_name = last_name if last_name is not None else ""
-        username = username if username is not None else ""
+        tg_username = tg_username if tg_username is not None else ""
 
         tg_user, created = await TelegramUser.objects.aupdate_or_create(
             chat_id=self.chat_id,
             defaults=dict(
                 first_name=first_name,
                 last_name=last_name,
-                username=username,
+                username=tg_username,
                 role=TelegramUser.Roles.ADMIN,
                 is_logged_out=False,
             )
@@ -143,28 +143,43 @@ class ChatService:
         self.set_admin_role()
         self.set_shop_id(None)
 
-    async def authenticate_seller(
+    async def authenticate_and_login_seller(
             self,
-            shop_api_key,
-            tg_user_id,
+            shop_api_key: str,
+            first_name: Optional[str],
+            last_name: Optional[str],
+            tg_username: Optional[str],
     ):
-        """
-        Mark tg_user (seller) as authenticated, if api_key is correct.
-
-        :param shop_api_key:
-        :param tg_user_id:
-        :return:
-        """
-        key_is_correct = await ShopService().check_shop_api_key(shop_api_key)
-        if key_is_correct:
-            self.context.chat_data[self.AUTH_KEY] = True
-            self.set_seller_role()
-            self.set_related_shop_api_key(shop_api_key)
-            return True
-        else:
+        """Create or update TelegramUser record."""
+        # authentication
+        shop_service = ShopService()
+        shop = await shop_service.get_shop_by_api_key(shop_api_key)
+        if (shop is None) or (not shop.is_active):
             return False
+        else:
+            # login
+            first_name = first_name if first_name is not None else ""
+            last_name = last_name if last_name is not None else ""
+            tg_username = tg_username if tg_username is not None else ""
 
-        # todo confirmation by admin
+            tg_user, created = await TelegramUser.objects.aupdate_or_create(
+                chat_id=self.chat_id,
+                defaults=dict(
+                    first_name=first_name,
+                    last_name=last_name,
+                    username=tg_username,
+                    role=TelegramUser.Roles.SELLER,
+                    is_logged_out=False,
+                )
+            )
+            await tg_user.shops.aadd(shop)
+            self.set_seller_role()
+            self.set_shop_id(shop.pk)
+
+            logger.info(
+                f"Seller has logged in: {self.chat_id=}, {first_name=},"
+                f" {last_name=}, {tg_username=}, {shop.pk=}")
+            return True
 
     async def logout(self):
         """
