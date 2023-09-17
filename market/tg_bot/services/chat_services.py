@@ -13,8 +13,10 @@ from telegram.ext import (
     ContextTypes,
 )
 from django.contrib.auth import get_user_model
+from django.db.models import QuerySet
 
 from shop.services import ShopService
+from shop.models import Shop
 from tg_bot.services.telegram_user_service import TelegramUserService
 from tg_bot.services.user_services import UserService
 from tg_bot.models import TelegramUser
@@ -87,6 +89,16 @@ class ChatService:
 
     def set_admin_username(self, username):
         self.context.chat_data[self.ADMIN_USERNAME_KEY] = username
+
+    async def get_shops(self) -> QuerySet[Shop]:
+        role = await self.get_role()
+        if role == self.SELLER_ROLE:
+            shops = await TelegramUserService().get_related_shops(self.chat_id)
+        elif role == self.ADMIN_ROLE:
+            shops = Shop.objects.all()
+        else:
+            raise ValueError(f"Wrong {role=}")
+        return shops
 
     async def check_to_login(self) -> tuple:
         """

@@ -4,6 +4,7 @@ from typing import Optional
 from asgiref.sync import sync_to_async
 
 from django.conf import settings
+from django.db.models import QuerySet
 
 from shop.models import Shop
 from tg_bot.dataclasses import ShopInfo
@@ -15,41 +16,31 @@ LIST_LIMIT = settings.TG_BOT_LIST_LIMIT
 
 class ShopService:
     """Services related to Shop model that are used in the bot."""
+
     # todo use django service layer to access models
     async def count_shops(self):
         """Count all shops."""
         # todo cache
         return await Shop.objects.acount()
 
-    async def get_shops_to_display(
+    async def paginate_shops_for_buttons(
             self,
+            qs: QuerySet[Shop],
             limit: int = LIST_LIMIT,
             offset: int = 0,
     ):
-        """
-        Get shops data required for displaying.
-
-        Returns data objects that contains only basic information about shops
-        in range. Shops are sorted by `id` and limited with offset.
-        :param limit: maximum shops, that can be returned. Can't be negative.
-        :param offset: starting index from 0. Can't be negative.
-        :return: list of ShopInfo partially filled.
-        """
         if (limit < 0) or (offset < 0):
             raise AttributeError(
                 f"Limit or offset less than 0: {limit=}; {offset=}")
 
-        shops = Shop.objects.all() \
-            .order_by("id") \
-            .values("id", "name", "api_key", )
+        shops = qs.order_by("id").only("name")
         shops = shops[offset:(offset + limit)]
 
         result = []
         async for shop in shops:
             shop_info = ShopInfo(
-                id=shop["id"],
-                name=shop["name"],
-                api_key=shop["api_key"]
+                id=shop.pk,
+                name=shop.name,
             )
             result.append(shop_info)
         return result

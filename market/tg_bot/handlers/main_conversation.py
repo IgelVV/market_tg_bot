@@ -83,19 +83,20 @@ async def display_shop_list(
     """
     query = update.callback_query
     chat_id = query.from_user.id
-    user_service = ChatService(chat_id, context)
-    # if user_service.get_role() == user_service.SELLER_ROLE:
-    #     return await display_shop_menu(update, context)
+    chat_service = ChatService(chat_id, context)
 
     limit = LIST_LIMIT
     offset = 0
     if isinstance(query.data, Navigation):
         limit = query.data.limit
         offset = query.data.offset
+    shop_qs = await chat_service.get_shops()
     await query.answer(text=str(query.data))
     await query.edit_message_text(
         text=texts.display_shop_list,
-        reply_markup=await inline_keyboards.build_shop_list(limit, offset),
+        reply_markup=await inline_keyboards.build_shop_list(
+            qs=shop_qs,
+            limit=limit, offset=offset),
         parse_mode="html",
     )
     return States.SHOP_LIST
@@ -136,7 +137,6 @@ async def display_shop_info(
     shop_service = ShopService()
     user_service = ChatService(chat_id, context)
     shop_id = user_service.get_shop_id()
-    logger.info(f"display shop {shop_id=}")
     shop_info = await shop_service.get_shop_info(shop_id=shop_id)
     text = texts.display_shop_info.format(
         id=shop_info.id,

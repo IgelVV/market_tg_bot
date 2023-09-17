@@ -6,9 +6,11 @@ from math import ceil
 from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from django.conf import settings
+from django.db.models import QuerySet
 
 from tg_bot.dataclasses import ShopInfo, Navigation
 from shop.services import ShopService
+from shop.models import Shop
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +29,9 @@ BACK = "back"
 CANCEL = "cancel"
 
 SHOP_LIST = "shop_list"
+
+ADD_SHOP = "add_shop"
+UNLINK_SHOP = "unlink_shop"
 
 ACTIVATE = "activate"
 SHOP_INFO = "shop_info"
@@ -76,21 +81,37 @@ def build_admin_menu():
     return InlineKeyboardMarkup(keyboard)
 
 
-async def build_shop_list(limit: int = LIST_LIMIT, offset: int = 0):
-    """
-    Build keyboard, that contains shop list.
+def build_seller_menu():
+    keyboard = [
+        [
+            InlineKeyboardButton("Shop list", callback_data=SHOP_LIST),
+            InlineKeyboardButton("Add shop", callback_data=ADD_SHOP),
+            InlineKeyboardButton("Unlink shop", callback_data=UNLINK_SHOP),
+        ]
+    ]
+    return InlineKeyboardMarkup(keyboard)
 
-    It uses pagination.
-    :param limit: maximum items per page.
-    :param offset: index of start item.
-    :return: keyboard with navigation buttons.
-    """
-    keyboard = []
+
+async def build_shop_list(
+        qs: QuerySet[Shop],
+        limit: int = LIST_LIMIT,
+        offset: int = 0
+):
+    # """
+    # Build keyboard, that contains shop list.
+    #
+    # It uses pagination.
+    # :param limit: maximum items per page.
+    # :param offset: index of start item.
+    # :return: keyboard with navigation buttons.
+    # """
     shop_service = ShopService()
-    shops: list[ShopInfo] = await shop_service.get_shops_to_display(
+    shops: list[ShopInfo] = await shop_service.paginate_shops_for_buttons(
+        qs=qs,
         limit=limit,
         offset=offset,
     )
+    keyboard = []
     for shop in shops:
         keyboard.append(
             [InlineKeyboardButton(f"{shop.name}", callback_data=shop, )]
@@ -100,7 +121,7 @@ async def build_shop_list(limit: int = LIST_LIMIT, offset: int = 0):
             limit=limit,
             offset=offset,
             displayed_count=len(shops),
-            total_count=await shop_service.count_shops(),
+            total_count=await qs.acount(),
         )
     )
     return InlineKeyboardMarkup(keyboard)
