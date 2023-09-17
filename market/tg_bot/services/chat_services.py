@@ -1,3 +1,9 @@
+"""
+Service for using in handlers.
+
+It allows interacting with telegram context, and other services.
+"""
+
 import logging
 from typing import Optional
 
@@ -71,13 +77,13 @@ class ChatService:
         self.context.chat_data[self.SHOP_API_KEY] = api_key
 
     def get_shop_id(self):
-        self.context.chat_data.get(self.SHOP_ID_KEY)
+        return self.context.chat_data.get(self.SHOP_ID_KEY)
 
     def set_shop_id(self, shop_id):
         self.context.chat_data[self.SHOP_ID_KEY] = shop_id
 
     def get_admin_username(self):
-        self.context.chat_data.get(self.ADMIN_USERNAME_KEY)
+        return self.context.chat_data.get(self.ADMIN_USERNAME_KEY)
 
     def set_admin_username(self, username):
         self.context.chat_data[self.ADMIN_USERNAME_KEY] = username
@@ -160,6 +166,12 @@ class ChatService:
 
         # todo confirmation by admin
 
-    def logout(self):
-        """Mark user as not authenticated."""
-        self.context.chat_data[self.AUTH_KEY] = False
+    async def logout(self):
+        """
+        Mark user as logged out.
+
+        Allows restart authentication and logging in to refresh user data
+        (e.g. change role, or names).
+        """
+        tg_user_service = TelegramUserService()
+        await tg_user_service.mark_as_logged_out(self.chat_id)

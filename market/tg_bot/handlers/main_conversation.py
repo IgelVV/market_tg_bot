@@ -12,7 +12,7 @@ from django.conf import settings
 from shop.services import ShopService
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
-from tg_bot.services import ChatService, TelegramUserService
+from tg_bot.services import ChatService
 from tg_bot.dataclasses import Navigation, ShopInfo
 from tg_bot import texts
 
@@ -260,7 +260,7 @@ async def sign_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     chat_id = update.message.chat_id
     logger.info("User %s signed out.", user.full_name)
-    ChatService(chat_id, context).logout()
+    await ChatService(chat_id, context).logout()
     return await start(update, context)
 
 
