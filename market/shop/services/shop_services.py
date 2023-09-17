@@ -54,14 +54,15 @@ class ShopService:
             result.append(shop_info)
         return result
 
-    async def get_shop_info(self, shop_api_key: int):
+    async def get_shop_info(self, shop_id: int):
         """
         Get full information about Shop object.
 
         :param shop_api_key: api_key, used as identifier
         :return: data object ShopInfo
         """
-        shop = await Shop.objects.aget(api_key=shop_api_key)
+        logger.info(f"get_shop_info {shop_id}")
+        shop = await Shop.objects.aget(id=shop_id)
         shop_info = ShopInfo(
             id=shop.pk,
             name=shop.name,
@@ -95,18 +96,25 @@ class ShopService:
             shop = await Shop.objects.aget(api_key=shop_api_key)
             return shop
         except Shop.DoesNotExist:
-            logger.info(f"Shop with {shop_api_key} DoesNotExist")
+            logger.info(f"Shop with {shop_api_key=} DoesNotExist")
 
-    async def switch_activation(self, shop_api_key: str):
+    async def get_shop_by_id(self, shop_id) -> Optional[Shop]:
+        try:
+            shop = await Shop.objects.aget(id=shop_id)
+            return shop
+        except Shop.DoesNotExist:
+            logger.info(f"Shop with {shop_id=} DoesNotExist")
+
+    async def switch_activation(self, shop_id):
         """Changes `is_active` field in Shop object to opposite value."""
-        shop = await self.get_shop_by_api_key(shop_api_key)
+        shop = await self.get_shop_by_id(shop_id)
         shop.is_active = not shop.is_active
         await shop.asave()
 
-    async def switch_price_updating(self, shop_api_key: str):
+    async def switch_price_updating(self, shop_id):
         """
         Changes `stop_updated_price` field in Shop object to opposite value.
         """
-        shop = await self.get_shop_by_api_key(shop_api_key)
+        shop = await self.get_shop_by_id(shop_id)
         shop.stop_updated_price = not shop.stop_updated_price
         await shop.asave()
