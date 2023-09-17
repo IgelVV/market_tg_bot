@@ -53,11 +53,11 @@ def build_role_keyboard():
     return InlineKeyboardMarkup(keyboard)
 
 
-def build_yes_no():
+def build_yes_no(yes_data=YES, no_data=NO):
     keyboard = [
         [
-            InlineKeyboardButton("Yes", callback_data=YES),
-            InlineKeyboardButton("No", callback_data=NO),
+            InlineKeyboardButton("Yes", callback_data=yes_data),
+            InlineKeyboardButton("No", callback_data=no_data),
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -83,11 +83,9 @@ def build_admin_menu():
 
 def build_seller_menu():
     keyboard = [
-        [
-            InlineKeyboardButton("Shop list", callback_data=SHOP_LIST),
-            InlineKeyboardButton("Add shop", callback_data=ADD_SHOP),
-            InlineKeyboardButton("Unlink shop", callback_data=UNLINK_SHOP),
-        ]
+        [InlineKeyboardButton("Add shop", callback_data=ADD_SHOP)],
+        [InlineKeyboardButton("Unlink shop", callback_data=UNLINK_SHOP)],
+        [InlineKeyboardButton("Shop list", callback_data=SHOP_LIST)],
     ]
     return InlineKeyboardMarkup(keyboard)
 
