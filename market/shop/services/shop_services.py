@@ -45,15 +45,29 @@ class ShopService:
             result.append(shop_info)
         return result
 
-    async def get_shop_info(self, shop_id: int):
-        """
-        Get full information about Shop object.
-
-        :param shop_api_key: api_key, used as identifier
-        :return: data object ShopInfo
-        """
-        logger.info(f"get_shop_info {shop_id}")
+    async def get_shop_info_by_id(self, shop_id: int) -> ShopInfo:
+        # """
+        # Get full information about Shop object.
+        #
+        # :param shop_api_key: api_key, used as identifier
+        # :return: data object ShopInfo
+        # """
         shop = await Shop.objects.aget(id=shop_id)
+        logger.info(f"get_shop_info {shop.pk}")
+        return self._to_shop_info(shop)
+
+    async def get_shop_info_by_api_key(self, api_key: str) -> ShopInfo:
+        # """
+        # Get full information about Shop object.
+        #
+        # :param shop_api_key: api_key, used as identifier
+        # :return: data object ShopInfo
+        # """
+        shop = await Shop.objects.aget(api_key=api_key)
+        logger.debug(f"get_shop_info {shop.pk=}")
+        return self._to_shop_info(shop)
+
+    def _to_shop_info(self, shop: Shop) -> ShopInfo:
         shop_info = ShopInfo(
             id=shop.pk,
             name=shop.name,
