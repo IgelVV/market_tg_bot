@@ -41,3 +41,9 @@ class TelegramUserService:
         if tg_user is None:
             raise TelegramUser.DoesNotExist
         await tg_user.shops.aadd(shop_id)
+
+    async def unlink_shop_by_chat_id(self, chat_id: int, shop_id: int):
+        tg_user = await self.get_by_chat_id(chat_id)
+        if tg_user is None:
+            raise TelegramUser.DoesNotExist
+        await tg_user.shops.aremove(shop_id)
