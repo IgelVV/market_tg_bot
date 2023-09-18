@@ -60,7 +60,7 @@ async def display_user_menu(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     from_user, reply_func = await utils.callback_and_message_unifier(
-        update, "user menu")
+        update, texts.display_user_menu_answer)
     chat_id = from_user.id
     full_name = from_user.full_name
 
@@ -89,8 +89,7 @@ async def display_user_menu(
 async def display_add_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     from_user, reply_func = await utils.callback_and_message_unifier(
-        update, "add shop")
-    chat_id = from_user.id
+        update, texts.display_add_shop_answer)
     await reply_func(
         text=texts.display_add_shop,
         reply_markup=inline_keyboards.build_back(),
@@ -132,7 +131,7 @@ async def display_unlink_shop(
     if isinstance(query.data, Navigation):
         limit = query.data.limit
         offset = query.data.offset
-    await query.answer(text=str(query.data))
+    await query.answer(text=texts.display_unlink_shop_answer)
     shop_qs = await chat_service.get_shops()
     keyboard = await inline_keyboards.build_shop_list(
         qs=shop_qs,
@@ -156,7 +155,8 @@ async def confirm_unlink_shop(
         raise ValueError("Wrong callback data")
     shop_info = query.data
     chat_service.set_shop_to_unlink(shop_info)
-    await query.answer(text=str(shop_info.name))
+    await query.answer(
+        text=texts.confirm_unlink_shop_answer.format(name=shop_info.name))
     keyboard = inline_keyboards.build_yes_no(no_data=inline_keyboards.BACK)
     text = texts.unlink_shop.format(name=shop_info.name)
     await query.edit_message_text(
@@ -176,7 +176,10 @@ async def unlink_shop(
     tg_user_service = TelegramUserService()
     await tg_user_service.unlink_shop_by_chat_id(
         chat_id=chat_id, shop_id=shop_to_unlink.id)
-    await query.answer(text=f"`{shop_to_unlink.name}` is unlinked.", show_alert=True)
+    await query.answer(
+        text=texts.unlink_shop_answer.format(name=shop_to_unlink.name),
+        show_alert=True,
+    )
     return await display_unlink_shop(update, context)
 
 
@@ -197,7 +200,7 @@ async def display_shop_list(
     if isinstance(query.data, Navigation):
         limit = query.data.limit
         offset = query.data.offset
-    await query.answer(text=str(query.data))
+    await query.answer(text=texts.display_shop_list_answer)
     shop_qs = await chat_service.get_shops()
     keyboard = await inline_keyboards.build_shop_list(
         qs=shop_qs,
@@ -232,7 +235,8 @@ async def display_shop_menu(
         shop_id = chat_service.get_shop_id()
         shop_info = await shop_service.get_shop_info_by_id(shop_id)
     keyboard = inline_keyboards.build_shop_menu(with_back=True)
-    await query.answer(text=str(shop_info.name))
+    await query.answer(
+        text=texts.display_shop_menu_answer.format(name=shop_info.name))
     text = texts.display_shop_menu.format(name=shop_info.name)
     await query.edit_message_text(
         text=text,
@@ -246,7 +250,7 @@ async def display_shop_info(
     """Display information from Shop model and `back` button."""
     query = update.callback_query
     chat_id = query.from_user.id
-    await query.answer(text=str(query.data))
+    await query.answer(text=texts.display_shop_info_answer)
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
     shop_id = chat_service.get_shop_id()
@@ -274,7 +278,7 @@ async def activate_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Display `is_active` status of shop, and button to change it."""
     query = update.callback_query
     chat_id = query.from_user.id
-    await query.answer(text=str(query.data))
+    await query.answer(text=texts.activate_shop_answer)
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
     shop_id = chat_service.get_shop_id()
@@ -298,7 +302,7 @@ async def switch_activation(
     """
     query = update.callback_query
     chat_id = query.message.chat_id
-    await query.answer(text=str(query.data))
+    await query.answer(text=texts.switch_activation_answer)
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
     shop_id = chat_service.get_shop_id()
@@ -310,7 +314,7 @@ async def price_updating(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Display `stop_updated_price` status of shop, and button to change it."""
     query = update.callback_query
     chat_id = query.message.chat_id
-    await query.answer(text=str(query.data))
+    await query.answer(text=texts.price_updating_answer)
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
     shop_id = chat_service.get_shop_id()
@@ -335,7 +339,7 @@ async def switch_price_updating(
     """
     query = update.callback_query
     chat_id = query.message.chat_id
-    await query.answer(text=str(query.data))
+    await query.answer(text=texts.switch_price_updating_answer)
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
     shop_id = chat_service.get_shop_id()
@@ -351,7 +355,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
     cancel_message = "Bye! I hope we can talk again some day."
     from_user, reply_func = await utils.callback_and_message_unifier(
-        update, "cancel")
+        update, texts.cancel_answer)
 
     logger.info("User %s canceled the conversation.", from_user.full_name)
     await reply_func(
@@ -396,5 +400,5 @@ async def display_not_active(update: Update,
 async def handle_invalid_button(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Informs the user that the button is no longer available."""
-    await update.callback_query.answer()
+    await update.callback_query.answer(texts.handle_invalid_button_answer)
     await update.effective_message.edit_text(texts.invalid_button)

@@ -25,7 +25,7 @@ async def ask_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
     and next handler will handle commands too.
     """
     query = update.callback_query
-    await query.answer(text=query.data)
+    await query.answer(text=texts.ask_username_answer)
     await query.edit_message_text(text=texts.ask_username)
     return States.PASSWORD
 
@@ -99,7 +99,7 @@ async def ask_shop_api_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
     and next handler will handle commands too.
     """
     query = update.callback_query
-    await query.answer(text=query.data)
+    await query.answer(text=texts.ask_shop_api_key_answer)
     await query.edit_message_text(text=texts.ask_shop_api_key)
     return States.API_KEY
 

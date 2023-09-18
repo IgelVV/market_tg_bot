@@ -39,6 +39,9 @@ display_ban = "You are banned."
 
 display_not_active = "Your account is not active."
 
+invalid_button = "Sorry, I could not process this button click 😕 " \
+                 "Please send /start to get a new keyboard."
+
 
 ask_username = "Type your Username:"
 
@@ -58,12 +61,28 @@ logged_in_as_seller = "You are logged in as Seller."
 
 wrong_api_key = "Wrong API key, please enter it again:"
 
-invalid_button = "Sorry, I could not process this button click 😕 " \
-                 "Please send /start to get a new keyboard."
-
 
 # Commands:
 start_command_description = "Start"
 menu_command_description = "Available actions"
 cancel_command_description = "Cancel the current operation"
 sign_out_command_description = "logout TEST command"
+
+
+# Callback answers:
+ask_username_answer = None
+ask_shop_api_key_answer = None
+display_user_menu_answer = "User menu"
+display_add_shop_answer = "Add shop"
+display_unlink_shop_answer = "Unlink shops"
+confirm_unlink_shop_answer = "Unlink `{name}`"
+unlink_shop_answer = "Shop `{name}` is unlinked."
+display_shop_list_answer = "Shop list"
+display_shop_menu_answer = "Shop `{name}` menu"
+display_shop_info_answer = "Shop info"
+activate_shop_answer = "Activation"
+switch_activation_answer = "Switch activation"
+price_updating_answer = "Price updating"
+switch_price_updating_answer = "Switch price updating"
+cancel_answer = "Cancel"
+handle_invalid_button_answer = "Invalid button"
