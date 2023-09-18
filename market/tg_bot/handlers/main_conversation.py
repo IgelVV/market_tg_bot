@@ -10,6 +10,7 @@ from telegram.ext import (
 from django.conf import settings
 
 from shop.services import ShopService
+from shop.models import Shop
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services import ChatService
@@ -31,7 +32,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.message.chat_id
     chat_service = ChatService(chat_id, context)
     logger.info(
-        f"{chat_id} starts. {chat_service.ADMIN_ROLE.label} {type(chat_service.ADMIN_ROLE.label)}")
+        f"{chat_id} starts. {chat_service.ADMIN_ROLE.label}")
 
     is_logged_out, is_banned, is_activate = await chat_service.check_to_login()
 
@@ -94,15 +95,43 @@ async def display_user_menu(
 
 async def display_add_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
-    query = update.callback_query
-    chat_id = query.from_user.id
-    chat_service = ChatService(chat_id, context)
-    await query.answer(text=str(query.data))
-    await query.edit_message_text(
+    if update.message:
+        chat_id = update.message.chat_id
+        reply_func = update.message.reply_text
+    elif query := update.callback_query:
+        chat_id = query.from_user.id
+        reply_func = query.edit_message_text
+        await query.answer(text=str(query.data))
+    else:
+        raise ValueError(
+            "Unexpected update. It is expected Callback or Message.")
+    await reply_func(
         text=texts.display_add_shop,
         reply_markup=inline_keyboards.build_back(),
     )
     return States.ADD_SHOP
+
+
+async def add_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # todo check is_banned
+    chat_id = update.message.chat_id
+    chat_service = ChatService(chat_id, context=context)
+    shop_api_key = update.message.text
+    await update.message.delete()
+    await update.message.reply_text(
+        text=texts.api_key_received.format(shop_api_key=shop_api_key),
+    )
+    shop_info = await chat_service.add_shop(shop_api_key)
+    if shop_info is not None:
+        text = texts.shop_is_added.format(name=shop_info.name)
+        await update.message.reply_text(text=text)
+        return await display_add_shop(update, context)
+    else:
+        await update.message.reply_text(
+            texts.wrong_api_key,
+            reply_markup=inline_keyboards.build_back(),
+        )
+        return None
 
 
 async def display_unlink_shop(
@@ -221,7 +250,7 @@ async def display_shop_info(
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
     shop_id = chat_service.get_shop_id()
-    shop_info = await shop_service.get_shop_info(shop_id=shop_id)
+    shop_info = await shop_service.get_shop_info_by_id(shop_id=shop_id)
     text = texts.display_shop_info.format(
         id=shop_info.id,
         name=shop_info.name,
@@ -249,7 +278,7 @@ async def activate_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
     shop_id = chat_service.get_shop_id()
-    shop_info = await shop_service.get_shop_info(shop_id)
+    shop_info = await shop_service.get_shop_info_by_id(shop_id)
     await query.edit_message_text(
         text=texts.activate_shop.format(
             name=shop_info.name,
@@ -285,7 +314,7 @@ async def price_updating(update: Update, context: ContextTypes.DEFAULT_TYPE):
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
     shop_id = chat_service.get_shop_id()
-    shop_info = await shop_service.get_shop_info(shop_id)
+    shop_info = await shop_service.get_shop_info_by_id(shop_id)
     is_updating_on = not shop_info.stop_updated_price
     await query.edit_message_text(
         text=texts.price_updating.format(

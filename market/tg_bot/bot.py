@@ -123,6 +123,10 @@ def run():
                 ),
             ],
             States.ADD_SHOP: [
+                MessageHandler(
+                    filters.TEXT,
+                    main_conversation.add_shop,
+                ),
                 CallbackQueryHandler(
                     main_conversation.display_user_menu,
                     pattern=f"^{il_keyboards.BACK}$",
