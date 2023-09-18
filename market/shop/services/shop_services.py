@@ -17,7 +17,6 @@ LIST_LIMIT = settings.TG_BOT_LIST_LIMIT
 class ShopService:
     """Services related to Shop model that are used in the bot."""
 
-    # todo use django service layer to access models
     async def count_shops(self):
         """Count all shops."""
         # todo cache

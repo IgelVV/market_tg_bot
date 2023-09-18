@@ -32,6 +32,11 @@ class ChatService:
     Actions and data related to telegram users.
 
     Uses context.chat_data as a storage.
+    Constants with `_ROLE` postfix are used fer marking user's roles.
+    It can be any immutable object, e.g. strings with verbose names of roles.
+
+    Constants with `_KEY` postfix are used for data storage
+    in context.chat_data.
     """
     ADMIN_ROLE = TelegramUser.Roles.ADMIN
     SELLER_ROLE = TelegramUser.Roles.SELLER

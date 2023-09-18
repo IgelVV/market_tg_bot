@@ -8,6 +8,13 @@ logger = logging.getLogger(__name__)
 
 
 class UserService:
+    """
+    Contains methods for working with main user model.
+
+    TG_ADMIN_GROUP_NAME - group name that must be created for tg_bot app.
+    Only users from this group can be admins of telegram bot.
+    """
+
     TG_ADMIN_GROUP_NAME = "telegram_admins"
 
     async def authenticate_telegram_admin(

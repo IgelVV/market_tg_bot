@@ -15,7 +15,7 @@ from tg_bot.keyboards import inline_keyboards
 from tg_bot.services import ChatService, TelegramUserService
 from tg_bot.dataclasses import Navigation, ShopInfo
 from tg_bot import texts
-from tg_bot.handlers import utils, command_handlers
+from tg_bot.handlers import utils
 
 logger = logging.getLogger(__name__)
 
