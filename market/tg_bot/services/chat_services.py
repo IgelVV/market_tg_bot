@@ -7,8 +7,6 @@ It allows interacting with telegram context, and other services.
 import logging
 from typing import Optional
 
-from asgiref.sync import sync_to_async
-
 from telegram.ext import (
     ContextTypes,
 )
@@ -229,3 +227,6 @@ class ChatService:
             shop_id=shop_info.id
         )
         return shop_info
+
+    async def is_banned(self):
+        return await TelegramUserService().is_banned_by_chat_id(self.chat_id)
