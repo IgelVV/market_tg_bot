@@ -62,14 +62,11 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     It handles both messages or callback queries.
     """
-    cancel_message = "Bye! I hope we can talk again some day."
     from_user, reply_func = await utils.callback_and_message_unifier(
         update, texts.cancel_answer)
 
     logger.info("User %s canceled the conversation.", from_user.full_name)
-    await reply_func(
-        cancel_message,
-    )
+    await reply_func(texts.cancel)
     return ConversationHandler.END
 
 

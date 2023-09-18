@@ -64,6 +64,8 @@ display_not_active = "Your account is not active. " \
 invalid_button = "Sorry, I could not process this button click 😕 " \
                  "Please send /start to get a new keyboard."
 
+cancel = "Bye! I hope we can talk again some day."
+
 
 ask_username = "Type your Username:"
 
