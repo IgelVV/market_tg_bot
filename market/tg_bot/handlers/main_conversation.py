@@ -1,7 +1,7 @@
 """Handlers that are used in main ConversationHandler."""
 import logging
 
-from telegram import Update, ReplyKeyboardRemove
+from telegram import Update
 from telegram.ext import (
     ContextTypes,
     ConversationHandler,
@@ -10,12 +10,12 @@ from telegram.ext import (
 from django.conf import settings
 
 from shop.services import ShopService
-from shop.models import Shop
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services import ChatService, TelegramUserService
 from tg_bot.dataclasses import Navigation, ShopInfo
 from tg_bot import texts
+from tg_bot.handlers import utils
 
 logger = logging.getLogger(__name__)
 
@@ -58,19 +58,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def display_user_menu(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # Works with callbacks as well as with messages.
-    if update.message:
-        chat_id = update.message.chat_id
-        full_name = update.message.from_user.full_name
-        reply_func = update.message.reply_text
-    elif query := update.callback_query:
-        chat_id = query.from_user.id
-        full_name = query.from_user.full_name
-        reply_func = query.edit_message_text
-        await query.answer(text=str(query.data))
-    else:
-        raise ValueError(
-            "Unexpected update. It is expected Callback or Message.")
+
+    from_user, reply_func = await utils.callback_and_message_unifier(
+        update, "user menu")
+    chat_id = from_user.id
+    full_name = from_user.full_name
+
     chat_service = ChatService(chat_id, context)
     role = await chat_service.get_role()
     text = texts.display_user_menu.format(
@@ -95,16 +88,9 @@ async def display_user_menu(
 
 async def display_add_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
-    if update.message:
-        chat_id = update.message.chat_id
-        reply_func = update.message.reply_text
-    elif query := update.callback_query:
-        chat_id = query.from_user.id
-        reply_func = query.edit_message_text
-        await query.answer(text=str(query.data))
-    else:
-        raise ValueError(
-            "Unexpected update. It is expected Callback or Message.")
+    from_user, reply_func = await utils.callback_and_message_unifier(
+        update, "add shop")
+    chat_id = from_user.id
     await reply_func(
         text=texts.display_add_shop,
         reply_markup=inline_keyboards.build_back(),
@@ -136,6 +122,7 @@ async def add_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def display_unlink_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # possible callbacks: back, Navigation
     query = update.callback_query
     chat_id = query.from_user.id
     chat_service = ChatService(chat_id, context)
@@ -161,6 +148,7 @@ async def display_unlink_shop(
 
 async def confirm_unlink_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # possible callbacks: back, Shop_info
     query = update.callback_query
     chat_id = query.from_user.id
     chat_service = ChatService(chat_id, context)
@@ -168,7 +156,7 @@ async def confirm_unlink_shop(
         raise ValueError("Wrong callback data")
     shop_info = query.data
     chat_service.set_shop_to_unlink(shop_info)
-    await query.answer(text=str(shop_info))
+    await query.answer(text=str(shop_info.name))
     keyboard = inline_keyboards.build_yes_no(no_data=inline_keyboards.BACK)
     text = texts.unlink_shop.format(name=shop_info.name)
     await query.edit_message_text(
@@ -186,9 +174,9 @@ async def unlink_shop(
     chat_service = ChatService(chat_id, context)
     shop_to_unlink = chat_service.get_shop_to_unlink()
     tg_user_service = TelegramUserService()
-    await query.answer(text=str(query.data))
     await tg_user_service.unlink_shop_by_chat_id(
         chat_id=chat_id, shop_id=shop_to_unlink.id)
+    await query.answer(text=f"`{shop_to_unlink.name}` is unlinked.", show_alert=True)
     return await display_unlink_shop(update, context)
 
 
@@ -362,23 +350,13 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     It handles both messages or callback queries.
     """
     cancel_message = "Bye! I hope we can talk again some day."
-    # Works with callbacks as well as with messages.
-    if update.message:
-        user = update.message.from_user
-        logger.info("User %s canceled the conversation.", user.first_name)
-        await update.message.reply_text(
-            cancel_message,
-            reply_markup=ReplyKeyboardRemove(),
-        )
-    elif update.callback_query:
-        query = update.callback_query
-        await query.answer(text=query.data)
-        await query.edit_message_text(
-            text=cancel_message
-        )
-    else:
-        raise ValueError(
-            "Unexpected update. It is expected Callback or Message.")
+    from_user, reply_func = await utils.callback_and_message_unifier(
+        update, "cancel")
+
+    logger.info("User %s canceled the conversation.", from_user.full_name)
+    await reply_func(
+        cancel_message,
+    )
     return ConversationHandler.END
 
 
