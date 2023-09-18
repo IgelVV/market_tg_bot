@@ -58,6 +58,9 @@ logged_in_as_seller = "You are logged in as Seller."
 
 wrong_api_key = "Wrong API key, please enter it again:"
 
+invalid_button = "Sorry, I could not process this button click 😕 " \
+                 "Please send /start to get a new keyboard."
+
 
 # Commands:
 start_command_description = "Start"

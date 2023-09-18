@@ -413,3 +413,10 @@ async def display_not_active(update: Update,
         chat_id = update.callback_query.message.chat_id
     await bot.send_message(chat_id, texts.display_not_active)
     return ConversationHandler.END
+
+
+async def handle_invalid_button(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Informs the user that the button is no longer available."""
+    await update.callback_query.answer()
+    await update.effective_message.edit_text(texts.invalid_button)

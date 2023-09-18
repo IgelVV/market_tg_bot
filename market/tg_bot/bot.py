@@ -7,6 +7,7 @@ from telegram.ext import (
     ConversationHandler,
     MessageHandler,
     CallbackQueryHandler,
+    InvalidCallbackData,
     filters,
 )
 from django.conf import settings
@@ -97,7 +98,11 @@ def run():
     )
 
     main_conv = ConversationHandler(
-        entry_points=[CommandHandler(commands.START, main_conversation.start)],
+        entry_points=[
+            CommandHandler(commands.START, main_conversation.start),
+            CallbackQueryHandler(main_conversation.handle_invalid_button,
+                                 pattern=InvalidCallbackData)
+        ],
         states={
             States.LOGIN: [
                 login_conv,
@@ -213,7 +218,8 @@ def run():
             CommandHandler(commands.MENU, main_conversation.start),
             CommandHandler(commands.SIGN_OUT, main_conversation.sign_out),
             CommandHandler(commands.CANCEL, main_conversation.cancel),
-            # todo add InvalidCallbackData handler
+            CallbackQueryHandler(main_conversation.handle_invalid_button,
+                                 pattern=InvalidCallbackData)
         ],
     )
     # todo add error handler
