@@ -16,7 +16,7 @@ from tg_bot import commands
 from tg_bot.handlers import (
     main_conversation,
     login_conversation,
-    command_handelrs,
+    command_handlers,
 )
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards as il_keyboards
@@ -73,7 +73,7 @@ def run():
                     pattern=f"^{il_keyboards.YES}$"
                 ),
                 CallbackQueryHandler(
-                    main_conversation.cancel,
+                    command_handlers.cancel,
                     pattern=f"^{il_keyboards.NO}$"
                 ),
             ],
@@ -85,9 +85,9 @@ def run():
             ]
         },
         fallbacks=[
-            CommandHandler(commands.CANCEL, main_conversation.cancel),
+            CommandHandler(commands.CANCEL, command_handlers.cancel),
             CallbackQueryHandler(
-                main_conversation.cancel,
+                command_handlers.cancel,
                 pattern=f"^{il_keyboards.CANCEL}$",
             )
         ],
@@ -97,12 +97,12 @@ def run():
             States.SELLER_MENU: States.SELLER_MENU,
         },
     )
-
     main_conv = ConversationHandler(
         entry_points=[
-            CommandHandler(commands.START, main_conversation.start),
-            CommandHandler(commands.MENU, main_conversation.start),
-            CommandHandler(commands.CANCEL, main_conversation.cancel),
+            CommandHandler(commands.START, command_handlers.start),
+            CommandHandler(commands.MENU, command_handlers.start),
+            CommandHandler(commands.CANCEL, command_handlers.cancel),
+            CommandHandler(commands.SIGN_OUT, command_handlers.sign_out),
             CallbackQueryHandler(main_conversation.handle_invalid_button,
                                  pattern=InvalidCallbackData)
         ],
@@ -218,19 +218,21 @@ def run():
             ],
         },
         fallbacks=[
-            CommandHandler(commands.MENU, main_conversation.start),
-            CommandHandler(commands.SIGN_OUT, main_conversation.sign_out),
-            CommandHandler(commands.CANCEL, main_conversation.cancel),
+            CommandHandler(commands.START, command_handlers.start),
+            CommandHandler(commands.MENU, command_handlers.start),
+            CommandHandler(commands.SIGN_OUT, command_handlers.sign_out),
+            CommandHandler(commands.CANCEL, command_handlers.cancel),
             CallbackQueryHandler(main_conversation.handle_invalid_button,
                                  pattern=InvalidCallbackData)
         ],
     )
+
     # todo add error handler
     commands.set_bot_commands(bot=application.bot)
 
     application.add_handler(main_conv)
     application.add_handler(
-        CommandHandler(commands.HELP, command_handelrs.help))
+        CommandHandler(commands.HELP, command_handlers.help_handler))
 
     application.run_polling()
 
