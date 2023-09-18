@@ -1,6 +1,27 @@
 """Text for bot messages, commands."""
 
 # Messages:
+help_text = """
+Основной способ управления ботом - интерактивные кнопки, под сообщениями. \
+Однако при длительном бездействии кнопки становятся неактивными. \
+В таком случае на помощь приходят команды, доступные в любое время.
+
+Список команд для управления ботом:
+/start - запуск диалога с ботом.
+/menu - переход в меню пользователя из любого места диалога.
+/cancel - отмена действия и завершение диалога. \
+После использования этой команды необходимо заново запустить диалог.
+
+При вводе текста с клавиатуры, например пароля или API key, текст, \
+который начинается как команда с '/' будет распознан как команда. \
+По этому не используйте данные, начинающиеся с этого символа.
+
+Служебные команды: 
+/sign_out - позволяет повторно пройти процесс регистрации. \
+Используется для смены роли или обновления данных пользователя, \
+таких как `username`.
+"""
+
 start_choose_role = "Choose your role"
 
 after_login = "Hello {full_name} your role is {role}"
@@ -64,6 +85,7 @@ wrong_api_key = "Wrong API key, please enter it again:"
 
 # Commands:
 start_command_description = "Start"
+help_command_description = "Information about the work of the bot"
 menu_command_description = "Available actions"
 cancel_command_description = "Cancel the current operation"
 sign_out_command_description = "logout TEST command"

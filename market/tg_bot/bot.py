@@ -16,6 +16,7 @@ from tg_bot import commands
 from tg_bot.handlers import (
     main_conversation,
     login_conversation,
+    command_handelrs,
 )
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards as il_keyboards
@@ -100,6 +101,8 @@ def run():
     main_conv = ConversationHandler(
         entry_points=[
             CommandHandler(commands.START, main_conversation.start),
+            CommandHandler(commands.MENU, main_conversation.start),
+            CommandHandler(commands.CANCEL, main_conversation.cancel),
             CallbackQueryHandler(main_conversation.handle_invalid_button,
                                  pattern=InvalidCallbackData)
         ],
@@ -226,6 +229,8 @@ def run():
     commands.set_bot_commands(bot=application.bot)
 
     application.add_handler(main_conv)
+    application.add_handler(
+        CommandHandler(commands.HELP, command_handelrs.help))
 
     application.run_polling()
 
