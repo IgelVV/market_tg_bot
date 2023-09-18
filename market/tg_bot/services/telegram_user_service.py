@@ -27,11 +27,17 @@ class TelegramUserService:
         except TelegramUser.DoesNotExist:
             return None
 
-    async def mark_as_logged_out(self, chat_id: int):
+    async def mark_as_logged_out_by_chat_id(self, chat_id: int):
         tg_user = await self.get_by_chat_id(chat_id)
         tg_user.is_logged_out = True
         await tg_user.asave()
 
-    async def get_related_shops(self, chat_id: int) -> QuerySet[Shop]:
+    async def get_related_shops_by_chat_id(self, chat_id: int) -> QuerySet[Shop]:
         tg_user = await self.get_by_chat_id(chat_id)
         return tg_user.shops.all()
+
+    async def add_shop_by_chat_id(self, chat_id: int, shop_id: int):
+        tg_user = await self.get_by_chat_id(chat_id)
+        if tg_user is None:
+            raise TelegramUser.DoesNotExist
+        await tg_user.shops.aadd(shop_id)
