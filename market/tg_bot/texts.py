@@ -56,9 +56,10 @@ activate_shop = "Shop name: {name}\nIs active: {is_active}"
 price_updating = "Shop name: {name}\n" \
                  "Price updating: {switch}"
 
-display_ban = "You are banned."
+display_ban = "You are banned. Contact the support service to unban."
 
-display_not_active = "Your account is not active."
+display_not_active = "Your account is not active. " \
+                     "Buy a subscription to the service"
 
 invalid_button = "Sorry, I could not process this button click 😕 " \
                  "Please send /start to get a new keyboard."
