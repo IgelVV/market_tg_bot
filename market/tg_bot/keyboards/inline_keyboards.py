@@ -205,5 +205,6 @@ def _build_navigation_buttons(
 
 def _build_back_button():
     """Creates `back` button to adding to keyboards as a line."""
-    button = [InlineKeyboardButton("\U0001F868", callback_data=BACK)]
+    # button = [InlineKeyboardButton("\U0001F868", callback_data=BACK)]
+    button = [InlineKeyboardButton("\U0001F519", callback_data=BACK)]
     return button
