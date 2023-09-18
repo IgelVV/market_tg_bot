@@ -7,7 +7,9 @@ after_login = "Hello {full_name} your role is {role}"
 
 display_user_menu = "Main menu ({full_name}: {role}):"
 
-display_add_shop = "Add shop by API key"
+display_add_shop = "Add shop by API key. \nType new API key:"
+
+shop_is_added = "Shop `{name}` is added."
 
 display_unlink_shop = "Unlink shop from the seller."
 
