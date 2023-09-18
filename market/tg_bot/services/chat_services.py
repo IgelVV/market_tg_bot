@@ -100,7 +100,8 @@ class ChatService:
     async def get_shops(self) -> QuerySet[Shop]:
         role = await self.get_role()
         if role == self.SELLER_ROLE:
-            shops = await TelegramUserService().get_related_shops(self.chat_id)
+            shops = await TelegramUserService().get_related_shops_by_chat_id(
+                self.chat_id)
         elif role == self.ADMIN_ROLE:
             shops = Shop.objects.all()
         else:
@@ -209,4 +210,16 @@ class ChatService:
         (e.g. change role, or names).
         """
         tg_user_service = TelegramUserService()
-        await tg_user_service.mark_as_logged_out(self.chat_id)
+        await tg_user_service.mark_as_logged_out_by_chat_id(self.chat_id)
+
+    async def add_shop(self, shop_api_key: str):
+        try:
+            shop_info = await ShopService().get_shop_info_by_api_key(
+                shop_api_key)
+        except Shop.DoesNotExist:
+            return None
+        await TelegramUserService().add_shop_by_chat_id(
+            chat_id=self.chat_id,
+            shop_id=shop_info.id
+        )
+        return shop_info
