@@ -58,13 +58,13 @@ def run():
         states={
             States.PASSWORD: [
                 MessageHandler(
-                    filters.TEXT,
+                    filters.TEXT & (~filters.COMMAND),
                     login_conversation.ask_password,
                 ),
             ],
             States.CHECK_PASSWORD: [
                 MessageHandler(
-                    filters.TEXT,
+                    filters.TEXT & (~filters.COMMAND),
                     login_conversation.check_password,
                 ),
                 CallbackQueryHandler(
@@ -78,7 +78,7 @@ def run():
             ],
             States.API_KEY: [
                 MessageHandler(
-                    filters.TEXT,
+                    filters.TEXT & (~filters.COMMAND),
                     login_conversation.check_shop_api_key,
                 ),
             ]
@@ -129,7 +129,7 @@ def run():
             ],
             States.ADD_SHOP: [
                 MessageHandler(
-                    filters.TEXT,
+                    filters.TEXT & (~filters.COMMAND),
                     main_conversation.add_shop,
                 ),
                 CallbackQueryHandler(
