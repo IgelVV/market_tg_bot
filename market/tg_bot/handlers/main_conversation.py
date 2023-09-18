@@ -13,7 +13,7 @@ from shop.services import ShopService
 from shop.models import Shop
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
-from tg_bot.services import ChatService
+from tg_bot.services import ChatService, TelegramUserService
 from tg_bot.dataclasses import Navigation, ShopInfo
 from tg_bot import texts
 
@@ -164,12 +164,15 @@ async def confirm_unlink_shop(
     query = update.callback_query
     chat_id = query.from_user.id
     chat_service = ChatService(chat_id, context)
-    if isinstance(query.data, ShopInfo):
-        chat_service.set_shop_id_to_unlink(query.data.id)
-    await query.answer(text=str(query.data))
+    if not isinstance(query.data, ShopInfo):
+        raise ValueError("Wrong callback data")
+    shop_info = query.data
+    chat_service.set_shop_to_unlink(shop_info)
+    await query.answer(text=str(shop_info))
     keyboard = inline_keyboards.build_yes_no(no_data=inline_keyboards.BACK)
+    text = texts.unlink_shop.format(name=shop_info.name)
     await query.edit_message_text(
-        text=texts.unlink_shop,
+        text=text,
         reply_markup=keyboard,
     )
     return States.UNLINK_SHOP
@@ -177,13 +180,16 @@ async def confirm_unlink_shop(
 
 async def unlink_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
+    # todo check is_banned
     query = update.callback_query
     chat_id = query.from_user.id
     chat_service = ChatService(chat_id, context)
-    shop_id_to_unlink = chat_service.get_shop_id_to_unlink()
-    # todo unlink
+    shop_to_unlink = chat_service.get_shop_to_unlink()
+    tg_user_service = TelegramUserService()
     await query.answer(text=str(query.data))
-    return await display_user_menu(update, context)
+    await tg_user_service.unlink_shop_by_chat_id(
+        chat_id=chat_id, shop_id=shop_to_unlink.id)
+    return await display_unlink_shop(update, context)
 
 
 async def display_shop_list(
@@ -229,13 +235,19 @@ async def display_shop_menu(
     chat_id = query.from_user.id
 
     chat_service = ChatService(chat_id, context)
+    shop_service = ShopService()
     if isinstance(query.data, ShopInfo):
-        chat_service.set_shop_id(query.data.id)
+        shop_info = query.data
+        chat_service.set_shop_id(shop_info.id)
+    else:
+        # todo optimize
+        shop_id = chat_service.get_shop_id()
+        shop_info = await shop_service.get_shop_info_by_id(shop_id)
     keyboard = inline_keyboards.build_shop_menu(with_back=True)
-    await query.answer(text=str(query.data))
+    await query.answer(text=str(shop_info.name))
+    text = texts.display_shop_menu.format(name=shop_info.name)
     await query.edit_message_text(
-        # todo format()
-        text=texts.display_shop_menu,
+        text=text,
         reply_markup=keyboard,
     )
     return States.SHOP_MENU
