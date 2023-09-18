@@ -13,11 +13,11 @@ shop_is_added = "Shop `{name}` is added."
 
 display_unlink_shop = "Unlink shop from the seller."
 
-unlink_shop = "Forget shop {name}?"
+unlink_shop = "Forget shop `{name}`?"
 
 display_shop_list = "Available shops:"
 
-display_shop_menu = "Shop: `{shop_name}`"
+display_shop_menu = "Shop: `{name}`"
 
 display_shop_info = \
     "<b>Full shop information</b>\n" \
