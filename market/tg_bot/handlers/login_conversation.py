@@ -115,13 +115,13 @@ async def check_shop_api_key(
     Displays `shop menu` if authenticated.
     """
     chat_id = update.message.chat_id
-    user_service = ChatService(chat_id, context=context)
+    chat_service = ChatService(chat_id, context=context)
     shop_api_key = update.message.text
     await update.message.delete()
     await update.message.reply_text(
         texts.api_key_received.format(shop_api_key=shop_api_key)
     )
-    logged_in = await user_service.authenticate_and_login_seller(
+    logged_in = await chat_service.authenticate_and_login_seller(
         shop_api_key=shop_api_key,
         first_name=update.message.from_user.first_name,
         last_name=update.message.from_user.last_name,
