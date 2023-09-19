@@ -127,7 +127,7 @@ async def confirm_unlink_shop(
     if not isinstance(query.data, ShopInfo):
         raise ValueError("Wrong callback data")
     shop_info = query.data
-    chat_service.set_shop_to_unlink(shop_info)
+    chat_service.set_shop_info(shop_info)
     await query.answer(
         text=texts.CONFIRM_UNLINK_SHOP_ANS.format(name=shop_info.name))
     keyboard = inline_keyboards.build_yes_no(no_data=inline_keyboards.BACK)
@@ -150,7 +150,7 @@ async def unlink_shop(
     if not is_activate:
         return await display_not_active(update, context)
 
-    shop_to_unlink = chat_service.get_shop_to_unlink()
+    shop_to_unlink = chat_service.get_shop_info()
     tg_user_service = TelegramUserService()
     await tg_user_service.unlink_shop_by_chat_id(
         chat_id=chat_id, shop_id=shop_to_unlink.id)
@@ -206,12 +206,12 @@ async def display_shop_menu(
     chat_service = ChatService(chat_id, context)
     shop_service = ShopService()
     if isinstance(query.data, ShopInfo):
+        # callback from shop list, using `shop` button
         shop_info = query.data
-        chat_service.set_shop_id(shop_info.id)
+        chat_service.set_shop_info(shop_info)
     else:
-        # todo optimize
-        shop_id = chat_service.get_shop_id()
-        shop_info = await shop_service.get_shop_info_by_id(shop_id)
+        # callback from shop submenu using `back` button
+        shop_info = chat_service.get_shop_info()
     keyboard = inline_keyboards.build_shop_menu(with_back=True)
     await query.answer(
         text=texts.DISPLAY_SHOP_MENU_ANS.format(name=shop_info.name))
@@ -237,17 +237,19 @@ async def display_shop_info(
     if not is_activate:
         return await display_not_active(update, context)
 
-    shop_id = chat_service.get_shop_id()
-    shop_info = await shop_service.get_shop_info_by_id(shop_id=shop_id)
+    shop_info = chat_service.get_shop_info()
+    # to refresh data
+    new_shop_info = await shop_service.get_shop_info_by_id(
+        shop_id=shop_info.id)
     text = texts.DISPLAY_SHOP_INFO.format(
-        id=shop_info.id,
-        name=shop_info.name,
-        slug=shop_info.slug,
-        api_key=shop_info.api_key,
-        vendor_name=shop_info.vendor_name,
-        is_active=shop_info.is_active,
-        stop_updated_price=shop_info.stop_updated_price,
-        individual_updating_time=shop_info.individual_updating_time,
+        id=new_shop_info.id,
+        name=new_shop_info.name,
+        slug=new_shop_info.slug,
+        api_key=new_shop_info.api_key,
+        vendor_name=new_shop_info.vendor_name,
+        is_active=new_shop_info.is_active,
+        stop_updated_price=new_shop_info.stop_updated_price,
+        individual_updating_time=new_shop_info.individual_updating_time,
     )
 
     await query.edit_message_text(
@@ -265,14 +267,16 @@ async def activate_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer(text=texts.ACTIVATE_SHOP_ANS)
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
-    shop_id = chat_service.get_shop_id()
-    shop_info = await shop_service.get_shop_info_by_id(shop_id)
+    shop_info = chat_service.get_shop_info()
+    # to refresh data about shop
+    new_shop_info = await shop_service.get_shop_info_by_id(shop_info.id)
     await query.edit_message_text(
         text=texts.ACTIVATE_SHOP.format(
-            name=shop_info.name,
-            is_active=shop_info.is_active
+            name=new_shop_info.name,
+            is_active=new_shop_info.is_active
         ),
-        reply_markup=inline_keyboards.build_activate_shop(shop_info.is_active)
+        reply_markup=inline_keyboards.build_activate_shop(
+            new_shop_info.is_active)
     )
     return States.ACTIVATE
 
@@ -295,8 +299,8 @@ async def switch_activation(
         return await display_not_active(update, context)
 
     shop_service = ShopService()
-    shop_id = chat_service.get_shop_id()
-    await shop_service.switch_activation(shop_id)
+    shop_info = chat_service.get_shop_info()
+    await shop_service.switch_activation(shop_info.id)
     return await activate_shop(update, context)
 
 
@@ -307,8 +311,8 @@ async def price_updating(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.answer(text=texts.PRICE_UPDATING_ANS)
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
-    shop_id = chat_service.get_shop_id()
-    shop_info = await shop_service.get_shop_info_by_id(shop_id)
+    shop_info = chat_service.get_shop_info()
+    shop_info = await shop_service.get_shop_info_by_id(shop_info.id)
     is_updating_on = not shop_info.stop_updated_price
     await query.edit_message_text(
         text=texts.PRICE_UPDATING.format(
@@ -338,8 +342,8 @@ async def switch_price_updating(
         return await display_not_active(update, context)
 
     shop_service = ShopService()
-    shop_id = chat_service.get_shop_id()
-    await shop_service.switch_price_updating(shop_id)
+    shop_info = chat_service.get_shop_info()
+    await shop_service.switch_price_updating(shop_info.id)
     return await price_updating(update, context)
 
 

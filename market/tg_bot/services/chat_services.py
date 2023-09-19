@@ -41,9 +41,7 @@ class ChatService:
 
     AUTH_KEY = "authenticated"
     ROLE_KEY = "role"
-    SHOP_API_KEY = "shop_api_key"
-    SHOP_ID_KEY = "shop id"
-    SHOP_TO_UNLINK_KEY = "shop_id_to_unlink"
+    SHOP_INFO_KEY = "shop_info"
     ADMIN_USERNAME_KEY = "admin_username"
 
     def __init__(self, chat_id: int, context: ContextTypes.DEFAULT_TYPE):
@@ -76,24 +74,11 @@ class ChatService:
         """Set tg_user role as `seller`."""
         self.context.chat_data[self.ROLE_KEY] = self.SELLER_ROLE
 
-    def get_related_shop_api_key(self):
-        """"""
-        return self.context.chat_data.get(self.SHOP_API_KEY)
+    def get_shop_info(self) -> ShopInfo:
+        return self.context.chat_data.get(self.SHOP_INFO_KEY)
 
-    def set_related_shop_api_key(self, api_key):
-        self.context.chat_data[self.SHOP_API_KEY] = api_key
-
-    def get_shop_id(self):
-        return self.context.chat_data.get(self.SHOP_ID_KEY)
-
-    def set_shop_id(self, shop_id):
-        self.context.chat_data[self.SHOP_ID_KEY] = shop_id
-
-    def get_shop_to_unlink(self) -> ShopInfo:
-        return self.context.chat_data.get(self.SHOP_TO_UNLINK_KEY)
-
-    def set_shop_to_unlink(self, shop: ShopInfo):
-        self.context.chat_data[self.SHOP_TO_UNLINK_KEY] = shop
+    def set_shop_info(self, shop: ShopInfo):
+        self.context.chat_data[self.SHOP_INFO_KEY] = shop
 
     def get_admin_username(self):
         return self.context.chat_data.get(self.ADMIN_USERNAME_KEY)
@@ -165,7 +150,6 @@ class ChatService:
             )
         )
         self.set_admin_role()
-        self.set_shop_id(None)
 
     async def authenticate_and_login_seller(
             self,
@@ -199,7 +183,6 @@ class ChatService:
             )
             await tg_user.shops.aadd(shop)
             self.set_seller_role()
-            self.set_shop_id(shop.pk)
 
             logger.info(
                 f"Seller has logged in: {self.chat_id=}, {first_name=},"
