@@ -32,6 +32,7 @@ async def display_user_menu(
 
     chat_service = ChatService(chat_id, context)
     role = await chat_service.get_role()
+    logger.info(f"User {full_name} {chat_id} displays menu as {role}.")
     readable_role = utils.readable_role(role)
     text = texts.DISPLAY_USER_MENU.format(
         full_name=full_name,
@@ -50,6 +51,7 @@ async def display_user_menu(
         )
         return States.SELLER_MENU
     else:
+        logger.error(f"{chat_id=} Wrong {role=}")
         raise ValueError(f"Wrong {role=}")
 
 
@@ -57,6 +59,8 @@ async def display_add_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     from_user, reply_func = await utils.callback_and_message_unifier(
         update, texts.DISPLAY_ADD_SHOP_ANS)
+    logger.debug(
+        f"User {from_user.full_name} {from_user.id} goes to `add shop` menu.")
     await reply_func(
         text=texts.DISPLAY_ADD_SHOP,
         reply_markup=inline_keyboards.build_back(),
@@ -65,6 +69,7 @@ async def display_add_shop(
 
 
 async def add_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    user = update.message.from_user
     chat_id = update.message.chat_id
     chat_service = ChatService(chat_id, context=context)
 
@@ -79,24 +84,34 @@ async def add_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(
         text=texts.API_KEY_RECEIVED.format(shop_api_key=shop_api_key),
     )
+    logger.debug(f"User {user.full_name} {chat_id} "
+                 f"is trying to add shop by {shop_api_key=}.")
     shop_info = await chat_service.add_shop(shop_api_key)
     if shop_info is not None:
         text = texts.SHOP_IS_ADDED.format(name=shop_info.name)
         await update.message.reply_text(text=text)
+        logger.info(f"User {user.full_name} {chat_id} "
+                    f"has added shop {shop_api_key=}")
         return await display_add_shop(update, context)
     else:
         await update.message.reply_text(
             texts.WRONG_API_KEY,
             reply_markup=inline_keyboards.build_back(),
         )
+        logger.info(f"User {user.full_name} {chat_id} "
+                    f"has passed wrong {shop_api_key=}")
         return None
 
 
 async def display_unlink_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     # possible callbacks: back, Navigation
+    user = update.callback_query.from_user
     query = update.callback_query
     chat_id = query.from_user.id
+    logger.debug(
+        f"User {user.full_name} {chat_id} goes to `unlink_shop` menu."
+        f" {query.data=}.")
     chat_service = ChatService(chat_id, context)
 
     limit = LIST_LIMIT
@@ -125,7 +140,8 @@ async def confirm_unlink_shop(
     chat_id = query.from_user.id
     chat_service = ChatService(chat_id, context)
     if not isinstance(query.data, ShopInfo):
-        raise ValueError("Wrong callback data")
+        logger.error(f"{chat_id=} Wrong callback data: {query.data}")
+        raise ValueError(f"Wrong callback data: {query.data=}")
     shop_info = query.data
     chat_service.set_shop_info(shop_info)
     await query.answer(
@@ -142,6 +158,7 @@ async def confirm_unlink_shop(
 async def unlink_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
+    user = query.from_user
     chat_id = query.from_user.id
     chat_service = ChatService(chat_id, context)
     is_banned, is_activate, _ = await chat_service.get_statuses()
@@ -158,6 +175,8 @@ async def unlink_shop(
         text=texts.UNLINK_SHOP_ANS.format(name=shop_to_unlink.name),
         show_alert=True,
     )
+    logger.info(f"User {user.full_name} {chat_id=} "
+                f"has unlinked shop {shop_to_unlink.name}")
     return await display_unlink_shop(update, context)
 
 
@@ -170,8 +189,11 @@ async def display_shop_list(
     It is allowed only for admins.
     """
     query = update.callback_query
+    user = query.from_user
     chat_id = query.from_user.id
     chat_service = ChatService(chat_id, context)
+    logger.debug(f"User {user.full_name} {chat_id=} is opening "
+                 f"`shop_list with {query.data=}")
 
     limit = LIST_LIMIT
     offset = 0
@@ -201,10 +223,12 @@ async def display_shop_menu(
     Allowed for both admin and seller.
     """
     query = update.callback_query
+    user = query.from_user
     chat_id = query.from_user.id
+    logger.debug(f"User {user.full_name} {chat_id=} is opening "
+                 f"`shop_menu with {query.data=}")
 
     chat_service = ChatService(chat_id, context)
-    shop_service = ShopService()
     if isinstance(query.data, ShopInfo):
         # callback from shop list, using `shop` button
         shop_info = query.data
@@ -227,6 +251,7 @@ async def display_shop_info(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Display information from Shop model and `back` button."""
     query = update.callback_query
+    user = query.from_user
     chat_id = query.from_user.id
     await query.answer(text=texts.DISPLAY_SHOP_INFO_ANS)
     shop_service = ShopService()
@@ -251,6 +276,8 @@ async def display_shop_info(
         stop_updated_price=new_shop_info.stop_updated_price,
         individual_updating_time=new_shop_info.individual_updating_time,
     )
+    logger.info(f"User {user.full_name} {chat_id=} is opening "
+                f"`shop_info of shop {new_shop_info}")
 
     await query.edit_message_text(
         text=text,
@@ -289,6 +316,7 @@ async def switch_activation(
     Then displays new status.
     """
     query = update.callback_query
+    user = query.from_user
     chat_id = query.message.chat_id
     await query.answer(text=texts.SWITCH_ACTIVATION_ANS)
     chat_service = ChatService(chat_id, context)
@@ -297,9 +325,10 @@ async def switch_activation(
         return await display_ban(update, context)
     if not is_activate:
         return await display_not_active(update, context)
-
     shop_service = ShopService()
     shop_info = chat_service.get_shop_info()
+    logger.info(f"User {user.full_name} {chat_id=} "
+                f"is switching activations of {shop_info}")
     await shop_service.switch_activation(shop_info.id)
     return await activate_shop(update, context)
 
@@ -332,6 +361,7 @@ async def switch_price_updating(
     Then displays new status.
     """
     query = update.callback_query
+    user = query.from_user
     chat_id = query.message.chat_id
     await query.answer(text=texts.SWITCH_PRICE_UPDATING_ANS)
     chat_service = ChatService(chat_id, context)
@@ -343,6 +373,8 @@ async def switch_price_updating(
 
     shop_service = ShopService()
     shop_info = chat_service.get_shop_info()
+    logger.info(f"User {user.full_name} {chat_id=} "
+                f"is switching price_updating of {shop_info}")
     await shop_service.switch_price_updating(shop_info.id)
     return await price_updating(update, context)
 
@@ -351,9 +383,11 @@ async def display_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Display message for banned user."""
     bot = context.bot
     if update.message:
-        chat_id = update.message.chat_id
+        user = update.message.from_user
     else:
-        chat_id = update.callback_query.message.chat_id
+        user = update.callback_query.from_user
+    chat_id = user.id
+    logger.info(f"User {user.full_name} {chat_id} has got a ban.")
     await bot.send_message(chat_id, texts.DISPLAY_BAN)
     return ConversationHandler.END
 
@@ -363,9 +397,12 @@ async def display_not_active(
     """Display message for not active user."""
     bot = context.bot
     if update.message:
-        chat_id = update.message.chat_id
+        user = update.message.from_user
     else:
-        chat_id = update.callback_query.message.chat_id
+        user = update.callback_query.from_user
+    chat_id = user.id
+    logger.info(f"User {user.full_name} {chat_id} "
+                f"has got a `not active` message.")
     await bot.send_message(chat_id, texts.DISPLAY_NOT_ACTIVE)
     return ConversationHandler.END
 
@@ -373,5 +410,8 @@ async def display_not_active(
 async def handle_invalid_button(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Informs the user that the button is no longer available."""
+    user = update.callback_query.from_user
     await update.callback_query.answer(texts.HANDLE_INVALID_BUTTON_ANS)
     await update.effective_message.edit_text(texts.INVALID_BUTTON)
+    logger.debug(f"User {user.full_name} {user.id} "
+                 f"has clicked on invalid button.")

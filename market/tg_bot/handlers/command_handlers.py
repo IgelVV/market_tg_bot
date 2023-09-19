@@ -31,8 +31,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     chat_id = update.message.chat_id
     chat_service = ChatService(chat_id, context)
+    user = update.message.from_user
     logger.info(
-        f"{chat_id} starts. {chat_service.ADMIN_ROLE.label}")
+        f"User {user.full_name} with {chat_id=} starts.")
 
     is_banned, is_activate, is_logged_out = await chat_service.get_statuses()
 
@@ -53,6 +54,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return States.LOGIN
     else:
+        logger.info(f"User {user.full_name} {chat_id} is recognised.")
         return await main_conversation.display_user_menu(update, context)
 
 
