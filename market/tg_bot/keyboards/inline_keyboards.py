@@ -46,8 +46,8 @@ SWITCH_PRICE_UPDATING = "switch_price_updating"
 def build_role_keyboard():
     keyboard = [
         [
-            InlineKeyboardButton("Admin", callback_data=ADMIN),
-            InlineKeyboardButton("Seller", callback_data=SELLER),
+            InlineKeyboardButton("Администратор", callback_data=ADMIN),
+            InlineKeyboardButton("Продавец", callback_data=SELLER),
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -56,8 +56,8 @@ def build_role_keyboard():
 def build_yes_no(yes_data=YES, no_data=NO):
     keyboard = [
         [
-            InlineKeyboardButton("Yes", callback_data=yes_data),
-            InlineKeyboardButton("No", callback_data=no_data),
+            InlineKeyboardButton("Да", callback_data=yes_data),
+            InlineKeyboardButton("Нет", callback_data=no_data),
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -66,7 +66,7 @@ def build_yes_no(yes_data=YES, no_data=NO):
 def build_cancel():
     keyboard = [
         [
-            InlineKeyboardButton("Cancel", callback_data=CANCEL),
+            InlineKeyboardButton("Отмена", callback_data=CANCEL),
         ]
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -75,7 +75,7 @@ def build_cancel():
 def build_admin_menu():
     keyboard = [
         [
-            InlineKeyboardButton("Shop list", callback_data=SHOP_LIST),
+            InlineKeyboardButton("📋 Список магазинов 📋", callback_data=SHOP_LIST),
         ]
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -83,9 +83,9 @@ def build_admin_menu():
 
 def build_seller_menu():
     keyboard = [
-        [InlineKeyboardButton("Add shop", callback_data=ADD_SHOP)],
-        [InlineKeyboardButton("Unlink shop", callback_data=UNLINK_SHOP)],
-        [InlineKeyboardButton("Shop list", callback_data=SHOP_LIST)],
+        [InlineKeyboardButton("➕ Добавить магазин ➕", callback_data=ADD_SHOP)],
+        [InlineKeyboardButton("➖ Отвязать магазин ➖", callback_data=UNLINK_SHOP)],
+        [InlineKeyboardButton("📋 Список магазинов 📋", callback_data=SHOP_LIST)],
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -130,9 +130,9 @@ async def build_shop_list(
 
 def build_shop_menu(with_back: bool = False):
     keyboard = [
-        [InlineKeyboardButton("Shop info", callback_data=SHOP_INFO)],
-        [InlineKeyboardButton("Activate", callback_data=ACTIVATE)],
-        [InlineKeyboardButton("Price updating", callback_data=PRICE_UPDATING)],
+        [InlineKeyboardButton("ℹ️ Информация о магазине ℹ️", callback_data=SHOP_INFO)],
+        [InlineKeyboardButton("⏯ Activate ⏯", callback_data=ACTIVATE)],
+        [InlineKeyboardButton("🔄 Price updating 🔄", callback_data=PRICE_UPDATING)],
     ]
     if with_back:
         keyboard.append(_build_back_button())
@@ -147,9 +147,9 @@ def build_back():
 
 def build_activate_shop(is_active: bool):
     if is_active:
-        text = "Deactivate"
+        text = "⏹ Деактивировать ⏹"
     else:
-        text = "Activate"
+        text = "▶️ Активировать ▶️"
 
     keyboard = [
         [InlineKeyboardButton(text, callback_data=SWITCH_ACTIVATION), ],
@@ -160,9 +160,9 @@ def build_activate_shop(is_active: bool):
 
 def build_price_updating(is_updating_on: bool):
     if is_updating_on:
-        text = "OFF"
+        text = "⏹ OFF ⏹"
     else:
-        text = "ON"
+        text = "▶️ ON ▶️"
 
     keyboard = [
         [InlineKeyboardButton(text, callback_data=SWITCH_PRICE_UPDATING), ],
@@ -206,5 +206,5 @@ def _build_navigation_buttons(
 def _build_back_button():
     """Creates `back` button to adding to keyboards as a line."""
     # button = [InlineKeyboardButton("\U0001F868", callback_data=BACK)]
-    button = [InlineKeyboardButton("\U0001F519", callback_data=BACK)]
+    button = [InlineKeyboardButton("🔙", callback_data=BACK)]
     return button
