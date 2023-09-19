@@ -112,7 +112,7 @@ class ChatService:
             raise ValueError(f"Wrong {role=}")
         return shops
 
-    async def check_to_login(self) -> tuple:
+    async def get_statuses(self) -> tuple:
         """
 
         :return: is_logged_out: Optional[bool],
@@ -121,16 +121,16 @@ class ChatService:
         tg_user_service = TelegramUserService()
         tg_user = await tg_user_service.get_by_chat_id(self.chat_id)
 
-        is_logged_out = None
         is_banned = None
         is_active = None
+        is_logged_out = None
 
         if tg_user is not None:
-            is_logged_out = tg_user.is_logged_out
             is_banned = tg_user.is_banned
             is_active = tg_user.is_active
+            is_logged_out = tg_user.is_logged_out
 
-        return is_logged_out, is_banned, is_active
+        return is_banned, is_active, is_logged_out
 
     async def authenticate_admin(
             self,
@@ -230,3 +230,6 @@ class ChatService:
 
     async def is_banned(self):
         return await TelegramUserService().is_banned_by_chat_id(self.chat_id)
+
+    async def is_active(self):
+        return await TelegramUserService().is_active_by_chat_id(self.chat_id)

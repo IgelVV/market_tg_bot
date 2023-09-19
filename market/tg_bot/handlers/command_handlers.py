@@ -34,9 +34,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info(
         f"{chat_id} starts. {chat_service.ADMIN_ROLE.label}")
 
-    is_logged_out, is_banned, is_activate = await chat_service.check_to_login()
+    is_banned, is_activate, is_logged_out = await chat_service.get_statuses()
 
-    exists = is_logged_out is not None
+    exists = is_banned is not None
     is_logged_in = exists and (not is_logged_out)
 
     if exists and is_banned:

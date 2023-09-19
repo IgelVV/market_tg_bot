@@ -46,3 +46,7 @@ class TelegramUserService:
     async def is_banned_by_chat_id(self, chat_id: int):
         tg_user = await self.get_by_chat_id(chat_id)
         return tg_user.is_banned
+
+    async def is_active_by_chat_id(self, chat_id: int):
+        tg_user = await self.get_by_chat_id(chat_id)
+        return tg_user.is_active

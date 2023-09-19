@@ -66,8 +66,12 @@ async def display_add_shop(
 async def add_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_id = update.message.chat_id
     chat_service = ChatService(chat_id, context=context)
-    if await chat_service.is_banned():
+
+    is_banned, is_activate, _ = await chat_service.get_statuses()
+    if is_banned:
         return await display_ban(update, context)
+    if not is_activate:
+        return await display_not_active(update, context)
 
     shop_api_key = update.message.text
     await update.message.delete()
@@ -139,8 +143,11 @@ async def unlink_shop(
     query = update.callback_query
     chat_id = query.from_user.id
     chat_service = ChatService(chat_id, context)
-    if await chat_service.is_banned():
+    is_banned, is_activate, _ = await chat_service.get_statuses()
+    if is_banned:
         return await display_ban(update, context)
+    if not is_activate:
+        return await display_not_active(update, context)
 
     shop_to_unlink = chat_service.get_shop_to_unlink()
     tg_user_service = TelegramUserService()
@@ -223,8 +230,11 @@ async def display_shop_info(
     await query.answer(text=texts.DISPLAY_SHOP_INFO_ANS)
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
-    if await chat_service.is_banned():
+    is_banned, is_activate, _ = await chat_service.get_statuses()
+    if is_banned:
         return await display_ban(update, context)
+    if not is_activate:
+        return await display_not_active(update, context)
 
     shop_id = chat_service.get_shop_id()
     shop_info = await shop_service.get_shop_info_by_id(shop_id=shop_id)
@@ -277,8 +287,11 @@ async def switch_activation(
     chat_id = query.message.chat_id
     await query.answer(text=texts.SWITCH_ACTIVATION_ANS)
     chat_service = ChatService(chat_id, context)
-    if await chat_service.is_banned():
+    is_banned, is_activate, _ = await chat_service.get_statuses()
+    if is_banned:
         return await display_ban(update, context)
+    if not is_activate:
+        return await display_not_active(update, context)
 
     shop_service = ShopService()
     shop_id = chat_service.get_shop_id()
@@ -317,9 +330,11 @@ async def switch_price_updating(
     chat_id = query.message.chat_id
     await query.answer(text=texts.SWITCH_PRICE_UPDATING_ANS)
     chat_service = ChatService(chat_id, context)
-
-    if await chat_service.is_banned():
+    is_banned, is_activate, _ = await chat_service.get_statuses()
+    if is_banned:
         return await display_ban(update, context)
+    if not is_activate:
+        return await display_not_active(update, context)
 
     shop_service = ShopService()
     shop_id = chat_service.get_shop_id()
