@@ -46,7 +46,7 @@ SWITCH_PRICE_UPDATING = "switch_price_updating"
 def build_role_keyboard():
     keyboard = [
         [
-            InlineKeyboardButton("Администратор", callback_data=ADMIN),
+            InlineKeyboardButton("Админ", callback_data=ADMIN),
             InlineKeyboardButton("Продавец", callback_data=SELLER),
         ],
     ]

@@ -32,9 +32,10 @@ async def display_user_menu(
 
     chat_service = ChatService(chat_id, context)
     role = await chat_service.get_role()
+    readable_role = utils.readable_role(role)
     text = texts.DISPLAY_USER_MENU.format(
         full_name=full_name,
-        role=role,
+        role=readable_role,
     )
     if role == chat_service.ADMIN_ROLE:
         await reply_func(

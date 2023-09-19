@@ -28,7 +28,7 @@ DISPLAY_USER_MENU = "Главное меню ({full_name}: {role}):"
 
 DISPLAY_ADD_SHOP = "Добавить магазин по API key. \nВведите API key 🔑:"
 
-SHOP_IS_ADDED = "Магазин `{name}` добавлен."
+SHOP_IS_ADDED = "✅ Магазин `{name}` добавлен."
 
 DISPLAY_UNLINK_SHOP = "Открепление магазина."
 
@@ -110,7 +110,7 @@ DISPLAY_USER_MENU_ANS = "User menu"
 DISPLAY_ADD_SHOP_ANS = "Add shop"
 DISPLAY_UNLINK_SHOP_ANS = "Unlink shops"
 CONFIRM_UNLINK_SHOP_ANS = "Unlink `{name}`"
-UNLINK_SHOP_ANS = "Shop `{name}` is unlinked."
+UNLINK_SHOP_ANS = "Магазин `{name}` отвязан."
 DISPLAY_SHOP_LIST_ANS = "Shop list"
 DISPLAY_SHOP_MENU_ANS = "Shop `{name}` menu"
 DISPLAY_SHOP_INFO_ANS = "Shop info"
@@ -122,3 +122,7 @@ CANCEL_ANS = "Cancel"
 HANDLE_INVALID_BUTTON_ANS = "Invalid button"
 
 # emoji and decoration
+
+# readable names
+READABLE_ADMIN_ROLE = "Админ"
+READABLE_SELLER_ROLE = "Продавец"

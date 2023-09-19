@@ -17,7 +17,7 @@ COMMANDS = [
     (HELP, texts.HELP_COMMAND_DESCR),
     (MENU, texts.MENU_COMMAND_DESCR),
     (CANCEL, texts.CANCEL_COMMAND_DESCR),
-    (SIGN_OUT, texts.SIGN_OUT_COMMAND_DESCR),  # todo make it hidden
+    # (SIGN_OUT, texts.SIGN_OUT_COMMAND_DESCR),
 ]
 
 

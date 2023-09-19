@@ -1,6 +1,8 @@
 from typing import Optional
 
 from telegram import Update
+from tg_bot import texts
+from tg_bot.models import TelegramUser
 
 
 async def callback_and_message_unifier(
@@ -17,3 +19,12 @@ async def callback_and_message_unifier(
             "Unexpected update. It is expected Callback or Message.")
 
     return from_user, reply_func
+
+
+def readable_role(role):
+    if role == TelegramUser.Roles.ADMIN:
+        return texts.READABLE_ADMIN_ROLE
+    elif role == TelegramUser.Roles.SELLER:
+        return texts.READABLE_SELLER_ROLE
+    else:
+        raise ValueError("Unknown TelegramUser role.")
