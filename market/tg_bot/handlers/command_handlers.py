@@ -16,7 +16,7 @@ logger = logging.getLogger(__name__)
 
 
 async def help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(texts.help_text)
+    await update.message.reply_text(texts.HELP_TEXT)
     user = update.message.from_user
     logger.debug("User %s asks help.", user.full_name)
     return None
@@ -48,7 +48,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if not is_logged_in:
         keyboard = inline_keyboards.build_role_keyboard()
         await update.message.reply_text(
-            texts.start_choose_role,
+            texts.START_CHOOSE_ROLE,
             reply_markup=keyboard,
         )
         return States.LOGIN
@@ -63,10 +63,10 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     It handles both messages or callback queries.
     """
     from_user, reply_func = await utils.callback_and_message_unifier(
-        update, texts.cancel_answer)
+        update, texts.CANCEL_ANS)
 
     logger.info("User %s canceled the conversation.", from_user.full_name)
-    await reply_func(texts.cancel)
+    await reply_func(texts.CANCEL)
     return ConversationHandler.END
 
 

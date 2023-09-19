@@ -25,8 +25,8 @@ async def ask_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
     and next handler will handle commands too.
     """
     query = update.callback_query
-    await query.answer(text=texts.ask_username_answer)
-    await query.edit_message_text(text=texts.ask_username)
+    await query.answer(text=texts.ASK_USERNAME_ANS)
+    await query.edit_message_text(text=texts.ASK_USERNAME)
     return States.PASSWORD
 
 
@@ -42,7 +42,7 @@ async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_service = ChatService(chat_id, context)
     chat_service.set_admin_username(username)
     logger.info(f"Username `{username}` is saved.")
-    await update.message.reply_text(texts.ask_password)
+    await update.message.reply_text(texts.ASK_PASSWORD)
     return States.CHECK_PASSWORD
 
 
@@ -61,7 +61,7 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     password = update.message.text
     await update.message.delete()
     await update.message.reply_text(
-        texts.password_received.format(password=password),
+        texts.PASSWORD_RECEIVED.format(password=password),
     )
     username = chat_service.get_admin_username()
     authenticated = await chat_service.authenticate_admin(
@@ -75,7 +75,7 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
             last_name=update.message.from_user.last_name,
             tg_username=update.message.from_user.username,
         )
-        message = texts.logged_in_as_admin
+        message = texts.LOGGED_IN_AS_ADMIN
         await update.message.reply_text(
             message,
             reply_markup=inline_keyboards.build_admin_menu()
@@ -84,7 +84,7 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         logger.info(f"User is not authenticated {username}: {password}")
         await update.message.reply_text(
-            text=texts.wrong_credentials,
+            text=texts.WRONG_CREDENTIALS,
             reply_markup=inline_keyboards.build_yes_no()
         )
         return None
@@ -99,8 +99,8 @@ async def ask_shop_api_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
     and next handler will handle commands too.
     """
     query = update.callback_query
-    await query.answer(text=texts.ask_shop_api_key_answer)
-    await query.edit_message_text(text=texts.ask_shop_api_key)
+    await query.answer(text=texts.ASK_SHOP_API_KEY_ANS)
+    await query.edit_message_text(text=texts.ASK_SHOP_API_KEY)
     return States.API_KEY
 
 
@@ -119,7 +119,7 @@ async def check_shop_api_key(
     shop_api_key = update.message.text
     await update.message.delete()
     await update.message.reply_text(
-        texts.api_key_received.format(shop_api_key=shop_api_key)
+        texts.API_KEY_RECEIVED.format(shop_api_key=shop_api_key)
     )
     logged_in = await chat_service.authenticate_and_login_seller(
         shop_api_key=shop_api_key,
@@ -129,13 +129,13 @@ async def check_shop_api_key(
     )
     if logged_in:
         await update.message.reply_text(
-            text=texts.logged_in_as_seller,
+            text=texts.LOGGED_IN_AS_SELLER,
             reply_markup=inline_keyboards.build_seller_menu()
         )
         return States.SELLER_MENU
     else:
         await update.message.reply_text(
-            texts.wrong_api_key,
+            texts.WRONG_API_KEY,
             reply_markup=inline_keyboards.build_cancel(),
         )
         return None

@@ -26,13 +26,13 @@ async def display_user_menu(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     from_user, reply_func = await utils.callback_and_message_unifier(
-        update, texts.display_user_menu_answer)
+        update, texts.DISPLAY_USER_MENU_ANS)
     chat_id = from_user.id
     full_name = from_user.full_name
 
     chat_service = ChatService(chat_id, context)
     role = await chat_service.get_role()
-    text = texts.display_user_menu.format(
+    text = texts.DISPLAY_USER_MENU.format(
         full_name=full_name,
         role=role,
     )
@@ -55,9 +55,9 @@ async def display_user_menu(
 async def display_add_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     from_user, reply_func = await utils.callback_and_message_unifier(
-        update, texts.display_add_shop_answer)
+        update, texts.DISPLAY_ADD_SHOP_ANS)
     await reply_func(
-        text=texts.display_add_shop,
+        text=texts.DISPLAY_ADD_SHOP,
         reply_markup=inline_keyboards.build_back(),
     )
     return States.ADD_SHOP
@@ -72,16 +72,16 @@ async def add_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     shop_api_key = update.message.text
     await update.message.delete()
     await update.message.reply_text(
-        text=texts.api_key_received.format(shop_api_key=shop_api_key),
+        text=texts.API_KEY_RECEIVED.format(shop_api_key=shop_api_key),
     )
     shop_info = await chat_service.add_shop(shop_api_key)
     if shop_info is not None:
-        text = texts.shop_is_added.format(name=shop_info.name)
+        text = texts.SHOP_IS_ADDED.format(name=shop_info.name)
         await update.message.reply_text(text=text)
         return await display_add_shop(update, context)
     else:
         await update.message.reply_text(
-            texts.wrong_api_key,
+            texts.WRONG_API_KEY,
             reply_markup=inline_keyboards.build_back(),
         )
         return None
@@ -99,7 +99,7 @@ async def display_unlink_shop(
     if isinstance(query.data, Navigation):
         limit = query.data.limit
         offset = query.data.offset
-    await query.answer(text=texts.display_unlink_shop_answer)
+    await query.answer(text=texts.DISPLAY_UNLINK_SHOP_ANS)
     shop_qs = await chat_service.get_shops()
     keyboard = await inline_keyboards.build_shop_list(
         qs=shop_qs,
@@ -107,7 +107,7 @@ async def display_unlink_shop(
         offset=offset,
     )
     await query.edit_message_text(
-        text=texts.display_unlink_shop,
+        text=texts.DISPLAY_UNLINK_SHOP,
         reply_markup=keyboard,
     )
     return States.UNLINK_SHOP
@@ -124,9 +124,9 @@ async def confirm_unlink_shop(
     shop_info = query.data
     chat_service.set_shop_to_unlink(shop_info)
     await query.answer(
-        text=texts.confirm_unlink_shop_answer.format(name=shop_info.name))
+        text=texts.CONFIRM_UNLINK_SHOP_ANS.format(name=shop_info.name))
     keyboard = inline_keyboards.build_yes_no(no_data=inline_keyboards.BACK)
-    text = texts.unlink_shop.format(name=shop_info.name)
+    text = texts.UNLINK_SHOP.format(name=shop_info.name)
     await query.edit_message_text(
         text=text,
         reply_markup=keyboard,
@@ -147,7 +147,7 @@ async def unlink_shop(
     await tg_user_service.unlink_shop_by_chat_id(
         chat_id=chat_id, shop_id=shop_to_unlink.id)
     await query.answer(
-        text=texts.unlink_shop_answer.format(name=shop_to_unlink.name),
+        text=texts.UNLINK_SHOP_ANS.format(name=shop_to_unlink.name),
         show_alert=True,
     )
     return await display_unlink_shop(update, context)
@@ -170,7 +170,7 @@ async def display_shop_list(
     if isinstance(query.data, Navigation):
         limit = query.data.limit
         offset = query.data.offset
-    await query.answer(text=texts.display_shop_list_answer)
+    await query.answer(text=texts.DISPLAY_SHOP_LIST_ANS)
     shop_qs = await chat_service.get_shops()
     keyboard = await inline_keyboards.build_shop_list(
         qs=shop_qs,
@@ -178,7 +178,7 @@ async def display_shop_list(
         offset=offset,
     )
     await query.edit_message_text(
-        text=texts.display_shop_list,
+        text=texts.DISPLAY_SHOP_LIST,
         reply_markup=keyboard,
         parse_mode="html",
     )
@@ -206,8 +206,8 @@ async def display_shop_menu(
         shop_info = await shop_service.get_shop_info_by_id(shop_id)
     keyboard = inline_keyboards.build_shop_menu(with_back=True)
     await query.answer(
-        text=texts.display_shop_menu_answer.format(name=shop_info.name))
-    text = texts.display_shop_menu.format(name=shop_info.name)
+        text=texts.DISPLAY_SHOP_MENU_ANS.format(name=shop_info.name))
+    text = texts.DISPLAY_SHOP_MENU.format(name=shop_info.name)
     await query.edit_message_text(
         text=text,
         reply_markup=keyboard,
@@ -220,7 +220,7 @@ async def display_shop_info(
     """Display information from Shop model and `back` button."""
     query = update.callback_query
     chat_id = query.from_user.id
-    await query.answer(text=texts.display_shop_info_answer)
+    await query.answer(text=texts.DISPLAY_SHOP_INFO_ANS)
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
     if await chat_service.is_banned():
@@ -228,7 +228,7 @@ async def display_shop_info(
 
     shop_id = chat_service.get_shop_id()
     shop_info = await shop_service.get_shop_info_by_id(shop_id=shop_id)
-    text = texts.display_shop_info.format(
+    text = texts.DISPLAY_SHOP_INFO.format(
         id=shop_info.id,
         name=shop_info.name,
         slug=shop_info.slug,
@@ -251,13 +251,13 @@ async def activate_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Display `is_active` status of shop, and button to change it."""
     query = update.callback_query
     chat_id = query.from_user.id
-    await query.answer(text=texts.activate_shop_answer)
+    await query.answer(text=texts.ACTIVATE_SHOP_ANS)
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
     shop_id = chat_service.get_shop_id()
     shop_info = await shop_service.get_shop_info_by_id(shop_id)
     await query.edit_message_text(
-        text=texts.activate_shop.format(
+        text=texts.ACTIVATE_SHOP.format(
             name=shop_info.name,
             is_active=shop_info.is_active
         ),
@@ -275,7 +275,7 @@ async def switch_activation(
     """
     query = update.callback_query
     chat_id = query.message.chat_id
-    await query.answer(text=texts.switch_activation_answer)
+    await query.answer(text=texts.SWITCH_ACTIVATION_ANS)
     chat_service = ChatService(chat_id, context)
     if await chat_service.is_banned():
         return await display_ban(update, context)
@@ -290,14 +290,14 @@ async def price_updating(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Display `stop_updated_price` status of shop, and button to change it."""
     query = update.callback_query
     chat_id = query.message.chat_id
-    await query.answer(text=texts.price_updating_answer)
+    await query.answer(text=texts.PRICE_UPDATING_ANS)
     shop_service = ShopService()
     chat_service = ChatService(chat_id, context)
     shop_id = chat_service.get_shop_id()
     shop_info = await shop_service.get_shop_info_by_id(shop_id)
     is_updating_on = not shop_info.stop_updated_price
     await query.edit_message_text(
-        text=texts.price_updating.format(
+        text=texts.PRICE_UPDATING.format(
             name=shop_info.name,
             switch='ON' if is_updating_on else 'OFF',
         ),
@@ -315,7 +315,7 @@ async def switch_price_updating(
     """
     query = update.callback_query
     chat_id = query.message.chat_id
-    await query.answer(text=texts.switch_price_updating_answer)
+    await query.answer(text=texts.SWITCH_PRICE_UPDATING_ANS)
     chat_service = ChatService(chat_id, context)
 
     if await chat_service.is_banned():
@@ -334,7 +334,7 @@ async def display_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
         chat_id = update.message.chat_id
     else:
         chat_id = update.callback_query.message.chat_id
-    await bot.send_message(chat_id, texts.display_ban)
+    await bot.send_message(chat_id, texts.DISPLAY_BAN)
     return ConversationHandler.END
 
 
@@ -346,12 +346,12 @@ async def display_not_active(
         chat_id = update.message.chat_id
     else:
         chat_id = update.callback_query.message.chat_id
-    await bot.send_message(chat_id, texts.display_not_active)
+    await bot.send_message(chat_id, texts.DISPLAY_NOT_ACTIVE)
     return ConversationHandler.END
 
 
 async def handle_invalid_button(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Informs the user that the button is no longer available."""
-    await update.callback_query.answer(texts.handle_invalid_button_answer)
-    await update.effective_message.edit_text(texts.invalid_button)
+    await update.callback_query.answer(texts.HANDLE_INVALID_BUTTON_ANS)
+    await update.effective_message.edit_text(texts.INVALID_BUTTON)

@@ -1,7 +1,7 @@
 """Text for bot messages, commands."""
 
 # Messages:
-help_text = """
+HELP_TEXT = """
 Основной способ управления ботом - интерактивные кнопки, под сообщениями. \
 Однако при длительном бездействии кнопки становятся неактивными. \
 В таком случае на помощь приходят команды, доступные в любое время.
@@ -22,25 +22,23 @@ help_text = """
 таких как `username`.
 """
 
-start_choose_role = "Choose your role"
+START_CHOOSE_ROLE = "Choose your role"
 
-after_login = "Hello {full_name} your role is {role}"
+DISPLAY_USER_MENU = "Main menu ({full_name}: {role}):"
 
-display_user_menu = "Main menu ({full_name}: {role}):"
+DISPLAY_ADD_SHOP = "Add shop by API key. \nType new API key:"
 
-display_add_shop = "Add shop by API key. \nType new API key:"
+SHOP_IS_ADDED = "Shop `{name}` is added."
 
-shop_is_added = "Shop `{name}` is added."
+DISPLAY_UNLINK_SHOP = "Unlink shop from the seller."
 
-display_unlink_shop = "Unlink shop from the seller."
+UNLINK_SHOP = "Forget shop `{name}`?"
 
-unlink_shop = "Forget shop `{name}`?"
+DISPLAY_SHOP_LIST = "Available shops:"
 
-display_shop_list = "Available shops:"
+DISPLAY_SHOP_MENU = "Shop: `{name}`"
 
-display_shop_menu = "Shop: `{name}`"
-
-display_shop_info = \
+DISPLAY_SHOP_INFO = \
     "<b>Full shop information</b>\n" \
     "Id: {id}\n" \
     "Name: {name}\n" \
@@ -51,63 +49,63 @@ display_shop_info = \
     "Stop updated price: {stop_updated_price}\n" \
     "Individual updating time: {individual_updating_time}\n"
 
-activate_shop = "Shop name: {name}\nIs active: {is_active}"
+ACTIVATE_SHOP = "Shop name: {name}\nIs active: {is_active}"
 
-price_updating = "Shop name: {name}\n" \
+PRICE_UPDATING = "Shop name: {name}\n" \
                  "Price updating: {switch}"
 
-display_ban = "You are banned. Contact the support service to unban."
+DISPLAY_BAN = "You are banned. Contact the support service to unban."
 
-display_not_active = "Your account is not active. " \
+DISPLAY_NOT_ACTIVE = "Your account is not active. " \
                      "Buy a subscription to the service"
 
-invalid_button = "Sorry, I could not process this button click 😕 " \
+INVALID_BUTTON = "Sorry, I could not process this button click 😕 " \
                  "Please send /start to get a new keyboard."
 
-cancel = "Bye! I hope we can talk again some day."
+CANCEL = "Bye! I hope we can talk again some day."
 
 
-ask_username = "Type your Username:"
+ASK_USERNAME = "Type your Username:"
 
-ask_password = "Type password:"
+ASK_PASSWORD = "Type password:"
 
-password_received = "Password received: {password} \nPlease wait."
+PASSWORD_RECEIVED = "Password received: {password} \nPlease wait."
 
-logged_in_as_admin = "You are logged in as admin."
+LOGGED_IN_AS_ADMIN = "You are logged in as admin."
 
-wrong_credentials = "Wrong username or password.\nDo you want to try again?"
+WRONG_CREDENTIALS = "Wrong username or password.\nDo you want to try again?"
 
-ask_shop_api_key = "Type API key of your shop:"
+ASK_SHOP_API_KEY = "Type API key of your shop:"
 
-api_key_received = "API key received: {shop_api_key} \nPlease wait."
+API_KEY_RECEIVED = "API key received: {shop_api_key} \nPlease wait."
 
-logged_in_as_seller = "You are logged in as Seller."
+LOGGED_IN_AS_SELLER = "You are logged in as Seller."
 
-wrong_api_key = "Wrong API key, please enter it again:"
+WRONG_API_KEY = "Wrong API key, please enter it again:"
 
 
 # Commands:
-start_command_description = "Start"
-help_command_description = "Information about the work of the bot"
-menu_command_description = "Available actions"
-cancel_command_description = "Cancel the current operation"
-sign_out_command_description = "logout TEST command"
+START_COMMAND_DESCR = "Start"
+HELP_COMMAND_DESCR = "Information about the work of the bot"
+MENU_COMMAND_DESCR = "Available actions"
+CANCEL_COMMAND_DESCR = "Cancel the current operation"
+SIGN_OUT_COMMAND_DESCR = "logout TEST command"
 
 
 # Callback answers:
-ask_username_answer = None
-ask_shop_api_key_answer = None
-display_user_menu_answer = "User menu"
-display_add_shop_answer = "Add shop"
-display_unlink_shop_answer = "Unlink shops"
-confirm_unlink_shop_answer = "Unlink `{name}`"
-unlink_shop_answer = "Shop `{name}` is unlinked."
-display_shop_list_answer = "Shop list"
-display_shop_menu_answer = "Shop `{name}` menu"
-display_shop_info_answer = "Shop info"
-activate_shop_answer = "Activation"
-switch_activation_answer = "Switch activation"
-price_updating_answer = "Price updating"
-switch_price_updating_answer = "Switch price updating"
-cancel_answer = "Cancel"
-handle_invalid_button_answer = "Invalid button"
+ASK_USERNAME_ANS = None
+ASK_SHOP_API_KEY_ANS = None
+DISPLAY_USER_MENU_ANS = "User menu"
+DISPLAY_ADD_SHOP_ANS = "Add shop"
+DISPLAY_UNLINK_SHOP_ANS = "Unlink shops"
+CONFIRM_UNLINK_SHOP_ANS = "Unlink `{name}`"
+UNLINK_SHOP_ANS = "Shop `{name}` is unlinked."
+DISPLAY_SHOP_LIST_ANS = "Shop list"
+DISPLAY_SHOP_MENU_ANS = "Shop `{name}` menu"
+DISPLAY_SHOP_INFO_ANS = "Shop info"
+ACTIVATE_SHOP_ANS = "Activation"
+SWITCH_ACTIVATION_ANS = "Switch activation"
+PRICE_UPDATING_ANS = "Price updating"
+SWITCH_PRICE_UPDATING_ANS = "Switch price updating"
+CANCEL_ANS = "Cancel"
+HANDLE_INVALID_BUTTON_ANS = "Invalid button"
