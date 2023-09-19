@@ -1,6 +1,5 @@
 """Main bot module."""
 import json
-import logging
 import logging.config
 
 from telegram.ext import (
