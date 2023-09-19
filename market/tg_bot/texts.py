@@ -16,80 +16,91 @@ HELP_TEXT = """
 который начинается как команда с '/' будет распознан как команда. \
 По этому не используйте данные, начинающиеся с этого символа.
 
-Служебные команды: 
+❗️ Служебные команды: 
 /sign_out - позволяет повторно пройти процесс регистрации. \
 Используется для смены роли или обновления данных пользователя, \
 таких как `username`.
 """
 
-START_CHOOSE_ROLE = "Choose your role"
+START_CHOOSE_ROLE = "Выберите роль:"
 
-DISPLAY_USER_MENU = "Main menu ({full_name}: {role}):"
+DISPLAY_USER_MENU = "Главное меню ({full_name}: {role}):"
 
-DISPLAY_ADD_SHOP = "Add shop by API key. \nType new API key:"
+DISPLAY_ADD_SHOP = "Добавить магазин по API key. \nВведите API key 🔑:"
 
-SHOP_IS_ADDED = "Shop `{name}` is added."
+SHOP_IS_ADDED = "Магазин `{name}` добавлен."
 
-DISPLAY_UNLINK_SHOP = "Unlink shop from the seller."
+DISPLAY_UNLINK_SHOP = "Открепление магазина."
 
-UNLINK_SHOP = "Forget shop `{name}`?"
+UNLINK_SHOP = "Открепить магазин `{name}`?"
 
-DISPLAY_SHOP_LIST = "Available shops:"
+DISPLAY_SHOP_LIST = "Доступные магазины:"
 
-DISPLAY_SHOP_MENU = "Shop: `{name}`"
+DISPLAY_SHOP_MENU = "Магазин: `{name}`"
 
-DISPLAY_SHOP_INFO = \
-    "<b>Full shop information</b>\n" \
-    "Id: {id}\n" \
-    "Name: {name}\n" \
-    "Slug: {slug}\n" \
-    "API key: {api_key}\n" \
-    "Vendor Name: {vendor_name}\n" \
-    "Is Active: {is_active}\n" \
-    "Stop updated price: {stop_updated_price}\n" \
-    "Individual updating time: {individual_updating_time}\n"
+DISPLAY_SHOP_INFO = """
+    <b>Детальная информация о магазине:</b>
+    
+    Id: {id}
+    
+    Название: {name}
+    
+    Slug: {slug}
+    
+    API key 🔑: {api_key}
+    
+    Поставщик: {vendor_name}
+    
+    Активен: {is_active}
+    
+    Остановить обновление цен: {stop_updated_price}
+    
+    Индивидуальное время обновления: {individual_updating_time}
+"""
 
-ACTIVATE_SHOP = "Shop name: {name}\nIs active: {is_active}"
+ACTIVATE_SHOP = "Магазин: {name}\nАктивен: {is_active}"
 
-PRICE_UPDATING = "Shop name: {name}\n" \
-                 "Price updating: {switch}"
+PRICE_UPDATING = "Магазин: {name}\n" \
+                 "Обновление цен: {switch}"
 
-DISPLAY_BAN = "You are banned. Contact the support service to unban."
+DISPLAY_BAN = "🚫 Вы забанены. Обратитесь в службу поддержки."
 
-DISPLAY_NOT_ACTIVE = "Your account is not active. " \
-                     "Buy a subscription to the service"
+DISPLAY_NOT_ACTIVE = "🔒 Ваш аккаунт не активен. " \
+                     "Оформите подписку для использования сервиса."
 
-INVALID_BUTTON = "Sorry, I could not process this button click 😕 " \
-                 "Please send /start to get a new keyboard."
+INVALID_BUTTON = "Извините, клавиатура больше не активна 😕 " \
+                 "Пожалуйста нажмите /start чтобы возобновить диалог."
 
-CANCEL = "Bye! I hope we can talk again some day."
+CANCEL = "👋 Диалог завершен. Для возобновления нажмите /start"
 
 
-ASK_USERNAME = "Type your Username:"
+ASK_USERNAME = "Введите ваш Username:"
 
-ASK_PASSWORD = "Type password:"
+ASK_PASSWORD = "Введите пароль:"
 
-PASSWORD_RECEIVED = "Password received: {password} \nPlease wait."
+PASSWORD_RECEIVED = "Пароль получен. Ожидайте."
 
-LOGGED_IN_AS_ADMIN = "You are logged in as admin."
+LOGGED_IN_AS_ADMIN = "✅ Вы вошли в систему как Администратор."
 
-WRONG_CREDENTIALS = "Wrong username or password.\nDo you want to try again?"
+WRONG_CREDENTIALS = "❌ Неверный username или password.\n" \
+                    "Вы можете ввести пароль повторно.\n" \
+                    "Хотите пройти процедуру авторизации заново?"
 
-ASK_SHOP_API_KEY = "Type API key of your shop:"
+ASK_SHOP_API_KEY = "Введите API key 🔑 вашего магазина:"
 
-API_KEY_RECEIVED = "API key received: {shop_api_key} \nPlease wait."
+API_KEY_RECEIVED = "API key получен. \nОжидайте."
 
-LOGGED_IN_AS_SELLER = "You are logged in as Seller."
+LOGGED_IN_AS_SELLER = "✅ Вы вошли в систему как Продавец."
 
-WRONG_API_KEY = "Wrong API key, please enter it again:"
+WRONG_API_KEY = "❌ Неверный API key 🔑, пожалуйста повторите ввод:"
 
 
 # Commands:
-START_COMMAND_DESCR = "Start"
-HELP_COMMAND_DESCR = "Information about the work of the bot"
-MENU_COMMAND_DESCR = "Available actions"
-CANCEL_COMMAND_DESCR = "Cancel the current operation"
-SIGN_OUT_COMMAND_DESCR = "logout TEST command"
+START_COMMAND_DESCR = "Начало работы."
+HELP_COMMAND_DESCR = "Справка о работе Бота."
+MENU_COMMAND_DESCR = "Переход в основное меню."
+CANCEL_COMMAND_DESCR = "Отменить текущую операцию, и завершить диалог."
+SIGN_OUT_COMMAND_DESCR = "Пройти регистрацию повторно."
 
 
 # Callback answers:
@@ -109,3 +120,5 @@ PRICE_UPDATING_ANS = "Price updating"
 SWITCH_PRICE_UPDATING_ANS = "Switch price updating"
 CANCEL_ANS = "Cancel"
 HANDLE_INVALID_BUTTON_ANS = "Invalid button"
+
+# emoji and decoration
