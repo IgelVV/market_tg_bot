@@ -23,7 +23,7 @@
             "handlers": ["console"]
         },
         "httpx": {
-            "level": "INFO",
+            "level": "WARNING",
             "handlers": ["console"]
         }
     }

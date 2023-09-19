@@ -1,7 +1,9 @@
 """Main bot module."""
 import json
 import logging.config
+from warnings import filterwarnings
 
+from telegram.warnings import PTBUserWarning
 from telegram.ext import (
     ApplicationBuilder,
     CommandHandler,
@@ -23,6 +25,12 @@ from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards as il_keyboards
 from tg_bot.dataclasses import ShopInfo, Navigation
 
+# to ignore CallbackQueryHandler warnings
+filterwarnings(
+    action="ignore",
+    message=r".*CallbackQueryHandler",
+    category=PTBUserWarning,
+)
 with open("tg_bot/logging_config.json", "r") as f:
     json_config = json.load(f)
     logging.config.dictConfig(json_config)
