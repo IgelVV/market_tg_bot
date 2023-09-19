@@ -1,5 +1,7 @@
 """Main bot module."""
+import json
 import logging
+import logging.config
 
 from telegram.ext import (
     ApplicationBuilder,
@@ -22,12 +24,9 @@ from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards as il_keyboards
 from tg_bot.dataclasses import ShopInfo, Navigation
 
-logging.basicConfig(
-    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
-    level=logging.INFO
-)
-
-# logging.getLogger("httpx").setLevel(logging.WARNING)
+with open("tg_bot/logging_config.json", "r") as f:
+    json_config = json.load(f)
+    logging.config.dictConfig(json_config)
 
 logger = logging.getLogger(__name__)
 
