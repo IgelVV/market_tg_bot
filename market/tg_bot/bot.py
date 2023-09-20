@@ -20,6 +20,7 @@ from tg_bot.handlers import (
     main_conversation,
     login_conversation,
     command_handlers,
+    error_handlers,
 )
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards as il_keyboards
@@ -234,12 +235,13 @@ def run():
         ],
     )
 
-    # todo add error handler
     commands.set_bot_commands(bot=application.bot)
 
     application.add_handler(main_conv)
     application.add_handler(
         CommandHandler(commands.HELP, command_handlers.help_handler))
+
+    application.add_error_handler(error_handlers.error_handler)
 
     application.run_polling()
 
