@@ -41,21 +41,22 @@ DISPLAY_SHOP_MENU = "Магазин: `{name}`"
 DISPLAY_SHOP_INFO = """
 <b>Детальная информация о магазине:</b>
 
-Id: {id}
-
-Название: {name}
-
-Slug: {slug}
-
-API key 🔑: {api_key}
-
-Поставщик: {vendor_name}
-
-Активен: {is_active}
-
-Остановить обновление цен: {stop_updated_price}
-
-Индивидуальное время обновления: {individual_updating_time}
+Id: 
+  <code>{id}</code>
+Название: 
+  <code>{name}</code>
+Slug: 
+  <code>{slug}</code>
+API key 🔑: 
+  <code>{api_key}</code>
+Поставщик: 
+  <code>{vendor_name}</code>
+Активен: 
+  <code>{is_active}</code>
+Остановить обновление цен: 
+  <code>{stop_updated_price}</code>
+Индивидуальное время обновления: 
+  <code>{individual_updating_time}</code>
 """
 
 ACTIVATE_SHOP = "Магазин: {name}\nАктивен: {is_active}"

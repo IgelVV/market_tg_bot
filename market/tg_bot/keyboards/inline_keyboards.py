@@ -130,9 +130,12 @@ async def build_shop_list(
 
 def build_shop_menu(with_back: bool = False):
     keyboard = [
-        [InlineKeyboardButton("ℹ️ Информация о магазине ℹ️", callback_data=SHOP_INFO)],
-        [InlineKeyboardButton("⏯ Activate ⏯", callback_data=ACTIVATE)],
-        [InlineKeyboardButton("🔄 Price updating 🔄", callback_data=PRICE_UPDATING)],
+        [InlineKeyboardButton(
+            "ℹ️ Информация о магазине ℹ️", callback_data=SHOP_INFO)],
+        [InlineKeyboardButton(
+            f"⏯ {'Активация': ^34} ⏯", callback_data=ACTIVATE)],
+        [InlineKeyboardButton(
+            f"🔄 {'Обновление цен': ^29} 🔄", callback_data=PRICE_UPDATING)],
     ]
     if with_back:
         keyboard.append(_build_back_button())
