@@ -1,7 +1,6 @@
 import logging
 
 from typing import Optional
-from asgiref.sync import sync_to_async
 
 from django.conf import settings
 from django.db.models import QuerySet
@@ -52,7 +51,7 @@ class ShopService:
         # :return: data object ShopInfo
         # """
         shop = await Shop.objects.aget(id=shop_id)
-        logger.info(f"get_shop_info {shop.pk}")
+        logger.debug(f"get_shop_info {shop.pk}")
         return self._to_shop_info(shop)
 
     async def get_shop_info_by_api_key(self, api_key: str) -> ShopInfo:
@@ -100,14 +99,14 @@ class ShopService:
             shop = await Shop.objects.aget(api_key=shop_api_key)
             return shop
         except Shop.DoesNotExist:
-            logger.info(f"Shop with {shop_api_key=} DoesNotExist")
+            logger.debug(f"Shop with {shop_api_key=} DoesNotExist")
 
     async def get_shop_by_id(self, shop_id) -> Optional[Shop]:
         try:
             shop = await Shop.objects.aget(id=shop_id)
             return shop
         except Shop.DoesNotExist:
-            logger.info(f"Shop with {shop_id=} DoesNotExist")
+            logger.debug(f"Shop with {shop_id=} DoesNotExist")
 
     async def switch_activation(self, shop_id):
         """Changes `is_active` field in Shop object to opposite value."""

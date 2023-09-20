@@ -133,7 +133,7 @@ class ChatService:
             tg_username: Optional[str],
     ):
         """Create or update TelegramUser record."""
-        logger.info(f"Admin has logged in: {self.chat_id=}, {first_name=},"
+        logger.debug(f"Admin has logged in: {self.chat_id=}, {first_name=},"
                     f" {last_name=}, {tg_username=},")
         first_name = first_name if first_name is not None else ""
         last_name = last_name if last_name is not None else ""
@@ -184,7 +184,7 @@ class ChatService:
             await tg_user.shops.aadd(shop)
             self.set_seller_role()
 
-            logger.info(
+            logger.debug(
                 f"Seller has logged in: {self.chat_id=}, {first_name=},"
                 f" {last_name=}, {tg_username=}, {shop.pk=}")
             return True
