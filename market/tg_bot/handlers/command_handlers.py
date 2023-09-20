@@ -18,7 +18,7 @@ logger = logging.getLogger(__name__)
 async def help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await update.message.reply_text(texts.HELP_TEXT)
     user = update.message.from_user
-    logger.debug("User %s asks help.", user.full_name)
+    logger.debug("User %s asks help.", user.username)
     return None
 
 
@@ -33,7 +33,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_service = ChatService(chat_id, context)
     user = update.message.from_user
     logger.info(
-        f"User {user.full_name} with {chat_id=} starts.")
+        f"User {user.username} with {chat_id=} starts.")
 
     is_banned, is_activate, is_logged_out = await chat_service.get_statuses()
 
@@ -54,7 +54,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return States.LOGIN
     else:
-        logger.info(f"User {user.full_name} {chat_id} is recognised.")
+        logger.info(f"User {user.username} {chat_id} is recognised.")
         return await main_conversation.display_user_menu(update, context)
 
 
@@ -67,7 +67,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     from_user, reply_func = await utils.callback_and_message_unifier(
         update, texts.CANCEL_ANS)
 
-    logger.info("User %s canceled the conversation.", from_user.full_name)
+    logger.info("User %s canceled the conversation.", from_user.username)
     await reply_func(texts.CANCEL)
     return ConversationHandler.END
 
@@ -77,6 +77,6 @@ async def sign_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
     user = update.message.from_user
 
     chat_id = update.message.chat_id
-    logger.info("User %s signed out.", user.full_name)
+    logger.info("User %s signed out.", user.username)
     await ChatService(chat_id, context).logout()
     return await start(update, context)

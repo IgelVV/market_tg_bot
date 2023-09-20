@@ -38,10 +38,12 @@ async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     and next handler will handle commands too.
     """
     chat_id = update.message.chat_id
+    user = update.message.from_user
     username = update.message.text
+    logger.debug(f"User {user.username} {chat_id} is entering "
+                f"{username=} for authorisation as admin.")
     chat_service = ChatService(chat_id, context)
     chat_service.set_admin_username(username)
-    logger.info(f"Username `{username}` is saved.")
     await update.message.reply_text(texts.ASK_PASSWORD)
     return States.CHECK_PASSWORD
 
@@ -57,8 +59,11 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     # Display `admin menu` if authenticated.
     # """
     chat_id = update.message.chat_id
+    user = update.message.from_user
     chat_service = ChatService(chat_id, context=context)
     password = update.message.text
+    logger.debug(f"User {user.username} {chat_id} is entering "
+                 f"password for authorisation as admin.")
     await update.message.delete()
     await update.message.reply_text(
         texts.PASSWORD_RECEIVED.format(password=password),
@@ -69,7 +74,8 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
         password=password,
     )
     if authenticated:
-        logger.info(f"User is authenticated")
+        logger.info(f"User {user.username} {chat_id} "
+                    f"is authenticated as admin")
         await chat_service.login_admin(
             first_name=update.message.from_user.first_name,
             last_name=update.message.from_user.last_name,
@@ -82,7 +88,8 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
         return States.ADMIN_MENU
     else:
-        logger.info(f"User is not authenticated {username}: {password}")
+        logger.info(f"User {user.username} {chat_id} "
+                    f"is not authenticated with {username=}")
         await update.message.reply_text(
             text=texts.WRONG_CREDENTIALS,
             reply_markup=inline_keyboards.build_yes_no()
@@ -115,8 +122,11 @@ async def check_shop_api_key(
     Displays `shop menu` if authenticated.
     """
     chat_id = update.message.chat_id
+    user = update.message.from_user
     chat_service = ChatService(chat_id, context=context)
     shop_api_key = update.message.text
+    logger.debug(f"User {user.username} {chat_id} is entering "
+                 f"{shop_api_key=} for authorisation as seller.")
     await update.message.delete()
     await update.message.reply_text(
         texts.API_KEY_RECEIVED.format(shop_api_key=shop_api_key)
@@ -128,12 +138,16 @@ async def check_shop_api_key(
         tg_username=update.message.from_user.username,
     )
     if logged_in:
+        logger.info(f"User {user.username} {chat_id} "
+                    f"is authenticated as seller")
         await update.message.reply_text(
             text=texts.LOGGED_IN_AS_SELLER,
             reply_markup=inline_keyboards.build_seller_menu()
         )
         return States.SELLER_MENU
     else:
+        logger.info(f"User {user.username} {chat_id} "
+                    f"is not authenticated with {shop_api_key=}")
         await update.message.reply_text(
             texts.WRONG_API_KEY,
             reply_markup=inline_keyboards.build_cancel(),
