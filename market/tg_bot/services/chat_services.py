@@ -210,9 +210,3 @@ class ChatService:
             shop_id=shop_info.id
         )
         return shop_info
-
-    async def is_banned(self):
-        return await TelegramUserService().is_banned_by_chat_id(self.chat_id)
-
-    async def is_active(self):
-        return await TelegramUserService().is_active_by_chat_id(self.chat_id)
