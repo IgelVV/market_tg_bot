@@ -26,16 +26,16 @@ class UserService:
             user = await UserModel.objects.aget(
                 username=username)
         except UserModel.DoesNotExist:
-            logger.info(f"User with {username=} DoesNotExists")
+            logger.debug(f"User with {username=} DoesNotExists")
         else:
             is_admin = await user.groups.filter(name=self.TG_ADMIN_GROUP_NAME) \
                 .aexists()
             if user.check_password(password) and user.is_active and is_admin:
 
-                logger.info(f"User: {username} is authenticated.")
+                logger.debug(f"User: {username} is authenticated.")
                 return user
             else:
-                logger.info(
+                logger.debug(
                     f"User: {username} is NOT authenticated. "
                     f"is_active={user.is_active}, is in admin group={is_admin}"
                     f" (if both is Thue, then wrong password)"
