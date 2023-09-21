@@ -1,4 +1,11 @@
-"""Text for bot messages, commands."""
+"""All static text, except of buttons."""
+
+# It is shown in the chat with the bot if the chat is empty.
+BOT_DESCRIPTION = "Бот для управления магазинами."
+
+# It is shown on the bot’s profile page and is sent together with the link
+# when users share the bot. (it is called `about` in BotFather)
+BOT_SHORT_DESCRIPTION = "Бот для управления магазинами."
 
 # Messages:
 HELP_TEXT = """

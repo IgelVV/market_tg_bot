@@ -15,7 +15,7 @@ from telegram.ext import (
 )
 from django.conf import settings
 
-from tg_bot import commands
+from tg_bot import commands, customisation
 from tg_bot.handlers import (
     main_conversation,
     login_conversation,
@@ -39,6 +39,7 @@ with open("tg_bot/logging_config.json", "r") as f:
 logger = logging.getLogger(__name__)
 
 TOKEN = settings.TG_BOT_TOKEN
+AUTO_CUSTOMISATION = settings.TG_AUTO_CUSTOMISATION
 
 
 def run():
@@ -235,7 +236,10 @@ def run():
         ],
     )
 
-    commands.set_bot_commands(bot=application.bot)
+    if AUTO_CUSTOMISATION:
+        customisation.set_bot_commands(bot=application.bot)
+        customisation.set_bot_description(bot=application.bot)
+        customisation.set_bot_short_description(bot=application.bot)
 
     application.add_handler(main_conv)
     application.add_handler(
