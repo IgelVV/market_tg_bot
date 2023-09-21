@@ -9,8 +9,8 @@ from telegram.ext import (
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services import ChatService
-from tg_bot import texts
-from tg_bot.handlers import utils, main_conversation
+from tg_bot import texts, utils
+from tg_bot.handlers import main_conversation
 
 logger = logging.getLogger(__name__)
 

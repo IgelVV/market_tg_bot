@@ -9,6 +9,7 @@ from django.conf import settings
 from django.db.models import QuerySet
 
 from tg_bot.dataclasses import ShopInfo, Navigation
+from tg_bot import utils
 from shop.services import ShopService
 from shop.models import Shop
 
