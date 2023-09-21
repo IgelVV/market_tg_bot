@@ -269,9 +269,10 @@ async def display_shop_info(
     text = texts.DISPLAY_SHOP_INFO.format(
         name=new_shop_info.name,
         vendor_name=new_shop_info.vendor_name,
-        is_active=new_shop_info.is_active,
-        update_prices=not new_shop_info.update_prices,
-        individual_updating_time=new_shop_info.individual_updating_time,
+        is_active=utils.readable_flag(new_shop_info.is_active),
+        update_prices=utils.readable_flag(new_shop_info.update_prices),
+        individual_updating_time=utils.readable_flag(
+            new_shop_info.individual_updating_time),
     )
     logger.info(f"User {user.username} {chat_id=} is opening "
                 f"`shop_info of shop {new_shop_info}")
@@ -297,7 +298,7 @@ async def activate_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     await query.edit_message_text(
         text=texts.ACTIVATE_SHOP.format(
             name=new_shop_info.name,
-            is_active=new_shop_info.is_active
+            is_active=utils.readable_shop_activiti(new_shop_info.is_active)
         ),
         reply_markup=inline_keyboards.build_activate_shop(
             new_shop_info.is_active)

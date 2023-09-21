@@ -52,12 +52,9 @@ DISPLAY_SHOP_INFO = """
   <code>{name}</code>
 Поставщик: 
   <code>{vendor_name}</code>
-Активен: 
-  <code>{is_active}</code>
-Обновлять цены: 
-  <code>{update_prices}</code>
-Индивидуальное время обновления: 
-  <code>{individual_updating_time}</code>
+Активен: {is_active}
+Обновлять цены: {update_prices}
+Индивидуальное время обновления: {individual_updating_time}
 """
 
 ACTIVATE_SHOP = "Магазин: {name}\nАктивен: {is_active}"
@@ -125,6 +122,10 @@ HANDLE_INVALID_BUTTON_ANS = "Invalid button"
 
 # emoji and decoration
 
-# readable names
+# readable elements
 READABLE_ADMIN_ROLE = "Админ"
 READABLE_SELLER_ROLE = "Продавец"
+READABLE_TRUE = "✅"
+READABLE_FALSE = "❌"
+READABLE_ACTIVE = "🟢"
+READABLE_INACTIVE = "🔴"  # "🛑"
