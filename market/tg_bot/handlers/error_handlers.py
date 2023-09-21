@@ -43,6 +43,7 @@ async def error_handler(
     )
 
     # Finally, send the message
-    # await context.bot.send_message(
-    #     chat_id=TG_REPORT_CHAT_ID, text=message, parse_mode=ParseMode.HTML
-    # )
+    if TG_REPORT_CHAT_ID:
+        await context.bot.send_message(
+            chat_id=TG_REPORT_CHAT_ID, text=message, parse_mode=ParseMode.HTML
+        )
