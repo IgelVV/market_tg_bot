@@ -15,6 +15,7 @@ from tg_bot.keyboards import inline_keyboards
 from tg_bot.services import ChatService, TelegramUserService
 from tg_bot.dataclasses import Navigation, ShopInfo
 from tg_bot import texts, utils
+from tg_bot.handlers import auxiliary
 
 logger = logging.getLogger(__name__)
 
@@ -24,7 +25,7 @@ LIST_LIMIT: int = settings.TG_BOT_LIST_LIMIT
 async def display_user_menu(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
 
-    from_user, reply_func = await utils.callback_and_message_unifier(
+    from_user, reply_func = await auxiliary.callback_and_message_unifier(
         update, texts.DISPLAY_USER_MENU_ANS)
     chat_id = from_user.id
 
@@ -56,7 +57,7 @@ async def display_user_menu(
 
 async def display_add_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
-    from_user, reply_func = await utils.callback_and_message_unifier(
+    from_user, reply_func = await auxiliary.callback_and_message_unifier(
         update, texts.DISPLAY_ADD_SHOP_ANS)
     logger.debug(
         f"User {from_user.username} {from_user.id} goes to `add shop` menu.")

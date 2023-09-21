@@ -9,8 +9,8 @@ from telegram.ext import (
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services import ChatService
-from tg_bot import texts, utils
-from tg_bot.handlers import main_conversation
+from tg_bot import texts
+from tg_bot.handlers import main_conversation, auxiliary
 
 logger = logging.getLogger(__name__)
 
@@ -64,7 +64,7 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     It handles both messages or callback queries.
     """
-    from_user, reply_func = await utils.callback_and_message_unifier(
+    from_user, reply_func = await auxiliary.callback_and_message_unifier(
         update, texts.CANCEL_ANS)
 
     logger.info("User %s canceled the conversation.", from_user.username)
