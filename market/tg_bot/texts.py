@@ -41,7 +41,7 @@ DISPLAY_UNLINK_SHOP = "Открепление магазина."
 
 UNLINK_SHOP = "Открепить магазин `{name}`?"
 
-DISPLAY_SHOP_LIST = "Доступные магазины:"
+DISPLAY_SHOP_LIST = "Доступные магазины и их активность:"
 
 DISPLAY_SHOP_MENU = "Магазин: `{name}`"
 

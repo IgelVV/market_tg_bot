@@ -31,7 +31,7 @@ class ShopService:
             raise AttributeError(
                 f"Limit or offset less than 0: {limit=}; {offset=}")
 
-        shops = qs.order_by("id").only("name")
+        shops = qs.order_by("id").only("name", "is_active")
         shops = shops[offset:(offset + limit)]
 
         result = []
@@ -39,6 +39,7 @@ class ShopService:
             shop_info = ShopInfo(
                 id=shop.pk,
                 name=shop.name,
+                is_active=shop.is_active,
             )
             result.append(shop_info)
         return result
