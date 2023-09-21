@@ -267,13 +267,10 @@ async def display_shop_info(
     new_shop_info = await shop_service.get_shop_info_by_id(
         shop_id=shop_info.id)
     text = texts.DISPLAY_SHOP_INFO.format(
-        id=new_shop_info.id,
         name=new_shop_info.name,
-        slug=new_shop_info.slug,
-        api_key=new_shop_info.api_key,
         vendor_name=new_shop_info.vendor_name,
         is_active=new_shop_info.is_active,
-        stop_updated_price=new_shop_info.stop_updated_price,
+        update_prices=not new_shop_info.stop_updated_price,
         individual_updating_time=new_shop_info.individual_updating_time,
     )
     logger.info(f"User {user.username} {chat_id=} is opening "
