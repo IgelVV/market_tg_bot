@@ -270,7 +270,7 @@ async def display_shop_info(
         name=new_shop_info.name,
         vendor_name=new_shop_info.vendor_name,
         is_active=new_shop_info.is_active,
-        update_prices=not new_shop_info.stop_updated_price,
+        update_prices=not new_shop_info.update_prices,
         individual_updating_time=new_shop_info.individual_updating_time,
     )
     logger.info(f"User {user.username} {chat_id=} is opening "
@@ -339,7 +339,7 @@ async def price_updating(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_service = ChatService(chat_id, context)
     shop_info = chat_service.get_shop_info()
     shop_info = await shop_service.get_shop_info_by_id(shop_info.id)
-    is_updating_on = not shop_info.stop_updated_price
+    is_updating_on = not shop_info.update_prices
     await query.edit_message_text(
         text=texts.PRICE_UPDATING.format(
             name=shop_info.name,

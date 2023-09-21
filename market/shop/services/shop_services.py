@@ -73,7 +73,7 @@ class ShopService:
             api_key=shop.api_key,
             vendor_name=shop.vendor_name,
             is_active=shop.is_active,
-            stop_updated_price=shop.stop_updated_price,
+            update_prices=shop.update_prices,
             individual_updating_time=shop.individual_updating_time,
         )
         return shop_info
@@ -119,5 +119,5 @@ class ShopService:
         Changes `stop_updated_price` field in Shop object to opposite value.
         """
         shop = await self.get_shop_by_id(shop_id)
-        shop.stop_updated_price = not shop.stop_updated_price
+        shop.update_prices = not shop.update_prices
         await shop.asave()

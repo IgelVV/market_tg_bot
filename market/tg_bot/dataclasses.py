@@ -11,7 +11,7 @@ class ShopInfo:
     api_key: Optional[str] = field(default=None, repr=False)
     vendor_name: Optional[str] = field(default=None, repr=False)
     is_active: Optional[bool] = field(default=None, repr=False)
-    stop_updated_price: Optional[bool] = field(default=None, repr=False)
+    update_prices: Optional[bool] = field(default=None, repr=False)
     individual_updating_time: Optional[bool] = field(default=None, repr=False)
 
 
