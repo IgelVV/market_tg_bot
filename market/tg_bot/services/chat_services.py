@@ -19,7 +19,7 @@ from shop.models import Shop
 from tg_bot.services.telegram_user_service import TelegramUserService
 from tg_bot.services.user_services import UserService
 from tg_bot.models import TelegramUser
-from tg_bot.dataclasses import ShopInfo
+from tg_bot.data_classes import ShopInfo
 
 UserModel = get_user_model()
 

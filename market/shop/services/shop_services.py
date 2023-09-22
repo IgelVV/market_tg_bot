@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db.models import QuerySet
 
 from shop.models import Shop
-from tg_bot.dataclasses import ShopInfo
+from tg_bot.data_classes import ShopInfo
 
 logger = logging.getLogger(__name__)
 

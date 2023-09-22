@@ -13,7 +13,7 @@ from shop.services import ShopService
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services import ChatService, TelegramUserService
-from tg_bot.dataclasses import Navigation, ShopInfo
+from tg_bot.data_classes import Navigation, ShopInfo
 from tg_bot import texts, utils
 from tg_bot.handlers import auxiliary
 
@@ -380,13 +380,9 @@ async def switch_price_updating(
 async def display_ban(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Display message for banned user."""
     bot = context.bot
-    if update.message:
-        user = update.message.from_user
-    else:
-        user = update.callback_query.from_user
-    chat_id = user.id
-    logger.info(f"User {user.username} {chat_id} has got a ban.")
-    await bot.send_message(chat_id, texts.DISPLAY_BAN)
+    user = update.effective_user
+    logger.info(f"User {user.username} {user.id} has got a ban.")
+    await bot.send_message(user.id, texts.DISPLAY_BAN)
     return ConversationHandler.END
 
 
@@ -394,14 +390,10 @@ async def display_not_active(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Display message for not active user."""
     bot = context.bot
-    if update.message:
-        user = update.message.from_user
-    else:
-        user = update.callback_query.from_user
-    chat_id = user.id
-    logger.info(f"User {user.username} {chat_id} "
+    user = update.effective_user
+    logger.info(f"User {user.username} {user.id} "
                 f"has got a `not active` message.")
-    await bot.send_message(chat_id, texts.DISPLAY_NOT_ACTIVE)
+    await bot.send_message(user.id, texts.DISPLAY_NOT_ACTIVE)
     return ConversationHandler.END
 
 

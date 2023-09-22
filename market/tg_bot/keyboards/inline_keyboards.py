@@ -8,7 +8,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from django.conf import settings
 from django.db.models import QuerySet
 
-from tg_bot.dataclasses import ShopInfo, Navigation
+from tg_bot.data_classes import ShopInfo, Navigation
 from tg_bot import utils
 from shop.services import ShopService
 from shop.models import Shop
@@ -146,8 +146,8 @@ def build_shop_menu(with_back: bool = False):
     return InlineKeyboardMarkup(keyboard)
 
 
-def build_back():
-    back_button = _build_back_button()
+def build_back(back_data=BACK):
+    back_button = _build_back_button(back_data)
     keyboard = [back_button]
     return InlineKeyboardMarkup(keyboard)
 
@@ -210,7 +210,7 @@ def _build_navigation_buttons(
     return buttons
 
 
-def _build_back_button():
+def _build_back_button(back_data=BACK):
     """Creates `back` button to adding to keyboards as a line."""
     # button = [InlineKeyboardButton("\U0001F868", callback_data=BACK)]
     # ↤ ⟵ ← ⇐ ↵ ⤶
