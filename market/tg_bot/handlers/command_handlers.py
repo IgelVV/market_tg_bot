@@ -7,7 +7,7 @@ from telegram.ext import (
 
 from tg_bot.services import ChatService
 from tg_bot import texts
-from tg_bot.handlers import main_conversation, auxiliary, login
+from tg_bot.handlers import prohibitions, auxiliary, login, user_menu
 
 logger = logging.getLogger(__name__)
 
@@ -38,16 +38,16 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     is_logged_in = exists and (not is_logged_out)
 
     if exists and is_banned:
-        return await main_conversation.display_ban(update, context)
+        return await prohibitions.display_ban(update, context)
 
     if exists and (not is_activate):
-        return await main_conversation.display_not_active(update, context)
+        return await prohibitions.display_not_active(update, context)
 
     if not is_logged_in:
         return await login.choose_role(update, context)
     else:
         logger.info(f"User {user.username} {chat_id} is recognised.")
-        return await main_conversation.display_user_menu(update, context)
+        return await user_menu.display_user_menu(update, context)
 
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:

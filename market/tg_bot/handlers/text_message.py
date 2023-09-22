@@ -9,7 +9,7 @@ from tg_bot import texts
 from tg_bot.handlers.login import ask_password,\
     check_password,\
     check_shop_api_key
-from tg_bot.handlers.main_conversation import add_shop
+from tg_bot.handlers import add_shop
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,7 @@ async def dispatcher(update: Update, context: ContextTypes.DEFAULT_TYPE):
         case ExpectedInput.API_KEY_TO_LOGIN:
             return await check_shop_api_key(update, context)
         case ExpectedInput.API_KEY_TO_ADD:
-            return await add_shop(update, context)
+            return await add_shop.add_shop(update, context)
         case _:
             return await _answer_unexpected_text(update, context)
 
