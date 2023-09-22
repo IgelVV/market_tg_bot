@@ -405,11 +405,4 @@ async def display_not_active(
     return ConversationHandler.END
 
 
-async def handle_invalid_button(
-        update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Informs the user that the button is no longer available."""
-    user = update.callback_query.from_user
-    await update.callback_query.answer(texts.HANDLE_INVALID_BUTTON_ANS)
-    await update.effective_message.edit_text(texts.INVALID_BUTTON)
-    logger.debug(f"User {user.username} {user.id} "
-                 f"has clicked on invalid button.")
+
