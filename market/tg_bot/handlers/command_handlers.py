@@ -10,7 +10,7 @@ from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services import ChatService
 from tg_bot import texts
-from tg_bot.handlers import main_conversation, auxiliary
+from tg_bot.handlers import main_conversation, auxiliary, login
 
 logger = logging.getLogger(__name__)
 
@@ -29,9 +29,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     If user is authenticated it displays corresponding menu,
     otherwise directs to `login conversation`.
     """
-    chat_id = update.message.chat_id
+    chat_id = update.effective_chat.id
     chat_service = ChatService(chat_id, context)
-    user = update.message.from_user
+    user = update.effective_user
     logger.info(
         f"User {user.username} with {chat_id=} starts.")
 
@@ -47,12 +47,7 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
         return await main_conversation.display_not_active(update, context)
 
     if not is_logged_in:
-        keyboard = inline_keyboards.build_role_keyboard()
-        await update.message.reply_text(
-            texts.START_CHOOSE_ROLE,
-            reply_markup=keyboard,
-        )
-        return States.LOGIN
+        return await login.choose_role(update, context)
     else:
         logger.info(f"User {user.username} {chat_id} is recognised.")
         return await main_conversation.display_user_menu(update, context)
@@ -64,12 +59,15 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 
     It handles both messages or callback queries.
     """
-    from_user, reply_func = await auxiliary.callback_and_message_unifier(
-        update, texts.CANCEL_ANS)
-
-    logger.info("User %s canceled the conversation.", from_user.username)
+    from_user = update.effective_user
+    reply_func = await auxiliary.callback_and_message_unifier(update, texts.CANCEL_ANS)
+    chat_service = ChatService(from_user.id, context)
+    expected_input = chat_service.get_expected_input()
+    chat_service.set_expected_input(None)
+    logger.info(
+        "User %s canceled input of %s.", from_user.username, expected_input)
     await reply_func(texts.CANCEL)
-    return ConversationHandler.END
+    return await start(update, context)
 
 
 async def sign_out(update: Update, context: ContextTypes.DEFAULT_TYPE):

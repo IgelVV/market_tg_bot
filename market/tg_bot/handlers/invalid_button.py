@@ -17,3 +17,9 @@ async def handle_invalid_button(
     await update.effective_message.edit_text(texts.INVALID_BUTTON)
     logger.debug(f"User {user.username} {user.id} "
                  f"has clicked on invalid button.")
+
+
+async def unexpected_callback(
+        update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """For debugging."""
+    logger.info(f"Unexpected callback: {update.callback_query.data}")

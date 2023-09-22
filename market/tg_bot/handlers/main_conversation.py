@@ -24,8 +24,8 @@ LIST_LIMIT: int = settings.TG_BOT_LIST_LIMIT
 
 async def display_user_menu(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
-
-    from_user, reply_func = await auxiliary.callback_and_message_unifier(
+    from_user = update.effective_user
+    reply_func = await auxiliary.callback_and_message_unifier(
         update, texts.DISPLAY_USER_MENU_ANS)
     chat_id = from_user.id
 
@@ -57,7 +57,8 @@ async def display_user_menu(
 
 async def display_add_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
-    from_user, reply_func = await auxiliary.callback_and_message_unifier(
+    from_user = update.effective_user
+    reply_func = await auxiliary.callback_and_message_unifier(
         update, texts.DISPLAY_ADD_SHOP_ANS)
     logger.debug(
         f"User {from_user.username} {from_user.id} goes to `add shop` menu.")
@@ -394,7 +395,7 @@ async def display_not_active(
     logger.info(f"User {user.username} {user.id} "
                 f"has got a `not active` message.")
     await bot.send_message(user.id, texts.DISPLAY_NOT_ACTIVE)
-    return ConversationHandler.END
+    # return ConversationHandler.END
 
 
 

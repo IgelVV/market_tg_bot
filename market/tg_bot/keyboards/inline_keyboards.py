@@ -22,6 +22,8 @@ LIST_LIMIT = settings.TG_BOT_LIST_LIMIT
 ADMIN_LOGIN = "admin"
 SELLER_LOGIN = "seller"
 
+BACK_TO_CHOOSE_ROLE = "back_to_choose_role"
+
 YES = "yes"
 NO = "no"
 
@@ -49,6 +51,16 @@ def build_role_keyboard():
         [
             InlineKeyboardButton("Админ", callback_data=ADMIN_LOGIN),
             InlineKeyboardButton("Продавец", callback_data=SELLER_LOGIN),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def build_wrong_credentials():
+    keyboard = [
+        [
+            InlineKeyboardButton("Ввести username", callback_data=ADMIN_LOGIN),
+            InlineKeyboardButton("Отмена", callback_data=CANCEL),
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -214,5 +226,5 @@ def _build_back_button(back_data=BACK):
     """Creates `back` button to adding to keyboards as a line."""
     # button = [InlineKeyboardButton("\U0001F868", callback_data=BACK)]
     # ↤ ⟵ ← ⇐ ↵ ⤶
-    button = [InlineKeyboardButton("⟵", callback_data=BACK)]
+    button = [InlineKeyboardButton("⟵", callback_data=back_data)]
     return button

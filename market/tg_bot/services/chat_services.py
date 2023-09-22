@@ -96,7 +96,7 @@ class ChatService:
         self.context.chat_data[self.ADMIN_USERNAME_KEY] = username
 
     def get_expected_input(self):
-        self.context.chat_data.get(self.EXPECTED_INPUT_KEY)
+        return self.context.chat_data.get(self.EXPECTED_INPUT_KEY)
 
     def set_expected_input(self, input_type: Optional[ExpectedInput]):
         self.context.chat_data[self.EXPECTED_INPUT_KEY] = input_type

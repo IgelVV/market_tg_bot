@@ -26,7 +26,7 @@ from tg_bot.handlers import (
 )
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards as il_keyboards
-from tg_bot.dataclasses import ShopInfo, Navigation
+from tg_bot.data_classes import ShopInfo, Navigation
 
 # to ignore CallbackQueryHandler warnings
 filterwarnings(
@@ -55,9 +55,8 @@ def run():
         .arbitrary_callback_data(True) \
         .build()
 
-    # Nested conversation
     login_conv = ConversationHandler(
-        per_message=True,
+        # per_message=True,
         entry_points=[
             CallbackQueryHandler(
                 login.ask_username,
@@ -70,16 +69,20 @@ def run():
         ],
         states={
             States.PASSWORD: [
-                # MessageHandler(
-                #     filters.TEXT & (~filters.COMMAND),
-                #     login_conversation.ask_password,
-                # ),
+                CallbackQueryHandler(
+                    command_handlers.cancel,
+                    pattern=f"^{il_keyboards.BACK}$",
+                ),
+                MessageHandler(
+                    filters.TEXT & (~filters.COMMAND),
+                    login.ask_password,
+                ),
             ],
             States.CHECK_PASSWORD: [
-                # MessageHandler(
-                #     filters.TEXT & (~filters.COMMAND),
-                #     login_conversation.check_password,
-                # ),
+                MessageHandler(
+                    filters.TEXT & (~filters.COMMAND),
+                    login.check_password,
+                ),
                 CallbackQueryHandler(
                     login.ask_username,
                     pattern=f"^{il_keyboards.YES}$"
@@ -247,16 +250,25 @@ def run():
         [
             CommandHandler(commands.HELP, command_handlers.help_handler),
             CommandHandler(commands.START, command_handlers.start),
-            CommandHandler(commands.MENU, command_handlers.start),
+            CommandHandler(commands.MENU, main_conversation.display_user_menu),
             CommandHandler(commands.CANCEL, command_handlers.cancel),
             CommandHandler(commands.SIGN_OUT, command_handlers.sign_out),
-            login_conv,
+
+            # login_conv,
+
+            CallbackQueryHandler(login.ask_username, pattern=f"^{il_keyboards.ADMIN_LOGIN}$"),
+            CallbackQueryHandler(login.ask_shop_api_key, pattern=f"^{il_keyboards.SELLER_LOGIN}$"),
+            CallbackQueryHandler(login.back_to_choose_role, pattern=f"^{il_keyboards.BACK_TO_CHOOSE_ROLE}$"),
+            CallbackQueryHandler(command_handlers.cancel, pattern=f"^{il_keyboards.CANCEL}$"),
+
             main_conv,
+
             CallbackQueryHandler(invalid_button.handle_invalid_button,
                                  pattern=InvalidCallbackData),
             MessageHandler(filters.TEXT & (~filters.COMMAND),
-                           text_message.text),
-            MessageHandler(filters.COMMAND, command_handlers.unexpected_command)
+                           text_message.dispatcher),
+            MessageHandler(filters.COMMAND, command_handlers.unexpected_command),
+            CallbackQueryHandler(invalid_button.unexpected_callback),
         ]
     )
 
