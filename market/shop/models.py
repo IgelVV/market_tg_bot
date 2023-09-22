@@ -13,7 +13,7 @@ class Shop(models.Model):
     client_id = models.CharField(max_length=1024)
     vendor_name = models.CharField(max_length=1024)
     is_active = models.BooleanField(default=True)
-    stop_updated_price = models.BooleanField(default=False)
+    update_prices = models.BooleanField(default=False)
     individual_updating_time = models.BooleanField(default=False)
 
 

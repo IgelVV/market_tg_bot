@@ -1,13 +1,6 @@
 import logging
 
-from asgiref.sync import sync_to_async
-
-from telegram.ext import (
-    ContextTypes,
-)
-from django.contrib.auth import get_user_model
-
-from tg_bot.services.shop_services import ShopService
+from django.contrib.auth import get_user_model, models as auth_models
 
 UserModel = get_user_model()
 
@@ -16,94 +9,40 @@ logger = logging.getLogger(__name__)
 
 class UserService:
     """
-    Actions and data related to telegram users.
+    Contains methods for working with main user model.
 
-    Uses context.user_data as a storage.
+    TG_ADMIN_GROUP_NAME - group name that must be created for tg_bot app.
+    Only users from this group can be admins of telegram bot.
     """
-    ADMIN_ROLE = "admin"
-    SELLER_ROLE = "seller"
 
-    AUTH_KEY = "authenticated"
-    ROLE_KEY = "role"
-    SHOP_API_KEY = "shop_api_key"
-    ADMIN_USERNAME_KEY = "admin_username"
+    TG_ADMIN_GROUP_NAME = "telegram_admins"
 
-    def __init__(self, context: ContextTypes.DEFAULT_TYPE):
-        self.context = context
-
-    def is_authenticated(self) -> bool:
-        """"""
-        return self.context.user_data.get(self.AUTH_KEY, False)
-
-    def get_role(self):
-        # todo find role in db
-        return self.context.user_data.get(self.ROLE_KEY)
-
-    def set_admin_role(self):
-        """Set tg_user role as `admin`."""
-        self.context.user_data[self.ROLE_KEY] = self.ADMIN_ROLE
-
-    def set_seller_role(self):
-        """Set tg_user role as `seller`."""
-        self.context.user_data[self.ROLE_KEY] = self.SELLER_ROLE
-
-    def get_related_shop_api_key(self):
-        """"""
-        return self.context.user_data.get(self.SHOP_API_KEY)
-
-    def set_related_shop_api_key(self):
-        # todo checks (role, ...)
-        self.context.user_data[self.SHOP_API_KEY] = self.SHOP_API_KEY
-
-    async def authenticate_admin(
+    async def authenticate_telegram_admin(
             self,
             username: str,
             password: str,
-            tg_user_id: int,
     ):
-        """
-        Mark tg_user (admin) as authenticated, if credentials are correct.
-
-        If password is matches to User object with passed username,
-        it marks user as admin, authenticated, bind username, and returns True,
-         otherwise returns False.
-        """
-        # tg_user_id for saving to db
         try:
-            user = await UserModel.objects.aget(username=username)
-            if user.check_password(password):
-                self.context.user_data[self.AUTH_KEY] = True
-                self.context.user_data[self.ROLE_KEY] = self.ADMIN_ROLE
-                self.context.user_data[self.ADMIN_USERNAME_KEY] = username
-                return True
-
+            user = await UserModel.objects.aget(
+                username=username)
         except UserModel.DoesNotExist:
-            logger.info(f"User with {username=} DoesNotExists")
-            return False
-
-    async def authenticate_seller(
-            self,
-            shop_api_key,
-            tg_user_id,
-    ):
-        """
-        Mark tg_user (seller) as authenticated, if api_key is correct.
-
-        :param shop_api_key:
-        :param tg_user_id:
-        :return:
-        """
-        key_is_correct = await ShopService().check_shop_api_key(shop_api_key)
-        if key_is_correct:
-            self.context.user_data[self.AUTH_KEY] = True
-            self.context.user_data[self.ROLE_KEY] = self.SELLER_ROLE
-            self.context.user_data[self.SHOP_API_KEY] = shop_api_key
-            return True
+            logger.debug(f"User with {username=} DoesNotExists")
         else:
-            return False
+            is_admin = await user.groups.filter(name=self.TG_ADMIN_GROUP_NAME) \
+                .aexists()
+            if user.check_password(password) and user.is_active and is_admin:
 
-        # todo confirmation by admin
+                logger.debug(f"User: {username} is authenticated.")
+                return user
+            else:
+                logger.debug(
+                    f"User: {username} is NOT authenticated. "
+                    f"is_active={user.is_active}, is in admin group={is_admin}"
+                    f" (if both is Thue, then wrong password)"
+                )
 
-    def logout(self):
-        """Mark user as not authenticated."""
-        self.context.user_data[self.AUTH_KEY] = False
+    async def get_or_create_tg_admin_group(self):
+        group, created = await auth_models.Group.objects.aget_or_create(
+            name=self.TG_ADMIN_GROUP_NAME,
+        )
+        return group, created

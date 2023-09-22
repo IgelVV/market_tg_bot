@@ -5,7 +5,7 @@ from shop import models
 @admin.register(models.Shop)
 class ShopAdmin(admin.ModelAdmin):
     list_display = ('pk', 'name', 'api_key', 'client_id', 'vendor_name',
-                    'is_active', 'stop_updated_price',
+                    'is_active', 'update_prices',
                     'individual_updating_time',)
     list_display_links = ('pk', 'name')
     prepopulated_fields = {"slug": ["name"]}

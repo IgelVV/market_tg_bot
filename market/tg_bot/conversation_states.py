@@ -10,6 +10,9 @@ class States(Enum):
     API_KEY = auto()
     # main conversation
     ADMIN_MENU = auto()
+    SELLER_MENU = auto()
+    ADD_SHOP = auto()
+    UNLINK_SHOP = auto()
     SHOP_LIST = auto()
     SHOP_MENU = auto()
     SHOP_INFO = auto()
