@@ -18,7 +18,7 @@ from django.conf import settings
 from tg_bot import commands, customisation
 from tg_bot.handlers import (
     main_conversation,
-    login_conversation,
+    login,
     text_message,
     command_handlers,
     invalid_button,
@@ -57,14 +57,15 @@ def run():
 
     # Nested conversation
     login_conv = ConversationHandler(
+        per_message=True,
         entry_points=[
             CallbackQueryHandler(
-                login_conversation.ask_username,
-                pattern=f"^{il_keyboards.ADMIN}$",
+                login.ask_username,
+                pattern=f"^{il_keyboards.ADMIN_LOGIN}$",
             ),
             CallbackQueryHandler(
-                login_conversation.ask_shop_api_key,
-                pattern=f"^{il_keyboards.SELLER}$",
+                login.ask_shop_api_key,
+                pattern=f"^{il_keyboards.SELLER_LOGIN}$",
             ),
         ],
         states={
@@ -80,7 +81,7 @@ def run():
                 #     login_conversation.check_password,
                 # ),
                 CallbackQueryHandler(
-                    login_conversation.ask_username,
+                    login.ask_username,
                     pattern=f"^{il_keyboards.YES}$"
                 ),
                 CallbackQueryHandler(
@@ -96,17 +97,13 @@ def run():
             ]
         },
         fallbacks=[
-            # CommandHandler(commands.CANCEL, command_handlers.cancel),
             CallbackQueryHandler(
                 command_handlers.cancel,
                 pattern=f"^{il_keyboards.CANCEL}$",
-            )
+            ),
+            CallbackQueryHandler(invalid_button.handle_invalid_button,
+                                 pattern=InvalidCallbackData),
         ],
-        map_to_parent={
-            ConversationHandler.END: ConversationHandler.END,
-            States.ADMIN_MENU: States.ADMIN_MENU,
-            States.SELLER_MENU: States.SELLER_MENU,
-        },
     )
     main_conv = ConversationHandler(
         per_message=True,
@@ -125,9 +122,9 @@ def run():
             ),
         ],
         states={
-            States.LOGIN: [
-                login_conv,
-            ],
+            # States.LOGIN: [
+            #     login_conv,
+            # ],
             States.ADMIN_MENU: [
                 CallbackQueryHandler(
                     main_conversation.display_shop_list,
@@ -253,6 +250,7 @@ def run():
             CommandHandler(commands.MENU, command_handlers.start),
             CommandHandler(commands.CANCEL, command_handlers.cancel),
             CommandHandler(commands.SIGN_OUT, command_handlers.sign_out),
+            login_conv,
             main_conv,
             CallbackQueryHandler(invalid_button.handle_invalid_button,
                                  pattern=InvalidCallbackData),

@@ -19,8 +19,8 @@ logger = logging.getLogger(__name__)
 LIST_LIMIT = settings.TG_BOT_LIST_LIMIT
 
 # Callback data:
-ADMIN = "admin"
-SELLER = "seller"
+ADMIN_LOGIN = "admin"
+SELLER_LOGIN = "seller"
 
 YES = "yes"
 NO = "no"
@@ -47,8 +47,8 @@ SWITCH_PRICE_UPDATING = "switch_price_updating"
 def build_role_keyboard():
     keyboard = [
         [
-            InlineKeyboardButton("Админ", callback_data=ADMIN),
-            InlineKeyboardButton("Продавец", callback_data=SELLER),
+            InlineKeyboardButton("Админ", callback_data=ADMIN_LOGIN),
+            InlineKeyboardButton("Продавец", callback_data=SELLER_LOGIN),
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
