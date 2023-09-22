@@ -55,184 +55,84 @@ def run():
         .arbitrary_callback_data(True) \
         .build()
 
-    login_conv = ConversationHandler(
-        # per_message=True,
-        entry_points=[
-            CallbackQueryHandler(
-                login.ask_username,
-                pattern=f"^{il_keyboards.ADMIN_LOGIN}$",
-            ),
-            CallbackQueryHandler(
-                login.ask_shop_api_key,
-                pattern=f"^{il_keyboards.SELLER_LOGIN}$",
-            ),
-        ],
-        states={
-            States.PASSWORD: [
-                CallbackQueryHandler(
-                    command_handlers.cancel,
-                    pattern=f"^{il_keyboards.BACK}$",
-                ),
-                MessageHandler(
-                    filters.TEXT & (~filters.COMMAND),
-                    login.ask_password,
-                ),
-            ],
-            States.CHECK_PASSWORD: [
-                MessageHandler(
-                    filters.TEXT & (~filters.COMMAND),
-                    login.check_password,
-                ),
-                CallbackQueryHandler(
-                    login.ask_username,
-                    pattern=f"^{il_keyboards.YES}$"
-                ),
-                CallbackQueryHandler(
-                    command_handlers.cancel,
-                    pattern=f"^{il_keyboards.NO}$"
-                ),
-            ],
-            States.API_KEY: [
-                # MessageHandler(
-                #     filters.TEXT & (~filters.COMMAND),
-                #     login_conversation.check_shop_api_key,
-                # ),
-            ]
-        },
-        fallbacks=[
-            CallbackQueryHandler(
-                command_handlers.cancel,
-                pattern=f"^{il_keyboards.CANCEL}$",
-            ),
-            CallbackQueryHandler(invalid_button.handle_invalid_button,
-                                 pattern=InvalidCallbackData),
-        ],
-    )
     main_conv = ConversationHandler(
         per_message=True,
         entry_points=[
-            CallbackQueryHandler(
-                main_conversation.display_shop_list,
-                pattern=f"^{il_keyboards.SHOP_LIST}$"
-            ),
-            CallbackQueryHandler(
-                main_conversation.display_add_shop,
-                pattern=f"^{il_keyboards.ADD_SHOP}$"
-            ),
-            CallbackQueryHandler(
-                main_conversation.display_unlink_shop,
-                pattern=f"^{il_keyboards.UNLINK_SHOP}$"
-            ),
+            CallbackQueryHandler(main_conversation.display_shop_list,
+                                 pattern=f"^{il_keyboards.SHOP_LIST}$"),
+            CallbackQueryHandler(main_conversation.display_add_shop,
+                                 pattern=f"^{il_keyboards.ADD_SHOP}$"),
+            CallbackQueryHandler(main_conversation.display_unlink_shop,
+                                 pattern=f"^{il_keyboards.UNLINK_SHOP}$"),
         ],
         states={
             # States.LOGIN: [
             #     login_conv,
             # ],
             States.ADMIN_MENU: [
-                CallbackQueryHandler(
-                    main_conversation.display_shop_list,
-                    pattern=f"^{il_keyboards.SHOP_LIST}$"
-                ),
+                CallbackQueryHandler(main_conversation.display_shop_list,
+                                     pattern=f"^{il_keyboards.SHOP_LIST}$"),
             ],
             States.SELLER_MENU: [
-                CallbackQueryHandler(
-                    main_conversation.display_add_shop,
-                    pattern=f"^{il_keyboards.ADD_SHOP}$"
-                ),
-                CallbackQueryHandler(
-                    main_conversation.display_unlink_shop,
-                    pattern=f"^{il_keyboards.UNLINK_SHOP}$"
-                ),
-                CallbackQueryHandler(
-                    main_conversation.display_shop_list,
-                    pattern=f"^{il_keyboards.SHOP_LIST}$"
-                ),
+                CallbackQueryHandler(main_conversation.display_add_shop,
+                                     pattern=f"^{il_keyboards.ADD_SHOP}$"),
+                CallbackQueryHandler(main_conversation.display_unlink_shop,
+                                     pattern=f"^{il_keyboards.UNLINK_SHOP}$"),
+                CallbackQueryHandler(main_conversation.display_shop_list,
+                                     pattern=f"^{il_keyboards.SHOP_LIST}$"),
             ],
             States.ADD_SHOP: [
-                # MessageHandler(
-                #     filters.TEXT & (~filters.COMMAND),
-                #     main_conversation.add_shop,
-                # ),
-                CallbackQueryHandler(
-                    main_conversation.display_user_menu,
-                    pattern=f"^{il_keyboards.BACK}$",
-                ),
+                # MessageHandler(filters.TEXT & (~filters.COMMAND),
+                #                main_conversation.add_shop),
+                CallbackQueryHandler(main_conversation.display_user_menu,
+                                     pattern=f"^{il_keyboards.BACK}$"),
             ],
             States.UNLINK_SHOP: [
-                CallbackQueryHandler(
-                    main_conversation.confirm_unlink_shop,
-                    pattern=ShopInfo,
-                ),
-                CallbackQueryHandler(
-                    main_conversation.display_unlink_shop,
-                    pattern=Navigation,
-                ),
-                CallbackQueryHandler(
-                    main_conversation.unlink_shop,
-                    pattern=f"^{il_keyboards.YES}$",
-                ),
-                CallbackQueryHandler(
-                    main_conversation.display_user_menu,
-                    pattern=f"^{il_keyboards.BACK}$",
-                ),
+                CallbackQueryHandler(main_conversation.confirm_unlink_shop,
+                                     pattern=ShopInfo),
+                CallbackQueryHandler(main_conversation.display_unlink_shop,
+                                     pattern=Navigation),
+                CallbackQueryHandler(main_conversation.unlink_shop,
+                                     pattern=f"^{il_keyboards.YES}$"),
+                CallbackQueryHandler(main_conversation.display_user_menu,
+                                     pattern=f"^{il_keyboards.BACK}$"),
             ],
             States.SHOP_LIST: [
-                CallbackQueryHandler(
-                    main_conversation.display_shop_menu,
-                    pattern=ShopInfo,
-                ),
-                CallbackQueryHandler(
-                    main_conversation.display_shop_list,
-                    pattern=Navigation,
-                ),
-                CallbackQueryHandler(
-                    main_conversation.display_user_menu,
-                    pattern=f"^{il_keyboards.BACK}$",
-                ),
+                CallbackQueryHandler(main_conversation.display_shop_menu,
+                                     pattern=ShopInfo),
+                CallbackQueryHandler(main_conversation.display_shop_list,
+                                     pattern=Navigation),
+                CallbackQueryHandler(main_conversation.display_user_menu,
+                                     pattern=f"^{il_keyboards.BACK}$", ),
             ],
             States.SHOP_MENU: [
-                CallbackQueryHandler(
-                    main_conversation.display_shop_info,
-                    pattern=f"^{il_keyboards.SHOP_INFO}$",
-                ),
-                CallbackQueryHandler(
-                    main_conversation.activate_shop,
-                    pattern=f"^{il_keyboards.ACTIVATE}$",
-                ),
+                CallbackQueryHandler(main_conversation.display_shop_info,
+                                     pattern=f"^{il_keyboards.SHOP_INFO}$"),
+                CallbackQueryHandler(main_conversation.activate_shop,
+                                     pattern=f"^{il_keyboards.ACTIVATE}$"),
                 CallbackQueryHandler(
                     main_conversation.price_updating,
-                    pattern=f"^{il_keyboards.PRICE_UPDATING}$",
-                ),
-                CallbackQueryHandler(
-                    main_conversation.display_shop_list,
-                    pattern=f"^{il_keyboards.BACK}$",
-                ),
+                    pattern=f"^{il_keyboards.PRICE_UPDATING}$"),
+                CallbackQueryHandler(main_conversation.display_shop_list,
+                                     pattern=f"^{il_keyboards.BACK}$"),
             ],
             States.SHOP_INFO: [
-                CallbackQueryHandler(
-                    main_conversation.display_shop_menu,
-                    pattern=f"^{il_keyboards.BACK}$",
-                ),
+                CallbackQueryHandler(main_conversation.display_shop_menu,
+                                     pattern=f"^{il_keyboards.BACK}$"),
             ],
             States.ACTIVATE: [
                 CallbackQueryHandler(
                     main_conversation.switch_activation,
-                    pattern=f"^{il_keyboards.SWITCH_ACTIVATION}$",
-                ),
-                CallbackQueryHandler(
-                    main_conversation.display_shop_menu,
-                    pattern=f"^{il_keyboards.BACK}$",
-                ),
+                    pattern=f"^{il_keyboards.SWITCH_ACTIVATION}$"),
+                CallbackQueryHandler(main_conversation.display_shop_menu,
+                                     pattern=f"^{il_keyboards.BACK}$"),
             ],
             States.PRICE_UPDATING: [
                 CallbackQueryHandler(
                     main_conversation.switch_price_updating,
-                    pattern=f"^{il_keyboards.SWITCH_PRICE_UPDATING}$",
-                ),
-                CallbackQueryHandler(
-                    main_conversation.display_shop_menu,
-                    pattern=f"^{il_keyboards.BACK}$",
-                ),
+                    pattern=f"^{il_keyboards.SWITCH_PRICE_UPDATING}$"),
+                CallbackQueryHandler(main_conversation.display_shop_menu,
+                                     pattern=f"^{il_keyboards.BACK}$"),
             ],
         },
         fallbacks=[
@@ -248,27 +148,34 @@ def run():
 
     application.add_handlers(
         [
+            # commands
             CommandHandler(commands.HELP, command_handlers.help_handler),
             CommandHandler(commands.START, command_handlers.start),
             CommandHandler(commands.MENU, main_conversation.display_user_menu),
             CommandHandler(commands.CANCEL, command_handlers.cancel),
             CommandHandler(commands.SIGN_OUT, command_handlers.sign_out),
 
-            # login_conv,
-
-            CallbackQueryHandler(login.ask_username, pattern=f"^{il_keyboards.ADMIN_LOGIN}$"),
-            CallbackQueryHandler(login.ask_shop_api_key, pattern=f"^{il_keyboards.SELLER_LOGIN}$"),
-            CallbackQueryHandler(login.back_to_choose_role, pattern=f"^{il_keyboards.BACK_TO_CHOOSE_ROLE}$"),
-            CallbackQueryHandler(command_handlers.cancel, pattern=f"^{il_keyboards.CANCEL}$"),
+            # login,
+            CallbackQueryHandler(login.ask_username,
+                                 pattern=f"^{il_keyboards.ADMIN_LOGIN}$"),
+            CallbackQueryHandler(login.ask_shop_api_key,
+                                 pattern=f"^{il_keyboards.SELLER_LOGIN}$"),
+            CallbackQueryHandler(login.back_to_choose_role,
+                                 pattern=f"^{il_keyboards.BACK_TO_CHOOSE_ROLE}$"),
+            CallbackQueryHandler(command_handlers.cancel,
+                                 pattern=f"^{il_keyboards.CANCEL}$"),
 
             main_conv,
 
-            CallbackQueryHandler(invalid_button.handle_invalid_button,
-                                 pattern=InvalidCallbackData),
+            # all text messages
             MessageHandler(filters.TEXT & (~filters.COMMAND),
                            text_message.dispatcher),
-            MessageHandler(filters.COMMAND, command_handlers.unexpected_command),
+
+            CallbackQueryHandler(invalid_button.handle_invalid_button,
+                                 pattern=InvalidCallbackData),
             CallbackQueryHandler(invalid_button.unexpected_callback),
+            MessageHandler(filters.COMMAND,
+                           command_handlers.unexpected_command),
         ]
     )
 
