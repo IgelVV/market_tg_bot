@@ -12,7 +12,7 @@ from django.conf import settings
 from shop.services import ShopService
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
-from tg_bot.services import ChatService, TelegramUserService
+from tg_bot.services import ChatService, TelegramUserService, ExpectedInput
 from tg_bot.data_classes import Navigation, ShopInfo
 from tg_bot import texts, utils
 from tg_bot.handlers import auxiliary
@@ -60,8 +60,10 @@ async def display_add_shop(
     from_user = update.effective_user
     reply_func = await auxiliary.callback_and_message_unifier(
         update, texts.DISPLAY_ADD_SHOP_ANS)
+    chat_service = ChatService(chat_id=from_user.id, context=context)
     logger.debug(
         f"User {from_user.username} {from_user.id} goes to `add shop` menu.")
+    chat_service.set_expected_input(ExpectedInput.API_KEY_TO_ADD)
     await reply_func(
         text=texts.DISPLAY_ADD_SHOP,
         reply_markup=inline_keyboards.build_back(),
@@ -89,6 +91,7 @@ async def add_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
                  f"is trying to add shop by {shop_api_key=}.")
     shop_info = await chat_service.add_shop(shop_api_key)
     if shop_info is not None:
+        chat_service.set_expected_input(None)
         text = texts.SHOP_IS_ADDED.format(name=shop_info.name)
         await update.message.reply_text(text=text)
         logger.info(f"User {user.username} {chat_id} "
@@ -97,7 +100,8 @@ async def add_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     else:
         await update.message.reply_text(
             texts.WRONG_API_KEY,
-            reply_markup=inline_keyboards.build_back(),
+            reply_markup=inline_keyboards.build_back(
+                back_data=inline_keyboards.USER_MENU),
         )
         logger.info(f"User {user.username} {chat_id} "
                     f"has passed wrong {shop_api_key=}")

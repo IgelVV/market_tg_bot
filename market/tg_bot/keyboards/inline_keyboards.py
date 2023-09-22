@@ -27,6 +27,8 @@ BACK_TO_CHOOSE_ROLE = "back_to_choose_role"
 YES = "yes"
 NO = "no"
 
+USER_MENU = "user_menu"
+
 BACK = "back"
 
 CANCEL = "cancel"

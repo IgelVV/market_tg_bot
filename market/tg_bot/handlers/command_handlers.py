@@ -30,11 +30,11 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     otherwise directs to `login conversation`.
     """
     chat_id = update.effective_chat.id
-    chat_service = ChatService(chat_id, context)
     user = update.effective_user
-    logger.info(
-        f"User {user.username} with {chat_id=} starts.")
+    logger.info(f"User {user.username} with {chat_id=} starts.")
 
+    chat_service = ChatService(chat_id, context)
+    chat_service.set_expected_input(None)
     is_banned, is_activate, is_logged_out = await chat_service.get_statuses()
 
     exists = is_banned is not None

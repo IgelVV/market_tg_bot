@@ -58,6 +58,8 @@ def run():
     main_conv = ConversationHandler(
         per_message=True,
         entry_points=[
+            CallbackQueryHandler(command_handlers.start,
+                                 pattern=f"^{il_keyboards.USER_MENU}$"),
             CallbackQueryHandler(main_conversation.display_shop_list,
                                  pattern=f"^{il_keyboards.SHOP_LIST}$"),
             CallbackQueryHandler(main_conversation.display_add_shop,
@@ -66,9 +68,6 @@ def run():
                                  pattern=f"^{il_keyboards.UNLINK_SHOP}$"),
         ],
         states={
-            # States.LOGIN: [
-            #     login_conv,
-            # ],
             States.ADMIN_MENU: [
                 CallbackQueryHandler(main_conversation.display_shop_list,
                                      pattern=f"^{il_keyboards.SHOP_LIST}$"),
@@ -82,8 +81,6 @@ def run():
                                      pattern=f"^{il_keyboards.SHOP_LIST}$"),
             ],
             States.ADD_SHOP: [
-                # MessageHandler(filters.TEXT & (~filters.COMMAND),
-                #                main_conversation.add_shop),
                 CallbackQueryHandler(main_conversation.display_user_menu,
                                      pattern=f"^{il_keyboards.BACK}$"),
             ],
