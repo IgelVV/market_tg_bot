@@ -6,6 +6,7 @@ It allows interacting with telegram context, and other services.
 
 import logging
 from typing import Optional
+from enum import Enum, auto
 
 from telegram.ext import (
     ContextTypes,
@@ -25,6 +26,12 @@ UserModel = get_user_model()
 logger = logging.getLogger(__name__)
 
 
+class ExpectedInput(Enum):
+    USERNAME = auto()
+    PASSWORD = auto()
+    API_KEY_TO_LOGIN = auto()
+    API_KEY_TO_ADD = auto()
+
 class ChatService:
     """
     Actions and data related to telegram users.
@@ -41,8 +48,10 @@ class ChatService:
 
     AUTH_KEY = "authenticated"
     ROLE_KEY = "role"
+    # todo separate shop to unlink
     SHOP_INFO_KEY = "shop_info"
     ADMIN_USERNAME_KEY = "admin_username"
+    EXPECTED_INPUT_KEY = "expected_input"
 
     def __init__(self, chat_id: int, context: ContextTypes.DEFAULT_TYPE):
         self.context = context
@@ -85,6 +94,12 @@ class ChatService:
 
     def set_admin_username(self, username):
         self.context.chat_data[self.ADMIN_USERNAME_KEY] = username
+
+    def get_expected_input(self):
+        self.context.chat_data.get(self.EXPECTED_INPUT_KEY)
+
+    def set_expected_input(self, input_type: Optional[ExpectedInput]):
+        self.context.chat_data[self.EXPECTED_INPUT_KEY] = input_type
 
     async def get_shops(self) -> QuerySet[Shop]:
         role = await self.get_role()

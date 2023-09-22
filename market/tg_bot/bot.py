@@ -19,7 +19,9 @@ from tg_bot import commands, customisation
 from tg_bot.handlers import (
     main_conversation,
     login_conversation,
+    text_message,
     command_handlers,
+    invalid_button,
     error_handlers,
 )
 from tg_bot.conversation_states import States
@@ -67,16 +69,16 @@ def run():
         ],
         states={
             States.PASSWORD: [
-                MessageHandler(
-                    filters.TEXT & (~filters.COMMAND),
-                    login_conversation.ask_password,
-                ),
+                # MessageHandler(
+                #     filters.TEXT & (~filters.COMMAND),
+                #     login_conversation.ask_password,
+                # ),
             ],
             States.CHECK_PASSWORD: [
-                MessageHandler(
-                    filters.TEXT & (~filters.COMMAND),
-                    login_conversation.check_password,
-                ),
+                # MessageHandler(
+                #     filters.TEXT & (~filters.COMMAND),
+                #     login_conversation.check_password,
+                # ),
                 CallbackQueryHandler(
                     login_conversation.ask_username,
                     pattern=f"^{il_keyboards.YES}$"
@@ -87,14 +89,14 @@ def run():
                 ),
             ],
             States.API_KEY: [
-                MessageHandler(
-                    filters.TEXT & (~filters.COMMAND),
-                    login_conversation.check_shop_api_key,
-                ),
+                # MessageHandler(
+                #     filters.TEXT & (~filters.COMMAND),
+                #     login_conversation.check_shop_api_key,
+                # ),
             ]
         },
         fallbacks=[
-            CommandHandler(commands.CANCEL, command_handlers.cancel),
+            # CommandHandler(commands.CANCEL, command_handlers.cancel),
             CallbackQueryHandler(
                 command_handlers.cancel,
                 pattern=f"^{il_keyboards.CANCEL}$",
@@ -107,13 +109,20 @@ def run():
         },
     )
     main_conv = ConversationHandler(
+        per_message=True,
         entry_points=[
-            CommandHandler(commands.START, command_handlers.start),
-            CommandHandler(commands.MENU, command_handlers.start),
-            CommandHandler(commands.CANCEL, command_handlers.cancel),
-            CommandHandler(commands.SIGN_OUT, command_handlers.sign_out),
-            CallbackQueryHandler(main_conversation.handle_invalid_button,
-                                 pattern=InvalidCallbackData)
+            CallbackQueryHandler(
+                main_conversation.display_shop_list,
+                pattern=f"^{il_keyboards.SHOP_LIST}$"
+            ),
+            CallbackQueryHandler(
+                main_conversation.display_add_shop,
+                pattern=f"^{il_keyboards.ADD_SHOP}$"
+            ),
+            CallbackQueryHandler(
+                main_conversation.display_unlink_shop,
+                pattern=f"^{il_keyboards.UNLINK_SHOP}$"
+            ),
         ],
         states={
             States.LOGIN: [
@@ -140,10 +149,10 @@ def run():
                 ),
             ],
             States.ADD_SHOP: [
-                MessageHandler(
-                    filters.TEXT & (~filters.COMMAND),
-                    main_conversation.add_shop,
-                ),
+                # MessageHandler(
+                #     filters.TEXT & (~filters.COMMAND),
+                #     main_conversation.add_shop,
+                # ),
                 CallbackQueryHandler(
                     main_conversation.display_user_menu,
                     pattern=f"^{il_keyboards.BACK}$",
@@ -227,11 +236,7 @@ def run():
             ],
         },
         fallbacks=[
-            CommandHandler(commands.START, command_handlers.start),
-            CommandHandler(commands.MENU, command_handlers.start),
-            CommandHandler(commands.SIGN_OUT, command_handlers.sign_out),
-            CommandHandler(commands.CANCEL, command_handlers.cancel),
-            CallbackQueryHandler(main_conversation.handle_invalid_button,
+            CallbackQueryHandler(invalid_button.handle_invalid_button,
                                  pattern=InvalidCallbackData)
         ],
     )
@@ -241,9 +246,21 @@ def run():
         customisation.set_bot_description(bot=application.bot)
         customisation.set_bot_short_description(bot=application.bot)
 
-    application.add_handler(main_conv)
-    application.add_handler(
-        CommandHandler(commands.HELP, command_handlers.help_handler))
+    application.add_handlers(
+        [
+            CommandHandler(commands.HELP, command_handlers.help_handler),
+            CommandHandler(commands.START, command_handlers.start),
+            CommandHandler(commands.MENU, command_handlers.start),
+            CommandHandler(commands.CANCEL, command_handlers.cancel),
+            CommandHandler(commands.SIGN_OUT, command_handlers.sign_out),
+            main_conv,
+            CallbackQueryHandler(invalid_button.handle_invalid_button,
+                                 pattern=InvalidCallbackData),
+            MessageHandler(filters.TEXT & (~filters.COMMAND),
+                           text_message.text),
+            MessageHandler(filters.COMMAND, command_handlers.unexpected_command)
+        ]
+    )
 
     application.add_error_handler(error_handlers.error_handler)
 
