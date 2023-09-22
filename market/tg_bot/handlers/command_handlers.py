@@ -80,3 +80,13 @@ async def sign_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
     logger.info("User %s signed out.", user.username)
     await ChatService(chat_id, context).logout()
     return await start(update, context)
+
+
+async def unexpected_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Logout user."""
+    user = update.message.from_user
+    command = update.message.text
+
+    chat_id = update.message.chat_id
+    logger.info("User %s sent unexpected command %s.", user.username, command)
+    await update.message.reply_text(text=texts.UNEXPECTED_COMMAND)
