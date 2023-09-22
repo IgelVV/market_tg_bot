@@ -3,11 +3,8 @@ import logging
 from telegram import Update
 from telegram.ext import (
     ContextTypes,
-    ConversationHandler,
 )
 
-from tg_bot.conversation_states import States
-from tg_bot.keyboards import inline_keyboards
 from tg_bot.services import ChatService
 from tg_bot import texts
 from tg_bot.handlers import main_conversation, auxiliary, login
@@ -60,13 +57,18 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     It handles both messages or callback queries.
     """
     from_user = update.effective_user
-    reply_func = await auxiliary.callback_and_message_unifier(update, texts.CANCEL_ANS)
+    reply_func = await auxiliary.callback_and_message_unifier(update,
+                                                              texts.CANCEL_ANS)
     chat_service = ChatService(from_user.id, context)
     expected_input = chat_service.get_expected_input()
     chat_service.set_expected_input(None)
     logger.info(
         "User %s canceled input of %s.", from_user.username, expected_input)
-    await reply_func(texts.CANCEL)
+    if expected_input is not None:
+        text = texts.CANCEL
+    else:
+        text = texts.USELESS_CANCEL
+    await reply_func(text)
     return await start(update, context)
 
 
@@ -80,7 +82,8 @@ async def sign_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
     return await start(update, context)
 
 
-async def unexpected_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def unexpected_command(update: Update,
+                             context: ContextTypes.DEFAULT_TYPE):
     """Logout user."""
     user = update.message.from_user
     command = update.message.text
