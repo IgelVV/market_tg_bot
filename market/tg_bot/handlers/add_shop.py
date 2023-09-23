@@ -23,8 +23,7 @@ async def display_add_shop(
     chat_service.set_expected_input(ExpectedInput.API_KEY_TO_ADD)
     await reply_func(
         text=texts.DISPLAY_ADD_SHOP,
-        reply_markup=inline_keyboards.build_back(
-            back_data=inline_keyboards.USER_MENU),
+        reply_markup=inline_keyboards.build_back(),
     )
     return States.ADD_SHOP
 
@@ -51,7 +50,7 @@ async def add_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if shop_info is not None:
         chat_service.set_expected_input(None)
         text = texts.SHOP_IS_ADDED.format(name=shop_info.name)
-        await update.message.reply_text(text=text)
+        await update.message.reply_text(text=text, parse_mode="html")
         logger.info(f"User {user.username} {chat_id} "
                     f"has added shop {shop_api_key=}")
         return await display_add_shop(update, context)

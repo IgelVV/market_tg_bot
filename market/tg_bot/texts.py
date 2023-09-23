@@ -38,15 +38,15 @@ DISPLAY_USER_MENU = "Главное меню ({full_name}: {role}):"
 
 DISPLAY_ADD_SHOP = "Добавить магазин по API key. \nВведите API key 🔑:"
 
-SHOP_IS_ADDED = "✅ Магазин `{name}` добавлен."
+SHOP_IS_ADDED = "✅ Магазин <code>{name}</code> добавлен."
 
 DISPLAY_UNLINK_SHOP = "Открепление магазина."
 
-UNLINK_SHOP = "Открепить магазин `{name}`?"
+UNLINK_SHOP = "Открепить магазин <code>{name}</code>?"
 
 DISPLAY_SHOP_LIST = "Доступные магазины и их активность:"
 
-DISPLAY_SHOP_MENU = "Магазин: `{name}`"
+DISPLAY_SHOP_MENU = "Магазин: <code>{name}</code>"
 
 DISPLAY_SHOP_INFO = """
 <b>Детальная информация о магазине:</b>
@@ -60,9 +60,9 @@ DISPLAY_SHOP_INFO = """
 Индивидуальное время обновления: {individual_updating_time}
 """
 
-ACTIVATE_SHOP = "Магазин: {name}\nАктивен: {is_active}"
+ACTIVATE_SHOP = "Магазин: <code>{name}</code>\nАктивен: {is_active}"
 
-PRICE_UPDATING = "Магазин: {name}\n" \
+PRICE_UPDATING = "Магазин: <code>{name}</code>\n" \
                  "Обновление цен: {switch}"
 
 DISPLAY_BAN = "🚫 Вы забанены. Обратитесь в службу поддержки."

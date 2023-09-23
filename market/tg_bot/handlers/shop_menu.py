@@ -42,6 +42,7 @@ async def display_shop_menu(update: Update,
     await query.edit_message_text(
         text=text,
         reply_markup=keyboard,
+        parse_mode="html",
     )
     return States.SHOP_MENU
 
@@ -100,7 +101,8 @@ async def activate_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
             is_active=utils.readable_shop_activiti(new_shop_info.is_active)
         ),
         reply_markup=inline_keyboards.build_activate_shop(
-            new_shop_info.is_active)
+            new_shop_info.is_active),
+        parse_mode="html",
     )
     return States.ACTIVATE
 
@@ -145,7 +147,8 @@ async def price_updating(update: Update, context: ContextTypes.DEFAULT_TYPE):
             name=shop_info.name,
             switch='ON' if is_updating_on else 'OFF',
         ),
-        reply_markup=inline_keyboards.build_price_updating(is_updating_on)
+        reply_markup=inline_keyboards.build_price_updating(is_updating_on),
+        parse_mode="html",
     )
     return States.PRICE_UPDATING
 

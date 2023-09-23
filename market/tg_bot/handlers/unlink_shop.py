@@ -65,6 +65,7 @@ async def confirm_unlink_shop(
     await query.edit_message_text(
         text=text,
         reply_markup=keyboard,
+        parse_mode="html",
     )
     return States.UNLINK_SHOP
 
