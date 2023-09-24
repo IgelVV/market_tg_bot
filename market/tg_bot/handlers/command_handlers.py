@@ -13,8 +13,10 @@ logger = logging.getLogger(__name__)
 
 
 async def help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    await update.message.reply_text(texts.HELP_TEXT)
-    user = update.message.from_user
+    reply_func = await auxiliary.callback_and_message_unifier(update,
+                                                              texts.HELP_ANS)
+    await reply_func(texts.HELP_TEXT)
+    user = update.effective_user
     logger.debug("User %s asks help.", user.username)
     return None
 

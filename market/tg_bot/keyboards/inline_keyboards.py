@@ -235,8 +235,8 @@ def _build_back_button(back_data=BACK):
 def _build_base_menu_buttons():
     buttons = [
         [
-            InlineKeyboardButton("⚡️ Подписка ⚡️", callback_data=SUBSCRIPTION),
             InlineKeyboardButton("❔ Помощь ❔", callback_data=HELP),
+            InlineKeyboardButton("⚡️ Подписка ⚡️", callback_data=SUBSCRIPTION),
         ],
     ]
     return buttons

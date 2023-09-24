@@ -115,8 +115,8 @@ class ChatService:
     async def get_statuses(self) -> tuple:
         """
 
-        :return: is_logged_out: Optional[bool],
-         is_banned: Optional[bool], is_activate: Optional[bool].
+        :return: is_banned: Optional[bool], is_activate: Optional[bool],
+        is_logged_out: Optional[bool].
         """
         tg_user_service = TelegramUserService()
         tg_user = await tg_user_service.get_by_chat_id(self.chat_id)

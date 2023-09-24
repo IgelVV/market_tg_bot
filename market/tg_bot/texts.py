@@ -36,6 +36,9 @@ START_CHOOSE_ROLE = "Выберите роль:"
 
 DISPLAY_USER_MENU = "Главное меню ({full_name}: {role}):"
 
+DISPLAY_SUBSCRIPTION_MENU = "Состояние подписки пользователя " \
+                            "<code>{username}</code>: {is_active}"
+
 DISPLAY_ADD_SHOP = "Добавить магазин по API key. \nВведите API key 🔑:"
 
 SHOP_IS_ADDED = "✅ Магазин <code>{name}</code> добавлен."
@@ -112,6 +115,7 @@ SIGN_OUT_COMMAND_DESCR = "Пройти регистрацию повторно."
 ASK_USERNAME_ANS = None
 ASK_SHOP_API_KEY_ANS = None
 DISPLAY_USER_MENU_ANS = "User menu"
+DISPLAY_SUBSCRIPTION_MENU_ANS = "Subscription menu"
 DISPLAY_ADD_SHOP_ANS = "Add shop"
 DISPLAY_UNLINK_SHOP_ANS = "Unlink shops"
 CONFIRM_UNLINK_SHOP_ANS = "Unlink `{name}`"
@@ -124,6 +128,7 @@ SWITCH_ACTIVATION_ANS = "Switch activation"
 PRICE_UPDATING_ANS = "Price updating"
 SWITCH_PRICE_UPDATING_ANS = "Switch price updating"
 CANCEL_ANS = "Cancel"
+HELP_ANS = "Help"
 HANDLE_INVALID_BUTTON_ANS = "Invalid button"
 
 # emoji and decoration

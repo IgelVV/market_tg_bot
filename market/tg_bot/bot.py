@@ -24,6 +24,7 @@ from tg_bot.handlers import (
     login,
     shop_list,
     shop_menu,
+    subscription,
     text_message,
     unlink_shop,
     user_menu,
@@ -71,8 +72,16 @@ def run():
                                  pattern=f"^{il_keyboards.ADD_SHOP}$"),
             CallbackQueryHandler(unlink_shop.display_unlink_shop,
                                  pattern=f"^{il_keyboards.UNLINK_SHOP}$"),
+            CallbackQueryHandler(subscription.display_subscription_menu,
+                                 pattern=f"^{il_keyboards.SUBSCRIPTION}$"),
+            CallbackQueryHandler(command_handlers.help_handler,
+                                 pattern=f"^{il_keyboards.HELP}$"),
         ],
         states={
+            States.SUBSCRIPTION: [
+                CallbackQueryHandler(user_menu.display_user_menu,
+                                     pattern=f"^{il_keyboards.BACK}$")
+            ],
             States.ADD_SHOP: [
                 CallbackQueryHandler(user_menu.display_user_menu,
                                      pattern=f"^{il_keyboards.BACK}$"),
@@ -161,6 +170,7 @@ def run():
             MessageHandler(filters.TEXT & (~filters.COMMAND),
                            text_message.dispatcher),
 
+            # special handlers
             CallbackQueryHandler(invalid_button.handle_invalid_button,
                                  pattern=InvalidCallbackData),
             CallbackQueryHandler(invalid_button.unexpected_callback),
