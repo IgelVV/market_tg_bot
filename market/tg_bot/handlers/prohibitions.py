@@ -7,6 +7,7 @@ from telegram.ext import (
 )
 
 from tg_bot import texts
+from tg_bot.keyboards import inline_keyboards
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,10 @@ async def display_not_active(
     user = update.effective_user
     logger.info(f"User {user.username} {user.id} "
                 f"has got a `not active` message.")
-    await bot.send_message(user.id, texts.DISPLAY_NOT_ACTIVE)
-    # return ConversationHandler.END
+    await bot.send_message(
+        user.id,
+        texts.DISPLAY_NOT_ACTIVE,
+        reply_markup=inline_keyboards.build_base_menu(),
+    )
+    return ConversationHandler.END
 
