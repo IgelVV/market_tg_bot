@@ -33,6 +33,9 @@ BACK = "back"
 
 CANCEL = "cancel"
 
+HELP = "help"
+SUBSCRIPTION = "subscription"
+
 SHOP_LIST = "shop_list"
 
 ADD_SHOP = "add_shop"
@@ -87,21 +90,18 @@ def build_cancel():
     return InlineKeyboardMarkup(keyboard)
 
 
+def build_base_menu():
+    keyboard = _build_base_menu_buttons()
+    return InlineKeyboardMarkup(keyboard)
+
+
 def build_admin_menu():
-    keyboard = [
-        [
-            InlineKeyboardButton("📋 Список магазинов 📋", callback_data=SHOP_LIST),
-        ]
-    ]
+    keyboard = _build_admin_menu_buttons()
     return InlineKeyboardMarkup(keyboard)
 
 
 def build_seller_menu():
-    keyboard = [
-        [InlineKeyboardButton("➕ Добавить магазин ➕", callback_data=ADD_SHOP)],
-        [InlineKeyboardButton("➖ Отвязать магазин ➖", callback_data=UNLINK_SHOP)],
-        [InlineKeyboardButton("📋 Список магазинов 📋", callback_data=SHOP_LIST)],
-    ]
+    keyboard = _build_seller_menu_buttons()
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -230,3 +230,37 @@ def _build_back_button(back_data=BACK):
     # ↤ ⟵ ← ⇐ ↵ ⤶
     button = [InlineKeyboardButton("⟵", callback_data=back_data)]
     return button
+
+
+def _build_base_menu_buttons():
+    buttons = [
+        [
+            InlineKeyboardButton("⚡️ Подписка ⚡️", callback_data=SUBSCRIPTION),
+            InlineKeyboardButton("❔ Помощь ❔", callback_data=HELP),
+        ],
+    ]
+    return buttons
+
+
+def _build_admin_menu_buttons():
+    buttons = _build_base_menu_buttons()
+    buttons.append(
+        [InlineKeyboardButton("📋 Список магазинов 📋",
+                              callback_data=SHOP_LIST)],
+    )
+    return buttons
+
+
+def _build_seller_menu_buttons():
+    buttons = _build_base_menu_buttons()
+    buttons.extend(
+        [
+            [InlineKeyboardButton("➕ Добавить магазин ➕",
+                                  callback_data=ADD_SHOP)],
+            [InlineKeyboardButton("➖ Отвязать магазин ➖",
+                                  callback_data=UNLINK_SHOP)],
+            [InlineKeyboardButton("📋 Список магазинов 📋",
+                                  callback_data=SHOP_LIST)],
+        ]
+    )
+    return buttons
