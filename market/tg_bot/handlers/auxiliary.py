@@ -1,6 +1,12 @@
+import logging
 from typing import Optional
 
 from telegram import Update
+from telegram.ext import ContextTypes
+
+from tg_bot import texts
+
+logger = logging.getLogger(__name__)
 
 
 async def callback_and_message_unifier(
@@ -15,3 +21,8 @@ async def callback_and_message_unifier(
             "Unexpected update. It is expected Callback or Message.")
 
     return reply_func
+
+
+async def do_nothing(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer(text=texts.DO_NOTHING_ANS)

@@ -30,7 +30,17 @@ async def display_subscription_menu(
     )
     await reply_func(
         text=text,
-        reply_markup=inline_keyboards.build_back(),
+        reply_markup=inline_keyboards.build_subscription_menu(),
         parse_mode="html",
     )
     return States.SUBSCRIPTION
+
+
+async def display_pay_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    query = update.callback_query
+    await query.answer(texts.DISPLAY_PAY_MENU_ANS)
+    await query.edit_message_text(
+        texts.DISPLAY_PAY_MENU,
+        reply_markup=inline_keyboards.build_back(),
+        parse_mode="html",
+    )

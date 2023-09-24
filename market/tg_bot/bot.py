@@ -18,6 +18,7 @@ from django.conf import settings
 from tg_bot import commands, customisation
 from tg_bot.handlers import (
     add_shop,
+    auxiliary,
     command_handlers,
     error_handlers,
     invalid_button,
@@ -79,8 +80,10 @@ def run():
         ],
         states={
             States.SUBSCRIPTION: [
+                CallbackQueryHandler(subscription.display_pay_menu,
+                                     pattern=f"^{il_keyboards.PAY}$"),
                 CallbackQueryHandler(user_menu.display_user_menu,
-                                     pattern=f"^{il_keyboards.BACK}$")
+                                     pattern=f"^{il_keyboards.BACK}$"),
             ],
             States.ADD_SHOP: [
                 CallbackQueryHandler(user_menu.display_user_menu,
@@ -171,6 +174,8 @@ def run():
                            text_message.dispatcher),
 
             # special handlers
+            CallbackQueryHandler(auxiliary.do_nothing,
+                                 pattern=il_keyboards.DO_NOTHING),
             CallbackQueryHandler(invalid_button.handle_invalid_button,
                                  pattern=InvalidCallbackData),
             CallbackQueryHandler(invalid_button.unexpected_callback),

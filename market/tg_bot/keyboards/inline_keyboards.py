@@ -34,7 +34,9 @@ BACK = "back"
 CANCEL = "cancel"
 
 HELP = "help"
+
 SUBSCRIPTION = "subscription"
+PAY = "pay"
 
 SHOP_LIST = "shop_list"
 
@@ -157,6 +159,15 @@ def build_shop_menu(with_back: bool = False):
     ]
     if with_back:
         keyboard.append(_build_back_button())
+    return InlineKeyboardMarkup(keyboard)
+
+
+def build_subscription_menu():
+    keyboard = [
+        [InlineKeyboardButton(
+            "💸 Оплатить подписку 💸", callback_data=PAY)],
+        _build_back_button(),
+    ]
     return InlineKeyboardMarkup(keyboard)
 
 
