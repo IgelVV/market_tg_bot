@@ -6,9 +6,8 @@ It responsible for authentication and registration.
 import logging
 
 from telegram import Update
-from telegram.ext import ContextTypes, ConversationHandler
+from telegram.ext import ContextTypes
 
-from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services import ChatService, ExpectedInput
 from tg_bot.handlers.auxiliary import callback_and_message_unifier
@@ -21,7 +20,6 @@ async def choose_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_func = await callback_and_message_unifier(update, None)
     keyboard = inline_keyboards.build_role_keyboard()
     await reply_func(texts.START_CHOOSE_ROLE, reply_markup=keyboard)
-    # return States.LOGIN
 
 
 # if user has chosen Admin role
@@ -42,7 +40,6 @@ async def ask_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
         reply_markup=inline_keyboards.build_back(
             back_data=inline_keyboards.BACK_TO_CHOOSE_ROLE),
     )
-    # return States.PASSWORD
 
 
 async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -61,7 +58,6 @@ async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_service.set_admin_username(username)
     chat_service.set_expected_input(ExpectedInput.PASSWORD)
     await update.message.reply_text(texts.ASK_PASSWORD)
-    # return States.CHECK_PASSWORD
 
 
 async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -103,7 +99,6 @@ async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
             message,
             reply_markup=inline_keyboards.build_admin_menu()
         )
-        return States.ADMIN_MENU
     else:
         logger.info(f"User {user.username} {chat_id} "
                     f"is not authenticated with {username=}")
@@ -128,7 +123,6 @@ async def ask_shop_api_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
     chat_service.set_expected_input(ExpectedInput.API_KEY_TO_LOGIN)
     await query.answer(text=texts.ASK_SHOP_API_KEY_ANS)
     await query.edit_message_text(text=texts.ASK_SHOP_API_KEY)
-    return States.API_KEY
 
 
 async def check_shop_api_key(
@@ -165,7 +159,6 @@ async def check_shop_api_key(
             text=texts.LOGGED_IN_AS_SELLER,
             reply_markup=inline_keyboards.build_seller_menu()
         )
-        return States.SELLER_MENU
     else:
         logger.info(f"User {user.username} {chat_id} "
                     f"is not authenticated with {shop_api_key=}")
@@ -176,7 +169,8 @@ async def check_shop_api_key(
         return None
 
 
-async def back_to_choose_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
+async def back_to_choose_role(update: Update,
+                              context: ContextTypes.DEFAULT_TYPE):
     user = update.effective_user
     chat_service = ChatService(user.id, context)
     chat_service.set_expected_input(None)

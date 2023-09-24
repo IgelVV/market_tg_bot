@@ -4,7 +4,6 @@ import logging
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services import ChatService
 from tg_bot import texts, utils
@@ -34,13 +33,11 @@ async def display_user_menu(
             text=text,
             reply_markup=inline_keyboards.build_admin_menu(),
         )
-        return States.ADMIN_MENU
     elif role == chat_service.SELLER_ROLE:
         await reply_func(
             text=text,
             reply_markup=inline_keyboards.build_seller_menu(),
         )
-        return States.SELLER_MENU
     else:
         logger.error(f"{chat_id=} Wrong {role=}")
         raise ValueError(f"Wrong {role=}")

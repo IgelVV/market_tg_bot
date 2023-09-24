@@ -33,11 +33,11 @@ from tg_bot.keyboards import inline_keyboards as il_keyboards
 from tg_bot.data_classes import ShopInfo, Navigation
 
 # to ignore CallbackQueryHandler warnings
-filterwarnings(
-    action="ignore",
-    message=r".*CallbackQueryHandler",
-    category=PTBUserWarning,
-)
+# filterwarnings(
+#     action="ignore",
+#     message=r".*CallbackQueryHandler",
+#     category=PTBUserWarning,
+# )
 with open("tg_bot/logging_config.json", "r") as f:
     json_config = json.load(f)
     logging.config.dictConfig(json_config)
@@ -61,6 +61,7 @@ def run():
 
     main_conv = ConversationHandler(
         per_message=True,
+        allow_reentry=True,
         entry_points=[
             CallbackQueryHandler(command_handlers.start,
                                  pattern=f"^{il_keyboards.USER_MENU}$"),
@@ -72,18 +73,6 @@ def run():
                                  pattern=f"^{il_keyboards.UNLINK_SHOP}$"),
         ],
         states={
-            States.ADMIN_MENU: [
-                CallbackQueryHandler(shop_list.display_shop_list,
-                                     pattern=f"^{il_keyboards.SHOP_LIST}$"),
-            ],
-            States.SELLER_MENU: [
-                CallbackQueryHandler(add_shop.display_add_shop,
-                                     pattern=f"^{il_keyboards.ADD_SHOP}$"),
-                CallbackQueryHandler(unlink_shop.display_unlink_shop,
-                                     pattern=f"^{il_keyboards.UNLINK_SHOP}$"),
-                CallbackQueryHandler(shop_list.display_shop_list,
-                                     pattern=f"^{il_keyboards.SHOP_LIST}$"),
-            ],
             States.ADD_SHOP: [
                 CallbackQueryHandler(user_menu.display_user_menu,
                                      pattern=f"^{il_keyboards.BACK}$"),
