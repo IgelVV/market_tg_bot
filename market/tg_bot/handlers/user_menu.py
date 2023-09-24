@@ -20,6 +20,7 @@ async def display_user_menu(
     chat_id = from_user.id
 
     chat_service = ChatService(chat_id, context)
+    chat_service.set_expected_input(None)
     role = await chat_service.get_role()
     logger.info(f"User {from_user.username} {chat_id} "
                 f"displays menu as {role}.")
