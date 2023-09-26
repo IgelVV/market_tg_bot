@@ -21,11 +21,12 @@ async def display_add_shop(
     logger.debug(
         f"User {from_user.username} {from_user.id} goes to `add shop` menu.")
     chat_service.set_expected_input(ExpectedInput.API_KEY_TO_ADD)
+    keyboard = inline_keyboards.build_back(
+        back_data=inline_keyboards.USER_MENU)
     await reply_func(
         text=texts.DISPLAY_ADD_SHOP,
-        reply_markup=inline_keyboards.build_back(),
+        reply_markup=keyboard,
     )
-    return States.ADD_SHOP
 
 
 async def add_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):

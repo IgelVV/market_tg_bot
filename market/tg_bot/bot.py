@@ -85,10 +85,6 @@ def run():
                 CallbackQueryHandler(user_menu.display_user_menu,
                                      pattern=f"^{il_keyboards.BACK}$"),
             ],
-            States.ADD_SHOP: [
-                CallbackQueryHandler(user_menu.display_user_menu,
-                                     pattern=f"^{il_keyboards.BACK}$"),
-            ],
             States.UNLINK_SHOP: [
                 CallbackQueryHandler(unlink_shop.confirm_unlink_shop,
                                      pattern=ShopInfo),
