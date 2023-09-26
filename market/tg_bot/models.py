@@ -35,7 +35,10 @@ def save_user_cart(sender, instance: TelegramUser, **kwargs):
         current = instance
         previous: TelegramUser = TelegramUser.objects.get(pk=instance.pk)
         if previous.is_banned != current.is_banned:
-            send_ban_unban_notification(current)
+            try:
+                send_ban_unban_notification(current)
+            except Exception as e:
+                print(e.__repr__())
 
 
 def send_ban_unban_notification(tg_user: TelegramUser):
@@ -48,12 +51,10 @@ def send_ban_unban_notification(tg_user: TelegramUser):
         .concurrent_updates(False) \
         .token(settings.TG_BOT_TOKEN) \
         .build()
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
 
     if tg_user.is_banned:
         text = texts.DISPLAY_BAN
     else:
         text = texts.DISPLAY_UNBAN
     coroutine = application.bot.send_message(tg_user.chat_id, text)
-    loop.run_until_complete(coroutine)
+    asyncio.run(coroutine)
