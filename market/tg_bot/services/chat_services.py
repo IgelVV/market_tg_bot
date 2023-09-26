@@ -48,8 +48,8 @@ class ChatService:
 
     AUTH_KEY = "authenticated"
     ROLE_KEY = "role"
-    # todo separate shop to unlink
     SHOP_INFO_KEY = "shop_info"
+    SHOP_INFO_TO_UNLINK_KEY = "shop_to_unlink"
     ADMIN_USERNAME_KEY = "admin_username"
     EXPECTED_INPUT_KEY = "expected_input"
 
@@ -88,6 +88,12 @@ class ChatService:
 
     def set_shop_info(self, shop: ShopInfo):
         self.context.chat_data[self.SHOP_INFO_KEY] = shop
+
+    def get_shop_info_to_unlink(self) -> ShopInfo:
+        return self.context.chat_data.get(self.SHOP_INFO_TO_UNLINK_KEY)
+
+    def set_shop_info_to_unlink(self, shop: ShopInfo):
+        self.context.chat_data[self.SHOP_INFO_TO_UNLINK_KEY] = shop
 
     def get_admin_username(self):
         return self.context.chat_data.get(self.ADMIN_USERNAME_KEY)

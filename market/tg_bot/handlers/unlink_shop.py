@@ -57,7 +57,7 @@ async def confirm_unlink_shop(
         logger.error(f"{chat_id=} Wrong callback data: {query.data}")
         raise ValueError(f"Wrong callback data: {query.data=}")
     shop_info = query.data
-    chat_service.set_shop_info(shop_info)
+    chat_service.set_shop_info_to_unlink(shop_info)
     await query.answer(
         text=texts.CONFIRM_UNLINK_SHOP_ANS.format(name=shop_info.name))
     keyboard = inline_keyboards.build_yes_no(no_data=inline_keyboards.BACK)
@@ -82,7 +82,7 @@ async def unlink_shop(
     if not is_activate:
         return await prohibitions.display_not_active(update, context)
 
-    shop_to_unlink = chat_service.get_shop_info()
+    shop_to_unlink = chat_service.get_shop_info_to_unlink()
     tg_user_service = TelegramUserService()
     await tg_user_service.unlink_shop_by_chat_id(
         chat_id=chat_id, shop_id=shop_to_unlink.id)
