@@ -39,4 +39,4 @@ async def _answer_unexpected_text(
     chat_id = update.message.chat_id
     chat_service = ChatService(chat_id, context=context)
 
-    await update.message.reply_text(text=texts.HELP_TEXT,)
+    await update.message.reply_text(text=texts.UNEXPECTED_TEXT,)
