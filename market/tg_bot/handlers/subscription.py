@@ -14,6 +14,11 @@ logger = logging.getLogger(__name__)
 
 async def display_subscription_menu(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Send message with subscription menu.
+
+    It is possible to use in Callback and Message handlers.
+    """
     from_user = update.effective_user
     reply_func = await auxiliary.callback_and_message_unifier(
         update, texts.DISPLAY_SUBSCRIPTION_MENU_ANS)
@@ -37,6 +42,8 @@ async def display_subscription_menu(
 
 
 async def display_pay_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    """
     query = update.callback_query
     await query.answer(texts.DISPLAY_PAY_MENU_ANS)
     await query.edit_message_text(

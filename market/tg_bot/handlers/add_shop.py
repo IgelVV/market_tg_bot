@@ -1,9 +1,10 @@
+"""Handlers related to `add shop` feature."""
+
 import logging
 
 from telegram import Update
 from telegram.ext import ContextTypes
 
-from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services import ChatService, ExpectedInput
 from tg_bot import texts
@@ -14,6 +15,12 @@ logger = logging.getLogger(__name__)
 
 async def display_add_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Send `add shop` menu to user.
+
+    It is possible to use in Callback and Message handlers.
+    NEXT: message handler to handle shop api_key
+    """
     from_user = update.effective_user
     reply_func = await auxiliary.callback_and_message_unifier(
         update, texts.DISPLAY_ADD_SHOP_ANS)
@@ -30,6 +37,12 @@ async def display_add_shop(
 
 
 async def add_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Link chosen shop to user.
+
+    Check prohibitions, try to add shop by api_key (from message).
+    NEXT: display_add_shop if OK, else same Message handler.
+    """
     user = update.message.from_user
     chat_id = update.message.chat_id
     chat_service = ChatService(chat_id, context=context)

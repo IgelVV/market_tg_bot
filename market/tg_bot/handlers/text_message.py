@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 
 
 async def dispatcher(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.message.from_user
+    """Call specific handler, depending on ExpectedInput in chat_data."""
     chat_id = update.message.chat_id
     chat_service = ChatService(chat_id, context=context)
 
@@ -35,8 +35,5 @@ async def dispatcher(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def _answer_unexpected_text(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
-    user = update.message.from_user
-    chat_id = update.message.chat_id
-    chat_service = ChatService(chat_id, context=context)
-
+    """Answer unexpected text."""
     await update.message.reply_text(text=texts.UNEXPECTED_TEXT,)

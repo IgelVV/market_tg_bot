@@ -51,7 +51,9 @@ AUTO_CUSTOMISATION = settings.TG_AUTO_CUSTOMISATION
 
 
 def run():
-    """Starts telegram bot."""
+    """
+    Start telegram bot and register all handlers.
+    """
     logger.info("Bot is running.")
     # arbitrary_callback_data(True) makes it possible to pass
     # any type as callback data
@@ -61,6 +63,7 @@ def run():
         .arbitrary_callback_data(True) \
         .build()
 
+    # Main ConversationHandler allows only CallbackQueryHandler to use.
     main_conv = ConversationHandler(
         per_message=True,
         allow_reentry=True,
@@ -139,11 +142,6 @@ def run():
         ],
     )
 
-    if AUTO_CUSTOMISATION:
-        customisation.set_bot_commands(bot=application.bot)
-        customisation.set_bot_description(bot=application.bot)
-        customisation.set_bot_short_description(bot=application.bot)
-
     application.add_handlers(
         [
             # commands
@@ -181,6 +179,13 @@ def run():
     )
 
     application.add_error_handler(error_handlers.error_handler)
+
+    # Set or refresh some bot attributes
+    # (if False it can be set manually using BotFather).
+    if AUTO_CUSTOMISATION:
+        customisation.set_bot_commands(bot=application.bot)
+        customisation.set_bot_description(bot=application.bot)
+        customisation.set_bot_short_description(bot=application.bot)
 
     application.run_polling()
 

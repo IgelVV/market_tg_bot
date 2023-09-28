@@ -19,7 +19,12 @@ LIST_LIMIT: int = settings.TG_BOT_LIST_LIMIT
 
 async def display_unlink_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # possible callbacks: back, Navigation
+    """
+    Send message with unlink shop menu.
+
+    Shows all linked shops to seller, using pagination.
+    possible callbacks: back, Navigation
+    """
     user = update.callback_query.from_user
     query = update.callback_query
     chat_id = query.from_user.id
@@ -49,7 +54,12 @@ async def display_unlink_shop(
 
 async def confirm_unlink_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # possible callbacks: back, Shop_info
+    """
+    Send message with confirmation.
+
+    possible callbacks: back, Shop_info
+    NEXT: if `yes` States.UNLINK_SHOP -> unlink_shop, if no user menu.
+    """
     query = update.callback_query
     chat_id = query.from_user.id
     chat_service = ChatService(chat_id, context)
@@ -72,6 +82,12 @@ async def confirm_unlink_shop(
 
 async def unlink_shop(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Remove many-to-many relation between TelegramUser and Shop.
+
+    Check prohibitions.
+    NEXT: display_unlink_shop.
+    """
     query = update.callback_query
     user = query.from_user
     chat_id = query.from_user.id

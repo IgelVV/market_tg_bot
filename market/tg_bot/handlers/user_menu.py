@@ -14,6 +14,12 @@ logger = logging.getLogger(__name__)
 
 async def display_user_menu(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Send message with seller or admin menu.
+
+    It is possible to use in Callback and Message handlers.
+    NEXT: main_conv entry_points.
+    """
     from_user = update.effective_user
     reply_func = await auxiliary.callback_and_message_unifier(
         update, texts.DISPLAY_USER_MENU_ANS)

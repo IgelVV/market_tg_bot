@@ -22,7 +22,7 @@ async def display_shop_list(update: Update,
     Display available shops.
 
     It uses pagination.
-    It is allowed only for admins.
+    For admins, it displays all shops.
     """
     query = update.callback_query
     user = query.from_user

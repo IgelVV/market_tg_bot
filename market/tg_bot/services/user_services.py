@@ -22,16 +22,24 @@ class UserService:
             username: str,
             password: str,
     ):
+        """
+        Check if UserModel with the credentials exists
+        and in telegram admin group.
+
+        :param username: Username of UserModel.
+        :param password: Password of UserModel.
+        :return: UserModel obj. or None.
+        """
         try:
             user = await UserModel.objects.aget(
                 username=username)
         except UserModel.DoesNotExist:
             logger.debug(f"User with {username=} DoesNotExists")
         else:
-            is_admin = await user.groups.filter(name=self.TG_ADMIN_GROUP_NAME) \
+            is_admin = await user.groups \
+                .filter(name=self.TG_ADMIN_GROUP_NAME) \
                 .aexists()
             if user.check_password(password) and user.is_active and is_admin:
-
                 logger.debug(f"User: {username} is authenticated.")
                 return user
             else:
@@ -42,6 +50,7 @@ class UserService:
                 )
 
     async def get_or_create_tg_admin_group(self):
+        """Get or create group record for telegram admins."""
         group, created = await auth_models.Group.objects.aget_or_create(
             name=self.TG_ADMIN_GROUP_NAME,
         )

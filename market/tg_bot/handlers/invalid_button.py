@@ -21,5 +21,5 @@ async def handle_invalid_button(
 
 async def unexpected_callback(
         update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """For debugging."""
+    """Write log message about unexpected callback for debugging."""
     logger.info(f"Unexpected callback: {update.callback_query.data}")

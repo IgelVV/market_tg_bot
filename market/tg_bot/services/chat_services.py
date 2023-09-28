@@ -27,10 +27,12 @@ logger = logging.getLogger(__name__)
 
 
 class ExpectedInput(Enum):
+    """States for text message dispatcher."""
     USERNAME = auto()
     PASSWORD = auto()
     API_KEY_TO_LOGIN = auto()
     API_KEY_TO_ADD = auto()
+
 
 class ChatService:
     """
@@ -58,6 +60,7 @@ class ChatService:
         self.chat_id = chat_id
 
     async def get_role(self):
+        """Get role from chat_data or from db."""
         cached_role = self.context.chat_data.get(self.ROLE_KEY)
         if cached_role:
             return cached_role
@@ -108,6 +111,7 @@ class ChatService:
         self.context.chat_data[self.EXPECTED_INPUT_KEY] = input_type
 
     async def get_shops(self) -> QuerySet[Shop]:
+        """Get available Shops depending on TgUser.role."""
         role = await self.get_role()
         if role == self.SELLER_ROLE:
             shops = await TelegramUserService().get_related_shops_by_chat_id(
@@ -120,7 +124,9 @@ class ChatService:
 
     async def get_statuses(self) -> tuple:
         """
+        Get all TgUser statuses at once.
 
+        If user does not exist return None in every status.
         :return: is_banned: Optional[bool], is_activate: Optional[bool],
         is_logged_out: Optional[bool].
         """
@@ -142,7 +148,15 @@ class ChatService:
             self,
             username: str,
             password: str,
-    ):
+    ) -> bool:
+        """
+        Check if User with the credentials exists
+        and in telegram admin group.
+
+        :param username: Username of User
+        :param password: Password of User
+        :return: True if authenticated.
+        """
         user = await UserService() \
             .authenticate_telegram_admin(username, password)
         return user is not None
@@ -155,7 +169,7 @@ class ChatService:
     ):
         """Create or update TelegramUser record."""
         logger.debug(f"Admin has logged in: {self.chat_id=}, {first_name=},"
-                    f" {last_name=}, {tg_username=},")
+                     f" {last_name=}, {tg_username=},")
         first_name = first_name if first_name is not None else ""
         last_name = last_name if last_name is not None else ""
         tg_username = tg_username if tg_username is not None else ""

@@ -13,6 +13,11 @@ logger = logging.getLogger(__name__)
 
 
 async def help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Send help message.
+
+    It is possible to use in Callback and Message handlers.
+    """
     reply_func = await auxiliary.callback_and_message_unifier(update,
                                                               texts.HELP_ANS)
     await reply_func(texts.HELP_TEXT)
@@ -23,10 +28,11 @@ async def help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
-    Starts the conversation and asks the user about their role.
+    Starts the conversation and asks the users about their role.
 
-    If user is authenticated it displays corresponding menu,
-    otherwise directs to `login conversation`.
+    Check prohibitions.
+    If user is authenticated it displays user menu,
+    otherwise starts logging in.
     """
     chat_id = update.effective_chat.id
     user = update.effective_user
@@ -54,9 +60,9 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """
-    Cancels and ends the conversation.
+    Cancel input and call start().
 
-    It handles both messages or callback queries.
+    It is possible to use in Callback and Message handlers.
     """
     from_user = update.effective_user
     reply_func = await auxiliary.callback_and_message_unifier(update,
@@ -77,7 +83,6 @@ async def cancel(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
 async def sign_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Logout user."""
     user = update.message.from_user
-
     chat_id = update.message.chat_id
     logger.info("User %s signed out.", user.username)
     await ChatService(chat_id, context).logout()
@@ -86,10 +91,8 @@ async def sign_out(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def unexpected_command(update: Update,
                              context: ContextTypes.DEFAULT_TYPE):
-    """Logout user."""
+    """Send message that the Command is unexpected."""
     user = update.message.from_user
     command = update.message.text
-
-    chat_id = update.message.chat_id
     logger.info("User %s sent unexpected command %s.", user.username, command)
     await update.message.reply_text(text=texts.UNEXPECTED_COMMAND)

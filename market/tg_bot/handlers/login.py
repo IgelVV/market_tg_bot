@@ -1,8 +1,5 @@
-"""
-Handlers that are used in nested ConversationHandler.
+"""Handlers that are used for registration and logging in."""
 
-It responsible for authentication and registration.
-"""
 import logging
 
 from telegram import Update
@@ -17,6 +14,12 @@ logger = logging.getLogger(__name__)
 
 
 async def choose_role(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """
+    Send message to choose user role.
+
+    It is possible to use in Callback and Message handlers.
+    NEXT: ask_username or ask_shop_api_key.
+    """
     reply_func = await callback_and_message_unifier(update, None)
     keyboard = inline_keyboards.build_role_keyboard()
     await reply_func(texts.START_CHOOSE_ROLE, reply_markup=keyboard)
@@ -27,8 +30,7 @@ async def ask_username(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Request admin username.
 
-    Command handlers can be unavailable, because it requests text answer,
-    and next handler will handle commands too.
+    NEXT: MessageHandler with ExpectedInput.USERNAME -> ask_password.
     """
     query = update.callback_query
     user = query.from_user
@@ -46,8 +48,7 @@ async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Request admin password and save the username.
 
-    Command handlers can be unavailable, because it requests text answer,
-    and next handler will handle commands too.
+    NEXT: MessageHandler with ExpectedInput.PASSWORD -> check_password.
     """
     chat_id = update.message.chat_id
     user = update.message.from_user
@@ -61,15 +62,16 @@ async def ask_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 
 async def check_password(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    # """
-    # Authenticate admin.
-    #
-    # Deletes user message that contains password.
-    # If authentication is failed, request if user want to enter username again.
-    # It is possible to send password again, ignoring inline keyboard.
-    #
-    # Display `admin menu` if authenticated.
-    # """
+    """
+    Authenticate admin.
+
+    Deletes user message that contains password.
+    If authentication is failed, request if user want to enter username again.
+    It is possible to send password again, ignoring inline keyboard.
+
+    Display `admin menu` if authenticated.
+    NEXT: same, or entry callbacks of main_conv.
+    """
     chat_id = update.message.chat_id
     user = update.message.from_user
     chat_service = ChatService(chat_id, context=context)
@@ -114,8 +116,8 @@ async def ask_shop_api_key(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     Request shop api_key from the seller.
 
-    Command handlers can be unavailable, because it requests text answer,
-    and next handler will handle commands too.
+    NEXT: MessageHandler with ExpectedInput.API_KEY_TO_LOGIN
+        -> check_shop_api_key.
     """
     query = update.callback_query
     chat_id = update.effective_chat.id
@@ -134,6 +136,8 @@ async def check_shop_api_key(
     If authentication is failed, requests api_key again.
 
     Displays `shop menu` if authenticated.
+
+    NEXT: same, or entry callbacks of main_conv.
     """
     chat_id = update.message.chat_id
     user = update.message.from_user
@@ -171,6 +175,7 @@ async def check_shop_api_key(
 
 async def back_to_choose_role(update: Update,
                               context: ContextTypes.DEFAULT_TYPE):
+    """Start from choosing role."""
     user = update.effective_user
     chat_service = ChatService(user.id, context)
     chat_service.set_expected_input(None)

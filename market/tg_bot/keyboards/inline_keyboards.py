@@ -113,14 +113,16 @@ async def build_shop_list(
         offset: int = 0,
         with_back: bool = True,
 ):
-    # """
-    # Build keyboard, that contains shop list.
-    #
-    # It uses pagination.
-    # :param limit: maximum items per page.
-    # :param offset: index of start item.
-    # :return: keyboard with navigation buttons.
-    # """
+    """
+    Build keyboard, that contains shop list.
+
+    It uses pagination.
+    :param qs: QuerySet of Shops, that need to be paginated.
+    :param limit: maximum items per page.
+    :param offset: index of start item.
+    :param with_back: whether display back button.
+    :return: keyboard with navigation buttons.
+    """
     shop_service = ShopService()
     shops: list[ShopInfo] = await shop_service.paginate_shops_for_buttons(
         qs=qs,
@@ -237,8 +239,7 @@ def _build_navigation_buttons(
 
 def _build_back_button(back_data=BACK):
     """Creates `back` button to adding to keyboards as a line."""
-    # button = [InlineKeyboardButton("\U0001F868", callback_data=BACK)]
-    # ↤ ⟵ ← ⇐ ↵ ⤶
+    # Options: ↤ ⟵ ← ⇐ ↵ ⤶
     button = [InlineKeyboardButton("⟵", callback_data=back_data)]
     return button
 
