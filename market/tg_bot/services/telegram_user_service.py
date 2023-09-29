@@ -49,3 +49,8 @@ class TelegramUserService:
             raise TelegramUser.DoesNotExist
         await tg_user.shops.aremove(shop_id)
 
+    async def activate(self, chat_id):
+        tg_user = await self.get_by_chat_id(chat_id)
+        tg_user.is_active = True
+        await tg_user.asave()
+

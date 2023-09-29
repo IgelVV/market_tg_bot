@@ -10,6 +10,7 @@ from telegram.ext import (
     ConversationHandler,
     MessageHandler,
     CallbackQueryHandler,
+    PreCheckoutQueryHandler,
     InvalidCallbackData,
     filters,
 )
@@ -23,6 +24,7 @@ from tg_bot.handlers import (
     error_handlers,
     invalid_button,
     login,
+    payment,
     shop_list,
     shop_menu,
     subscription,
@@ -83,7 +85,7 @@ def run():
         ],
         states={
             States.SUBSCRIPTION: [
-                CallbackQueryHandler(subscription.display_pay_menu,
+                CallbackQueryHandler(payment.display_payment,
                                      pattern=f"^{il_keyboards.PAY}$"),
                 CallbackQueryHandler(user_menu.display_user_menu,
                                      pattern=f"^{il_keyboards.BACK}$"),
@@ -162,6 +164,11 @@ def run():
                                  pattern=f"^{il_keyboards.CANCEL}$"),
 
             main_conv,
+
+            # payment
+            PreCheckoutQueryHandler(payment.precheckout_callback),
+            MessageHandler(filters.SUCCESSFUL_PAYMENT,
+                           payment.successful_payment_callback),
 
             # all text messages
             MessageHandler(filters.TEXT & (~filters.COMMAND),
