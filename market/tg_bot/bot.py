@@ -3,6 +3,7 @@ import json
 import logging.config
 from warnings import filterwarnings
 
+from telegram import Update
 from telegram.warnings import PTBUserWarning
 from telegram.ext import (
     ApplicationBuilder,
@@ -194,8 +195,13 @@ def run():
         customisation.set_bot_description(bot=application.bot)
         customisation.set_bot_short_description(bot=application.bot)
 
-    application.run_polling()
+    application.run_polling(allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == '__main__':
     run()
+
+    # todo убрать индивидуальное обновление цен ото всюду
+    # добавить в хэлп инфу о руслане
+    # проверить разлоогин при бане после добавления магазина выкидывать в основное меню
+
