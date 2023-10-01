@@ -1,5 +1,7 @@
 import logging
 
+from django.conf import settings
+
 from telegram import Update
 from telegram.ext import (
     ContextTypes,
@@ -20,7 +22,7 @@ async def help_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """
     reply_func = await auxiliary.callback_and_message_unifier(update,
                                                               texts.HELP_ANS)
-    await reply_func(texts.HELP_TEXT)
+    await reply_func(texts.HELP_TEXT.format(admin_username=settings.TG_HELP_ADMIN_USERNAME))
     user = update.effective_user
     logger.debug("User %s asks help.", user.username)
     return None
