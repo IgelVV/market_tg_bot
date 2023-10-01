@@ -8,7 +8,7 @@ from telegram.ext import ContextTypes
 from tg_bot.keyboards import inline_keyboards
 from tg_bot.services import ChatService, ExpectedInput
 from tg_bot import texts
-from tg_bot.handlers import auxiliary, prohibitions
+from tg_bot.handlers import auxiliary, prohibitions, user_menu
 
 logger = logging.getLogger(__name__)
 
@@ -67,7 +67,7 @@ async def add_shop(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await update.message.reply_text(text=text, parse_mode="html")
         logger.info(f"User {user.username} {chat_id} "
                     f"has added shop {shop_api_key=}")
-        return await display_add_shop(update, context)
+        return await user_menu.display_user_menu(update, context)
     else:
         await update.message.reply_text(
             texts.WRONG_API_KEY,
