@@ -81,7 +81,6 @@ class ShopService:
             vendor_name=shop.vendor_name,
             is_active=shop.is_active,
             update_prices=shop.update_prices,
-            individual_updating_time=shop.individual_updating_time,
         )
         return shop_info
 

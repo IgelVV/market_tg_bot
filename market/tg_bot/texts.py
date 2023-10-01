@@ -95,7 +95,6 @@ DISPLAY_SHOP_INFO = """
   <code>{vendor_name}</code>
 Активен: {is_active}
 Обновлять цены: {update_prices}
-Индивидуальное время обновления: {individual_updating_time}
 """
 
 ACTIVATE_SHOP = "Магазин: <code>{name}</code>\nАктивен: {is_active}"

@@ -71,8 +71,6 @@ async def display_shop_info(update: Update,
         vendor_name=new_shop_info.vendor_name,
         is_active=utils.readable_flag(new_shop_info.is_active),
         update_prices=utils.readable_flag(new_shop_info.update_prices),
-        individual_updating_time=utils.readable_flag(
-            new_shop_info.individual_updating_time),
     )
     logger.info(f"User {user.username} {chat_id=} is opening "
                 f"`shop_info of shop {new_shop_info}")
