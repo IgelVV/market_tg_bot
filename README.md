@@ -166,6 +166,14 @@ CallbackQueryHandler(invalid_button.handle_invalid_button,
 создаваться свой `Продавец`), или он может передать ключ своему помощнику.
 Причем у одного Продавца может быть доступ к нескольким магазинам, а у 
 помощника, только к части, в зависимости от количества известных ему api_keys.
-## 
+## Deploy 
+
+```bash
+docker run --rm --name tg_app -v ./market/database:/app/database -d -e "DJANGO_DEBUG=1" tg_market python manage.py run_tg_bot
+```
+
+```bash
+docker run --rm --name tg_django -p 8000:8000 -d -e "DJANGO_DEBUG=1" tg_market python manage.py runserver 0.0.0.0:8000
+```
 ##
 ##
