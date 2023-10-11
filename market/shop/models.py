@@ -14,7 +14,6 @@ class Shop(models.Model):
     vendor_name = models.CharField(max_length=1024)
     is_active = models.BooleanField(default=True)
     update_prices = models.BooleanField(default=False)
-    individual_updating_time = models.BooleanField(default=False)
 
 
 class Storage(models.Model):

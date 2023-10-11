@@ -6,6 +6,7 @@ It allows interacting with telegram context, and other services.
 
 import logging
 from typing import Optional
+from enum import Enum, auto
 
 from telegram.ext import (
     ContextTypes,
@@ -18,11 +19,19 @@ from shop.models import Shop
 from tg_bot.services.telegram_user_service import TelegramUserService
 from tg_bot.services.user_services import UserService
 from tg_bot.models import TelegramUser
-from tg_bot.dataclasses import ShopInfo
+from tg_bot.data_classes import ShopInfo
 
 UserModel = get_user_model()
 
 logger = logging.getLogger(__name__)
+
+
+class ExpectedInput(Enum):
+    """States for text message dispatcher."""
+    USERNAME = auto()
+    PASSWORD = auto()
+    API_KEY_TO_LOGIN = auto()
+    API_KEY_TO_ADD = auto()
 
 
 class ChatService:
@@ -42,13 +51,16 @@ class ChatService:
     AUTH_KEY = "authenticated"
     ROLE_KEY = "role"
     SHOP_INFO_KEY = "shop_info"
+    SHOP_INFO_TO_UNLINK_KEY = "shop_to_unlink"
     ADMIN_USERNAME_KEY = "admin_username"
+    EXPECTED_INPUT_KEY = "expected_input"
 
     def __init__(self, chat_id: int, context: ContextTypes.DEFAULT_TYPE):
         self.context = context
         self.chat_id = chat_id
 
     async def get_role(self):
+        """Get role from chat_data or from db."""
         cached_role = self.context.chat_data.get(self.ROLE_KEY)
         if cached_role:
             return cached_role
@@ -80,13 +92,26 @@ class ChatService:
     def set_shop_info(self, shop: ShopInfo):
         self.context.chat_data[self.SHOP_INFO_KEY] = shop
 
+    def get_shop_info_to_unlink(self) -> ShopInfo:
+        return self.context.chat_data.get(self.SHOP_INFO_TO_UNLINK_KEY)
+
+    def set_shop_info_to_unlink(self, shop: ShopInfo):
+        self.context.chat_data[self.SHOP_INFO_TO_UNLINK_KEY] = shop
+
     def get_admin_username(self):
         return self.context.chat_data.get(self.ADMIN_USERNAME_KEY)
 
     def set_admin_username(self, username):
         self.context.chat_data[self.ADMIN_USERNAME_KEY] = username
 
+    def get_expected_input(self):
+        return self.context.chat_data.get(self.EXPECTED_INPUT_KEY)
+
+    def set_expected_input(self, input_type: Optional[ExpectedInput]):
+        self.context.chat_data[self.EXPECTED_INPUT_KEY] = input_type
+
     async def get_shops(self) -> QuerySet[Shop]:
+        """Get available Shops depending on TgUser.role."""
         role = await self.get_role()
         if role == self.SELLER_ROLE:
             shops = await TelegramUserService().get_related_shops_by_chat_id(
@@ -99,9 +124,11 @@ class ChatService:
 
     async def get_statuses(self) -> tuple:
         """
+        Get all TgUser statuses at once.
 
-        :return: is_logged_out: Optional[bool],
-         is_banned: Optional[bool], is_activate: Optional[bool].
+        If user does not exist return None in every status.
+        :return: is_banned: Optional[bool], is_activate: Optional[bool],
+        is_logged_out: Optional[bool].
         """
         tg_user_service = TelegramUserService()
         tg_user = await tg_user_service.get_by_chat_id(self.chat_id)
@@ -121,7 +148,15 @@ class ChatService:
             self,
             username: str,
             password: str,
-    ):
+    ) -> bool:
+        """
+        Check if User with the credentials exists
+        and in telegram admin group.
+
+        :param username: Username of User
+        :param password: Password of User
+        :return: True if authenticated.
+        """
         user = await UserService() \
             .authenticate_telegram_admin(username, password)
         return user is not None
@@ -134,7 +169,7 @@ class ChatService:
     ):
         """Create or update TelegramUser record."""
         logger.debug(f"Admin has logged in: {self.chat_id=}, {first_name=},"
-                    f" {last_name=}, {tg_username=},")
+                     f" {last_name=}, {tg_username=},")
         first_name = first_name if first_name is not None else ""
         last_name = last_name if last_name is not None else ""
         tg_username = tg_username if tg_username is not None else ""

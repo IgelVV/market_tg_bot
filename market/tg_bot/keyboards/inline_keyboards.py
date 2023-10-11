@@ -8,7 +8,7 @@ from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 from django.conf import settings
 from django.db.models import QuerySet
 
-from tg_bot.dataclasses import ShopInfo, Navigation
+from tg_bot.data_classes import ShopInfo, Navigation
 from tg_bot import utils
 from shop.services import ShopService
 from shop.models import Shop
@@ -19,15 +19,24 @@ logger = logging.getLogger(__name__)
 LIST_LIMIT = settings.TG_BOT_LIST_LIMIT
 
 # Callback data:
-ADMIN = "admin"
-SELLER = "seller"
+ADMIN_LOGIN = "admin"
+SELLER_LOGIN = "seller"
+
+BACK_TO_CHOOSE_ROLE = "back_to_choose_role"
 
 YES = "yes"
 NO = "no"
 
+USER_MENU = "user_menu"
+
 BACK = "back"
 
 CANCEL = "cancel"
+
+HELP = "help"
+
+SUBSCRIPTION = "subscription"
+PAY = "pay"
 
 SHOP_LIST = "shop_list"
 
@@ -47,8 +56,18 @@ SWITCH_PRICE_UPDATING = "switch_price_updating"
 def build_role_keyboard():
     keyboard = [
         [
-            InlineKeyboardButton("Админ", callback_data=ADMIN),
-            InlineKeyboardButton("Продавец", callback_data=SELLER),
+            InlineKeyboardButton("Админ", callback_data=ADMIN_LOGIN),
+            InlineKeyboardButton("Продавец", callback_data=SELLER_LOGIN),
+        ],
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def build_wrong_credentials():
+    keyboard = [
+        [
+            InlineKeyboardButton("Ввести username", callback_data=ADMIN_LOGIN),
+            InlineKeyboardButton("Отмена", callback_data=CANCEL),
         ],
     ]
     return InlineKeyboardMarkup(keyboard)
@@ -73,21 +92,18 @@ def build_cancel():
     return InlineKeyboardMarkup(keyboard)
 
 
+def build_base_menu():
+    keyboard = _build_base_menu_buttons()
+    return InlineKeyboardMarkup(keyboard)
+
+
 def build_admin_menu():
-    keyboard = [
-        [
-            InlineKeyboardButton("📋 Список магазинов 📋", callback_data=SHOP_LIST),
-        ]
-    ]
+    keyboard = _build_admin_menu_buttons()
     return InlineKeyboardMarkup(keyboard)
 
 
 def build_seller_menu():
-    keyboard = [
-        [InlineKeyboardButton("➕ Добавить магазин ➕", callback_data=ADD_SHOP)],
-        [InlineKeyboardButton("➖ Отвязать магазин ➖", callback_data=UNLINK_SHOP)],
-        [InlineKeyboardButton("📋 Список магазинов 📋", callback_data=SHOP_LIST)],
-    ]
+    keyboard = _build_seller_menu_buttons()
     return InlineKeyboardMarkup(keyboard)
 
 
@@ -97,14 +113,16 @@ async def build_shop_list(
         offset: int = 0,
         with_back: bool = True,
 ):
-    # """
-    # Build keyboard, that contains shop list.
-    #
-    # It uses pagination.
-    # :param limit: maximum items per page.
-    # :param offset: index of start item.
-    # :return: keyboard with navigation buttons.
-    # """
+    """
+    Build keyboard, that contains shop list.
+
+    It uses pagination.
+    :param qs: QuerySet of Shops, that need to be paginated.
+    :param limit: maximum items per page.
+    :param offset: index of start item.
+    :param with_back: whether display back button.
+    :return: keyboard with navigation buttons.
+    """
     shop_service = ShopService()
     shops: list[ShopInfo] = await shop_service.paginate_shops_for_buttons(
         qs=qs,
@@ -146,8 +164,17 @@ def build_shop_menu(with_back: bool = False):
     return InlineKeyboardMarkup(keyboard)
 
 
-def build_back():
-    back_button = _build_back_button()
+def build_subscription_menu():
+    keyboard = [
+        [InlineKeyboardButton(
+            "💸 Оплатить подписку 💸", callback_data=PAY)],
+        _build_back_button(),
+    ]
+    return InlineKeyboardMarkup(keyboard)
+
+
+def build_back(back_data=BACK):
+    back_button = _build_back_button(back_data)
     keyboard = [back_button]
     return InlineKeyboardMarkup(keyboard)
 
@@ -210,9 +237,42 @@ def _build_navigation_buttons(
     return buttons
 
 
-def _build_back_button():
+def _build_back_button(back_data=BACK):
     """Creates `back` button to adding to keyboards as a line."""
-    # button = [InlineKeyboardButton("\U0001F868", callback_data=BACK)]
-    # ↤ ⟵ ← ⇐ ↵ ⤶
-    button = [InlineKeyboardButton("⟵", callback_data=BACK)]
+    # Options: ↤ ⟵ ← ⇐ ↵ ⤶
+    button = [InlineKeyboardButton("⟵", callback_data=back_data)]
     return button
+
+
+def _build_base_menu_buttons():
+    buttons = [
+        [
+            InlineKeyboardButton("❔ Помощь ❔", callback_data=HELP),
+            InlineKeyboardButton("⚡️ Подписка ⚡️", callback_data=SUBSCRIPTION),
+        ],
+    ]
+    return buttons
+
+
+def _build_admin_menu_buttons():
+    buttons = _build_base_menu_buttons()
+    buttons.append(
+        [InlineKeyboardButton("📋 Список магазинов 📋",
+                              callback_data=SHOP_LIST)],
+    )
+    return buttons
+
+
+def _build_seller_menu_buttons():
+    buttons = _build_base_menu_buttons()
+    buttons.extend(
+        [
+            [InlineKeyboardButton("➕ Добавить магазин ➕",
+                                  callback_data=ADD_SHOP)],
+            [InlineKeyboardButton("➖ Отвязать магазин ➖",
+                                  callback_data=UNLINK_SHOP)],
+            [InlineKeyboardButton("📋 Список магазинов 📋",
+                                  callback_data=SHOP_LIST)],
+        ]
+    )
+    return buttons

@@ -6,7 +6,7 @@ from django.conf import settings
 from django.db.models import QuerySet
 
 from shop.models import Shop
-from tg_bot.dataclasses import ShopInfo
+from tg_bot.data_classes import ShopInfo
 
 logger = logging.getLogger(__name__)
 
@@ -16,17 +16,22 @@ LIST_LIMIT = settings.TG_BOT_LIST_LIMIT
 class ShopService:
     """Services related to Shop model that are used in the bot."""
 
-    async def count_shops(self):
-        """Count all shops."""
-        # todo cache
-        return await Shop.objects.acount()
-
     async def paginate_shops_for_buttons(
             self,
             qs: QuerySet[Shop],
             limit: int = LIST_LIMIT,
             offset: int = 0,
-    ):
+    ) -> list[ShopInfo]:
+        """
+        Prepare `page` of ShopInfo for displaying (e.g. as a keyboard).
+
+        :param qs: QuerySet of Shops
+        :param limit: limit
+        :param offset: offset
+        :return: list of ShopInfo obj. that represents a part of passed
+            QuerySet. ShopInfo obj. contains only important fields for
+            pagination (id, name, is_active).
+        """
         if (limit < 0) or (offset < 0):
             raise AttributeError(
                 f"Limit or offset less than 0: {limit=}; {offset=}")
@@ -45,28 +50,29 @@ class ShopService:
         return result
 
     async def get_shop_info_by_id(self, shop_id: int) -> ShopInfo:
-        # """
-        # Get full information about Shop object.
-        #
-        # :param shop_api_key: api_key, used as identifier
-        # :return: data object ShopInfo
-        # """
+        """
+        Get full information about Shop object.
+
+        :param shop_id: Shop.pk.
+        :return: data object ShopInfo.
+        """
         shop = await Shop.objects.aget(id=shop_id)
         logger.debug(f"get_shop_info {shop.pk}")
         return self._to_shop_info(shop)
 
     async def get_shop_info_by_api_key(self, api_key: str) -> ShopInfo:
-        # """
-        # Get full information about Shop object.
-        #
-        # :param shop_api_key: api_key, used as identifier
-        # :return: data object ShopInfo
-        # """
+        """
+        Get full information about Shop object.
+
+        :param api_key: api_key, used as identifier
+        :return: data object ShopInfo
+        """
         shop = await Shop.objects.aget(api_key=api_key)
         logger.debug(f"get_shop_info {shop.pk=}")
         return self._to_shop_info(shop)
 
     def _to_shop_info(self, shop: Shop) -> ShopInfo:
+        """Convert Shop obj. to ShopInfo."""
         shop_info = ShopInfo(
             id=shop.pk,
             name=shop.name,
@@ -75,22 +81,12 @@ class ShopService:
             vendor_name=shop.vendor_name,
             is_active=shop.is_active,
             update_prices=shop.update_prices,
-            individual_updating_time=shop.individual_updating_time,
         )
         return shop_info
 
-    async def check_shop_api_key(self, shop_api_key: str):
-        """
-        Check if shop with passed api_key exists.
-
-        :param shop_api_key: api_key.
-        :return: bool
-        """
-        return await Shop.objects.filter(api_key=shop_api_key).aexists()
-
     async def get_shop_by_api_key(self, shop_api_key: str) -> Optional[Shop]:
         """
-        Get shop by api_key.
+        Async get Shop by api_key.
 
         If shop does not exist returns None
         :param shop_api_key: api_key.
@@ -103,6 +99,13 @@ class ShopService:
             logger.debug(f"Shop with {shop_api_key=} DoesNotExist")
 
     async def get_shop_by_id(self, shop_id) -> Optional[Shop]:
+        """
+        Async get Shop by id.
+
+        If shop does not exist returns None.
+        :param shop_id: Shop.pk.
+        :return: Shop object or None.
+        """
         try:
             shop = await Shop.objects.aget(id=shop_id)
             return shop
