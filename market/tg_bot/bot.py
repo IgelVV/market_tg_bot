@@ -1,5 +1,4 @@
 """Main bot module."""
-import asyncio
 import json
 import logging.config
 from warnings import filterwarnings
@@ -11,6 +10,8 @@ from django.conf import settings
 
 from tg_bot import set_up, customisation
 from tg_bot.run import run_polling
+from rabbit import broker, callbacks
+
 
 # to ignore CallbackQueryHandler warnings
 # filterwarnings(
@@ -26,6 +27,8 @@ logger = logging.getLogger(__name__)
 
 TOKEN = settings.TG_BOT_TOKEN
 AUTO_CUSTOMISATION = settings.TG_AUTO_CUSTOMISATION
+
+QUEUE = "shop"
 
 
 def run():
@@ -52,15 +55,11 @@ def run():
 
     # application.run_polling(allowed_updates=Update.ALL_TYPES)
 
-    async def consume():
-        count = 0
-        while True:
-            count += 1
-            print(f"{count=}")
-            await asyncio.sleep(1)
+    rmq_broker = broker.Broker()
 
     run_polling(application,
-                side_coroutines=[consume()],
+                side_coroutines=[
+                    rmq_broker.consume_queue(callbacks.on_message, QUEUE)],
                 allowed_updates=Update.ALL_TYPES)
 
 
