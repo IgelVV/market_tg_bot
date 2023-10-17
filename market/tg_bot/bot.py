@@ -1,4 +1,5 @@
 """Main bot module."""
+import asyncio
 import json
 import logging.config
 from warnings import filterwarnings
@@ -36,6 +37,8 @@ from tg_bot.handlers import (
 from tg_bot.conversation_states import States
 from tg_bot.keyboards import inline_keyboards as il_keyboards
 from tg_bot.data_classes import ShopInfo, Navigation
+
+from tg_bot.run import run_polling
 
 # to ignore CallbackQueryHandler warnings
 # filterwarnings(
@@ -195,9 +198,19 @@ def run():
         customisation.set_bot_description(bot=application.bot)
         customisation.set_bot_short_description(bot=application.bot)
 
-    application.run_polling(allowed_updates=Update.ALL_TYPES)
+    # application.run_polling(allowed_updates=Update.ALL_TYPES)
+
+    async def consume():
+        count = 0
+        while True:
+            count += 1
+            print(f"{count=}")
+            await asyncio.sleep(1)
+
+    run_polling(application,
+                side_coroutines=[consume()],
+                allowed_updates=Update.ALL_TYPES)
 
 
 if __name__ == '__main__':
     run()
-
