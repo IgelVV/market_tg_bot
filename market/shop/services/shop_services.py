@@ -67,7 +67,7 @@ class ShopService:
         :param api_key: api_key, used as identifier
         :return: data object ShopInfo
         """
-        shop = await Shop.objects.aget(api_key=api_key)
+        shop = await Shop.objects.aget(ozon_api_key=api_key)
         logger.debug(f"get_shop_info {shop.pk=}")
         return self._to_shop_info(shop)
 
@@ -77,10 +77,10 @@ class ShopService:
             id=shop.pk,
             name=shop.name,
             slug=shop.slug,
-            api_key=shop.api_key,
+            api_key=shop.ozon_api_key,
             vendor_name=shop.vendor_name,
             is_active=shop.is_active,
-            update_prices=shop.update_prices,
+            update_prices=shop.price_updating,
         )
         return shop_info
 
@@ -93,7 +93,7 @@ class ShopService:
         :return: Shop object or None.
         """
         try:
-            shop = await Shop.objects.aget(api_key=shop_api_key)
+            shop = await Shop.objects.aget(ozon_api_key=shop_api_key)
             return shop
         except Shop.DoesNotExist:
             logger.debug(f"Shop with {shop_api_key=} DoesNotExist")
