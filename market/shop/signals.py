@@ -18,6 +18,7 @@ def create_or_update_shop(sender, instance, created, **kwargs):
     """
     Signal triggered when the Shop object is created or updated
     """
+    # todo add flag to settings `disable_signals` and write decorator.
     logger.info("Shop post save signal")
 
     data = serializers.serialize("json", [instance])
