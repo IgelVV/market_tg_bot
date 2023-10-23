@@ -88,7 +88,6 @@ def run_polling(
                         side_tasks.append(tg.create_task(coro))
 
         # main proces
-        # loop.run_until_complete(application.start())
         loop.run_until_complete(gather_main_coro(side_coroutines))
 
         loop.run_forever()

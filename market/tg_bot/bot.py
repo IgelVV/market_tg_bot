@@ -51,8 +51,6 @@ def run():
         customisation.set_bot_description(bot=application.bot)
         customisation.set_bot_short_description(bot=application.bot)
 
-    # application.run_polling(allowed_updates=Update.ALL_TYPES)
-
     rmq_consumer_coro = broker.Broker().consume_queue(
         callbacks.on_message_shop,
         broker.OZON_SHOP_EXCHANGE,
