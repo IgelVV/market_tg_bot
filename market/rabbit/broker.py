@@ -3,7 +3,7 @@ import asyncio
 
 from django.conf import settings
 
-from aio_pika import DeliveryMode, ExchangeType, Message, connect_robust
+from aio_pika import ExchangeType, Message, connect_robust
 
 logger = logging.getLogger(__name__)
 
@@ -12,8 +12,13 @@ RMQ_PORT = settings.RMQ_PORT
 RMQ_LOGIN = settings.RMQ_LOGIN
 RMQ_PASSWORD = settings.RMQ_PASSWORD
 
-SHOP_EXCHANGE = "shop"
-SHOP_ROUTING_KEY = "shop"
+OZON_SHOP_EXCHANGE = "ozon_shop"
+OZON_SHOP_ROUTING_KEY = "ozon_shop"
+
+BOT_SHOP_EXCHANGE = "bot_shop"
+BOT_SHOP_ROUTING_KEY = "bot_shop"
+
+OPERATION_KEY = "operation"
 
 CREATE_OPERATION = "create"
 UPDATE_OPERATION = "update"
@@ -23,19 +28,18 @@ DELETE_OPERATION = "delete"
 class Broker:
     connection = None
 
-    @classmethod
-    async def connect_to_broker(cls):
+    async def connect_to_broker(self):
         """"""
         retries = 0
-        while not cls.connection:
+        while not self.connection:
             logger.info(f"Trying to create connection to broker: {RMQ_HOST}")
             try:
-                cls.connection = await connect_robust(host=RMQ_HOST,
-                                                      port=RMQ_PORT,
-                                                      login=RMQ_LOGIN,
-                                                      password=RMQ_PASSWORD,)
-                logger.info(f"Connected to broker ({type(cls.connection)} "
-                            f"ID {id(cls.connection)})")
+                self.connection = await connect_robust(host=RMQ_HOST,
+                                                       port=RMQ_PORT,
+                                                       login=RMQ_LOGIN,
+                                                       password=RMQ_PASSWORD, )
+                logger.info(f"Connected to broker ({type(self.connection)} "
+                            f"ID {id(self.connection)})")
             except Exception as e:
                 retries += 1
                 logger.warning(
@@ -43,7 +47,7 @@ class Broker:
                     f"({e.__class__.__name__}:{e}). Will retry in 5 seconds...")
                 await asyncio.sleep(5)
 
-        return cls.connection
+        return self.connection
 
     async def send(self,
                    exchange_name: str,
