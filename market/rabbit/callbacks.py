@@ -1,5 +1,4 @@
 import logging
-import asyncio
 
 from aio_pika.abc import AbstractIncomingMessage
 from rabbit import broker
@@ -20,7 +19,7 @@ async def on_message_shop(message: AbstractIncomingMessage) -> None:
     logger.info(" [x] Received message %r" % message)
     logger.info("Message body is: %r" % message.body)
 
-    operation = message.headers.get("operation", None)
+    operation = message.headers.get(broker.OPERATION_KEY, None)
     match operation:
         case broker.UPDATE_OPERATION:
             for deserialized_shop in serializers.deserialize(
@@ -38,14 +37,18 @@ async def on_message_shop(message: AbstractIncomingMessage) -> None:
             for deserialized_shop in serializers.deserialize(
                     'json', message.body):
                 received_shop_obj: Shop = deserialized_shop.object
-                await received_shop_obj.asave()
+                local_shop_obj = await ShopService() \
+                    .get_shop_by_id(received_shop_obj.pk)
+                if local_shop_obj is None:
+                    await received_shop_obj.asave()
                 break
 
         case broker.DELETE_OPERATION:
             id_to_delete = int(message.body.decode())
             local_shop_obj = await ShopService() \
                 .get_shop_by_id(id_to_delete)
-            await local_shop_obj.adelete()
+            if local_shop_obj is not None:
+                await local_shop_obj.adelete()
 
         case _:
             assert False, f"{operation=} does not match any known operation."
