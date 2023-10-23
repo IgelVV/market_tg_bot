@@ -28,8 +28,6 @@ logger = logging.getLogger(__name__)
 TOKEN = settings.TG_BOT_TOKEN
 AUTO_CUSTOMISATION = settings.TG_AUTO_CUSTOMISATION
 
-QUEUE = "shop"
-
 
 def run():
     """
@@ -55,11 +53,11 @@ def run():
 
     # application.run_polling(allowed_updates=Update.ALL_TYPES)
 
-    rmq_broker = broker.Broker()
+    rmq_consumer_coro = broker.Broker().consume_queue(
+        callbacks.on_message_shop, "shop", "shop")
 
     run_polling(application,
-                side_coroutines=[
-                    rmq_broker.consume_queue(callbacks.on_message, QUEUE)],
+                side_coroutines=[rmq_consumer_coro],
                 allowed_updates=Update.ALL_TYPES)
 
 

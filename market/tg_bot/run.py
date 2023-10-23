@@ -81,11 +81,11 @@ def run_polling(
 
         async def gather_main_coro(side_coro: Optional[Iterable[Coroutine]]):
             async with asyncio.TaskGroup() as tg:
-                tg.create_task(application.start())
+                task1 = tg.create_task(application.start())
+                side_tasks = []
                 if side_coro:
                     for coro in side_coro:
-                        print(side_coro)
-                        tg.create_task(coro)
+                        side_tasks.append(tg.create_task(coro))
 
         # main proces
         # loop.run_until_complete(application.start())
