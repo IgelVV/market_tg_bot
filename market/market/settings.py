@@ -80,10 +80,13 @@ WSGI_APPLICATION = 'market.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+DATABASE_DIR = BASE_DIR / "database"
+DATABASE_DIR.mkdir(exist_ok=True)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': DATABASE_DIR / 'db.sqlite3',
     }
 }
 
@@ -133,9 +136,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Telegram bot Settings
 
 TG_BOT_TOKEN = getenv('TG_BOT_TOKEN')
-TG_BOT_LIST_LIMIT = getenv('TG_BOT_LIST_LIMIT', 5)
+TG_BOT_LIST_LIMIT = int(getenv('TG_BOT_LIST_LIMIT', "5"))
 TG_REPORT_CHAT_ID = getenv('TG_REPORT_CHAT_ID', None)
 TG_HELP_ADMIN_USERNAME = getenv("TG_HELP_ADMIN_USERNAME")
-TG_AUTO_CUSTOMISATION = getenv('TG_AUTO_CUSTOMISATION', True)
+TG_AUTO_CUSTOMISATION = getenv('TG_AUTO_CUSTOMISATION', "1") == "1"
 
 TG_PAYMENT_PROVIDER_TOKEN = getenv('TG_PAYMENT_PROVIDER_TOKEN')
+
+# RabbitMQ
+RMQ_HOST = getenv("RMQ_HOST", "rabbitmq")
+RMQ_PORT = getenv("RMQ_PORT", 5672)
+RMQ_LOGIN = getenv("RMQ_LOGIN", "guest")
+RMQ_PASSWORD = getenv("RMQ_PASSWORD", "guest")
+
+# Signals
+ENABLE_SIGNALS_TO_SYNCHRONISE_DB = getenv("ENABLE_SIGNALS_TO_SYNCHRONISE_DB", "1") == "1"
